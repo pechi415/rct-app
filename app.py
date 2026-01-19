@@ -25,10 +25,9 @@ def get_db_connection():
 
     if database_url:
         # Render / PostgreSQL
-        return psycopg2.connect(
-            database_url,
-            cursor_factory=RealDictCursor
-        )
+        conn = psycopg2.connect(database_url, cursor_factory=RealDictCursor)
+        conn.autocommit = True  # <-- CLAVE
+        return conn
     else:
         # Local / SQLite
         conn = sqlite3.connect(DB_PATH)
@@ -1027,6 +1026,8 @@ def init_db():
                 )
             """)
 
+            conn.commit()
+
 
 
 # ---------------------------------------------------------
@@ -1588,6 +1589,40 @@ def reabrir_reporte(reporte_id):
 # =========================================================
 # Bloque 6: Gestión + Buses + Varados (CRUD)
 # =========================================================
+
+@app.route("/__dbcheck")
+def __dbcheck():
+    conn = get_db_connection()
+    cur = conn.cursor()
+    try:
+        # 1) Identidad de la DB
+        cur.execute("SELECT current_database() AS db, current_user AS usr;")
+        ident = cur.fetchone()
+
+        # 2) Qué tablas existen en public
+        cur.execute("""
+            SELECT table_name
+            FROM information_schema.tables
+            WHERE table_schema = 'public'
+            ORDER BY table_name;
+        """)
+        tablas = [r["table_name"] if isinstance(r, dict) else r[0] for r in cur.fetchall()]
+
+        # 3) ¿Existe reportes?
+        existe_reportes = "reportes" in tablas
+
+        return {
+            "database": ident,
+            "tables_public": tablas,
+            "reportes_exists": existe_reportes,
+        }
+    finally:
+        try:
+            cur.close()
+        except Exception:
+            pass
+        conn.close()
+
 
 # ---------------------------------------------------------
 # [RUTA] GESTIÓN
