@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+{% block title %}Reporte #{{ r.id }}{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h2 class="mb-1">Reporte #{{ r.id }}</h2>
+    <div class="text-muted">
+      {{ r.fecha }} · Turno {{ r.turno }} · <strong>{{ r.estado }}</strong>
+    </div>
+  </div>
+
+  <div class="d-flex gap-2">
+    <a class="btn btn-secondary btn-sm" href="/reportes">🏠 Inicio</a>
+  </div>
+</div>
+
+<div class="row g-3">
+
+  <!-- Secciones principales -->
+  <div class="col-12 col-md-6 col-lg-4">
+    <a class="card card-seccion h-100 text-decoration-none" href="/reportes/{{ r.id }}/gestion">
+      <div class="card-body">
+        <div class="card-title h5 mb-1">Gestión</div>
+        <div class="text-muted">Gestión de áreas</div>
+      </div>
+    </a>
+  </div>
+
+  <div class="col-12 col-md-6 col-lg-4">
+    <a class="card card-seccion h-100 text-decoration-none" href="/reportes/{{ r.id }}/buses">
+      <div class="card-body">
+        <div class="card-title h5 mb-1">Buses</div>
+        <div class="text-muted">Llegadas a bahías</div>
+      </div>
+    </a>
+  </div>
+
+  <div class="col-12 col-md-6 col-lg-4">
+    <a class="card card-seccion h-100 text-decoration-none" href="/reportes/{{ r.id }}/varados">
+      <div class="card-body">
+        <div class="card-title h5 mb-1">Equipos</div>
+        <div class="text-muted">Varados en campo</div>
+      </div>
+    </a>
+  </div>
+
+  <div class="col-12 col-md-6 col-lg-4">
+    <a class="card card-seccion h-100 text-decoration-none" href="/reportes/{{ r.id }}/ausentismo">
+      <div class="card-body">
+        <div class="card-title h5 mb-1">Ausentismo</div>
+        <div class="text-muted">Nombre · Motivo</div>
+      </div>
+    </a>
+  </div>
+
+  <div class="col-12 col-md-6 col-lg-4">
+    <a class="card card-seccion h-100 text-decoration-none" href="/reportes/{{ r.id }}/bombas">
+      <div class="card-body">
+        <div class="card-title h5 mb-1">Bombas</div>
+        <div class="text-muted">Número · Estado · Ubicación</div>
+      </div>
+    </a>
+  </div>
+
+  <div class="col-12 col-md-6 col-lg-4">
+    <a class="card card-seccion h-100 text-decoration-none" href="/reportes/{{ r.id }}/dist_camiones">
+      <div class="card-body">
+        <div class="card-title h5 mb-1">Distribución de Camiones</div>
+        <div class="text-muted">Operativos · Down · Stand By · Carbón · Total</div>
+      </div>
+    </a>
+  </div>
+
+  <div class="col-12 col-md-6 col-lg-4">
+    <a class="card card-seccion h-100 text-decoration-none" href="/reportes/{{ r.id }}/equipo_liviano">
+      <div class="card-body">
+        <div class="card-title h5 mb-1">Equipo Liviano (Camionetas)</div>
+        <div class="text-muted">Camionetas · Estado · Comentario</div>
+      </div>
+    </a>
+  </div>
+
+  <div class="col-12 col-md-6 col-lg-4">
+    <a class="card card-seccion h-100 text-decoration-none" href="/reportes/{{ r.id }}/personal">
+      <div class="card-body">
+        <div class="card-title h5 mb-1">Distribución del personal</div>
+        <div class="text-muted">Roster · Ausentes · Vacaciones...</div>
+      </div>
+    </a>
+  </div>
+
+  <div class="col-12 col-md-6 col-lg-4">
+    <a class="card card-seccion h-100 text-decoration-none" href="/reportes/{{ r.id }}/otras_areas">
+      <div class="card-body">
+        <div class="card-title h5 mb-1">Operadores prestados a otras áreas</div>
+        <div class="text-muted">Crabon · Botaderos · Palas · Entrenamiento...</div>
+      </div>
+    </a>
+  </div>
+
+  <div class="col-12 col-md-6 col-lg-4">
+    <a class="card card-seccion h-100 text-decoration-none" href="/reportes/{{ r.id }}/entrenamiento">
+      <div class="card-body">
+        <div class="card-title h5 mb-1">Personal en entrenamiento</div>
+        <div class="text-muted">Regular · Brigada · Equipos · Especial</div>
+      </div>
+    </a>
+  </div>
+
+  <div class="col-12 col-md-6 col-lg-4">
+    <a class="card card-seccion h-100 text-decoration-none" href="/reportes/{{ r.id }}/luminarias">
+      <div class="card-body">
+        <div class="card-title h5 mb-1">Luminarias</div>
+        <div class="text-muted">Numero · Ubicación </div>
+      </div>
+    </a>
+  </div>  
+
+  <div class="col-12 col-md-6 col-lg-4">
+    <a class="card card-seccion h-100 text-decoration-none" href="/reportes/{{ r.id }}/contactos">
+      <div class="card-body">
+        <div class="card-title h5 mb-1">Contactos con Operadores</div>
+        <div class="text-muted">Tipo de contacto · Operador</div>
+      </div>
+    </a>
+  </div>
+
+  <div class="col-12 col-md-6 col-lg-4">
+    <a class="card card-seccion h-100 text-decoration-none" href="/reportes/{{ r.id }}/seguridad">
+      <div class="card-body">
+        <div class="card-title h5 mb-1">Seguridad</div>
+        <div class="text-muted">Observación · Charla de seguridad</div>
+      </div>
+    </a>
+  </div>
+
+  <div class="col-12 col-md-6 col-lg-4">
+    <a class="card card-seccion h-100 text-decoration-none" href="/reportes/{{ r.id }}/first_last">
+      <div class="card-body">
+        <div class="card-title h5 mb-1">First - Last</div>
+        <div class="text-muted">Arribo palas (Inicio/Final) · Cam x Operador (1ra hora)</div>
+      </div>
+    </a>
+  </div>
+
+  <div class="col-12 col-md-6 col-lg-4">
+    <a class="card card-seccion h-100 text-decoration-none" href="/reportes/{{ r.id }}/pts">
+      <div class="card-body">
+        <div class="card-title h5 mb-1">Divulgación de PTS</div>
+        <div class="text-muted">Procedimientos</div>
+      </div>
+    </a>
+  </div>
+
+  <div class="col-12 col-md-6 col-lg-4">
+    <a class="card card-seccion h-100 text-decoration-none" href="/reportes/{{ r.id }}/comentarios">
+      <div class="card-body">
+        <div class="card-title h5 mb-1">Comentarios del turno</div>
+        <div class="text-muted">Comentarios</div>
+      </div>
+    </a>
+  </div>
+
+  <div class="col-12 col-md-6 col-lg-4">
+    <a class="card card-seccion h-100 text-decoration-none" href="/reportes/{{ r.id }}/supervisores">
+      <div class="card-body">
+        <div class="card-title h5 mb-1">Supervisores de turno</div>
+        <div class="text-muted">G1 · G2 · G3</div>
+      </div>
+    </a>
+  </div>
+
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block title %}Editar varado{% endblock %}
+
+{% block content %}
+<div class="contenido-reporte">
+
+  <!-- =========================
+    HEADER: TÍTULO + NAV REPORTE
+  ========================= -->
+  <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+    <div>
+      <h1 class="mb-1">Editar equipo varado</h1>
+      <div class="text-muted">
+        Reporte #{{ r.id }} | {{ r.fecha }} | {{ r.turno }} | {{ r.mina }} | Estado: {{ r.estado }}
+      </div>
+    </div>
+
+    {% include "_nav_reporte.html" %}
+  </div>
+
+  <!-- =========================
+    MENSAJES
+  ========================= -->
+  {% if error %}
+    <div class="alert alert-danger">{{ error }}</div>
+  {% endif %}
+
+  {% if r.estado == "CERRADO" %}
+    <div class="alert alert-warning">
+      Este reporte está cerrado. No se puede editar.
+    </div>
+  {% endif %}
+
+  <!-- =========================
+    FORM: EDITAR REGISTRO
+  ========================= -->
+  <form method="POST" class="card card-body">
+    <div class="row g-2">
+
+      <div class="col-md-2">
+        <label class="form-label">Equipo</label>
+        <input type="number"
+               class="form-control"
+               name="equipo"
+               min="1"
+               step="1"
+               value="{{ it.equipo }}"
+               placeholder="Ej: 2714"
+               {% if r.estado == "CERRADO" %}disabled{% endif %}>
+      </div>
+
+      <div class="col-md-4">
+        <label class="form-label">Ubicación</label>
+        <input class="form-control"
+               name="ubicacion"
+               value="{{ it.ubicacion }}"
+               placeholder="Ej: Bahía 5 / Rampa 6B"
+               {% if r.estado == "CERRADO" %}disabled{% endif %}>
+      </div>
+
+      <div class="col-md-2">
+        <label class="form-label">Hora</label>
+        <!-- Hora libre: texto -->
+        <input class="form-control"
+               type="text"
+               name="hora"
+               value="{{ it.hora }}"
+               placeholder="Ej: 05:52"
+               {% if r.estado == "CERRADO" %}disabled{% endif %}>
+      </div>
+
+      <div class="col-md-4">
+        <label class="form-label">Motivo</label>
+        <input class="form-control"
+               name="motivo"
+               value="{{ it.motivo }}"
+               placeholder="Ej: Falla hidráulica"
+               {% if r.estado == "CERRADO" %}disabled{% endif %}>
+        <div class="form-text">Guía: Utilice el Formato de Hora militar (HH:MM) para registrar la Hora.</div>
+      </div>
+
+    </div>
+
+    <div class="mt-3 d-flex gap-2">
+      {% if r.estado != "CERRADO" %}
+        <button class="btn btn-primary" type="submit">💾 Guardar cambios</button>
+      {% else %}
+        <button class="btn btn-secondary" type="button" disabled>Reporte cerrado</button>
+      {% endif %}
+
+      <a class="btn btn-outline-secondary"
+         href="{{ url_for('equipos_varados', reporte_id=r.id) }}">
+        Cancelar
+      </a>
+    </div>
+  </form>
+
+</div>
+{% endblock %}

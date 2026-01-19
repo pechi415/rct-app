@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-4" style="max-width: 720px;">
+  <h3 class="mb-3">Editar usuario: {{ u.username }}</h3>
+
+  {% if error %}
+    <div class="alert alert-danger">{{ error }}</div>
+  {% endif %}
+  {% if ok %}
+    <div class="alert alert-success">{{ ok }}</div>
+  {% endif %}
+
+  <form method="post" class="card p-3">
+    <div class="row g-3">
+      <div class="col-md-6">
+        <label class="form-label">Rol</label>
+        <select class="form-select" name="rol" required>
+          {% for r in roles %}
+            <option value="{{ r }}" {% if r == u.rol %}selected{% endif %}>{{ r }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label">Activo</label>
+        <select class="form-select" name="is_active">
+          <option value="1" {% if u.is_active == 1 %}selected{% endif %}>Sí</option>
+          <option value="0" {% if u.is_active == 0 %}selected{% endif %}>No</option>
+        </select>
+      </div>
+    </div>
+
+    <hr class="my-3">
+
+    <div class="mb-3">
+      <label class="form-label">Reset contraseña (opcional)</label>
+      <input class="form-control" type="password" name="new_password" minlength="6" placeholder="Dejar vacío para no cambiar">
+      <div class="form-text">Si la escribes, se reemplaza la contraseña actual.</div>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Minas autorizadas</label>
+      <div class="d-flex gap-3 flex-wrap">
+        {% for code, label in minas %}
+          <label class="form-check">
+            <input class="form-check-input" type="checkbox" name="minas" value="{{ code }}"
+                   {% if code in user_minas_set %}checked{% endif %}>
+            <span class="form-check-label">{{ label }}</span>
+          </label>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="d-flex gap-2">
+      <button class="btn btn-primary" type="submit">Guardar</button>
+      <a class="btn btn-outline-secondary" href="{{ url_for('admin_usuarios') }}">Volver</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

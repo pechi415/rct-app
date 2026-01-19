@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}Editar supervisor{% endblock %}
+
+{% block content %}
+<div class="contenido-reporte">
+
+  <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+    <div>
+      <h2 class="mb-1">Editar supervisor del turno</h2>
+      <div class="text-muted">
+        Reporte #{{ r.id }} | {{ r.fecha }} | {{ r.turno }} | {{ r.mina }} | Estado: {{ r.estado }}
+      </div>
+    </div>
+    {% include "_nav_reporte.html" %}
+  </div>
+
+  {% if error %}
+    <div class="alert alert-danger">{{ error }}</div>
+  {% endif %}
+
+  <div class="card">
+    <div class="card-header fw-bold">Editar registro</div>
+    <div class="card-body">
+      <form method="POST">
+        <div class="row g-3 align-items-end">
+          <div class="col-md-3">
+            <label class="form-label">Grupo</label>
+            <select class="form-select" name="grupo" id="grupoEdit" required>
+              {% for g in grupos %}
+                <option value="{{ g }}" {% if it.grupo == g %}selected{% endif %}>{{ g }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="col-md-9">
+            <label class="form-label">Supervisor</label>
+            <select class="form-select" name="supervisor" id="supEdit" required></select>
+          </div>
+        </div>
+
+        <div class="d-flex gap-2 mt-3">
+          <button type="submit" class="btn btn-primary">💾 Guardar</button>
+          <a class="btn btn-outline-secondary" href="/reportes/{{ r.id }}/supervisores">Cancelar</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  const SUP_POR_GRUPO = {{ sup_por_grupo | tojson }};
+  const grupoEdit = document.getElementById("grupoEdit");
+  const supEdit = document.getElementById("supEdit");
+  const valorActual = {{ it.supervisor | tojson }};
+
+  function renderSup(grupo) {
+    supEdit.innerHTML = "";
+    (SUP_POR_GRUPO[grupo] || []).forEach(nombre => {
+      const opt = document.createElement("option");
+      opt.value = nombre;
+      opt.textContent = nombre;
+      if (nombre === valorActual) opt.selected = true;
+      supEdit.appendChild(opt);
+    });
+  }
+
+  grupoEdit.addEventListener("change", () => {
+    // al cambiar de grupo, resetear selección al primero
+    const g = grupoEdit.value;
+    renderSup(g);
+    if (supEdit.options.length > 0) supEdit.selectedIndex = 0;
+  });
+
+  // inicial
+  renderSup(grupoEdit.value);
+</script>
+
+{% endblock %}

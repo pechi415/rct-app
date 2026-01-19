@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+{% block title %}Distribución de Camiones{% endblock %}
+{% block content %}
+
+<!-- =========================
+     HEADER: TÍTULO + NAV REPORTE
+========================= -->
+<div class="d-flex justify-content-between align-items-center gap-3 mb-2">
+  <div>
+    <h1 class="mb-1">Distribución de Camiones</h1>
+    <div class="text-muted">
+      Reporte #{{ r.id }} | {{ r.fecha }} | {{ r.turno }} | {{r.mina}} | Estado: {{ r.estado }}
+    </div>
+  </div>
+
+  {% include "_nav_reporte.html" %}
+</div>
+
+<!-- =========================
+     MENSAJES / ALERTAS
+========================= -->
+{% if error %}
+  <div class="alert alert-danger">{{ error }}</div>
+{% endif %}
+
+{% if r.estado == "CERRADO" %}
+  <div class="alert alert-warning">
+    Este reporte está cerrado. No se puede editar.
+  </div>
+{% endif %}
+
+<!-- =========================
+     FORM: AGREGAR REGISTRO
+========================= -->
+<form method="post" class="card card-body mb-3">
+  <div class="row g-2 align-items-end">
+
+    <div class="col-md-6">
+      <label class="form-label">Tipo</label>
+      <select name="tipo" class="form-select" required {% if r.estado == "CERRADO" %}disabled{% endif %}>
+        <option value="">-- Seleccionar --</option>
+        {% for t in tipos %}
+          <option value="{{ t }}">{{ t }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">Cantidad</label>
+      <input name="cantidad"
+             type="number"
+             step="0.01"
+             class="form-control"
+             placeholder="Ej: 12.5"
+             required
+             {% if r.estado == "CERRADO" %}disabled{% endif %}>
+    </div>
+
+  </div>
+
+  {% if r.estado != "CERRADO" %}
+    <div class="mt-3">
+      <button class="btn btn-primary">✅ Agregar</button>
+    </div>
+  {% endif %}
+</form>
+
+<!-- =========================
+     LISTADO: REGISTROS + TOTAL
+========================= -->
+<div class="card mb-3">
+  <div class="card-header fw-bold d-flex justify-content-between align-items-center">
+    <span>Registros</span>
+    <span class="badge bg-secondary">Total: {{ total }}</span>
+  </div>
+
+  <div class="card-body">
+    {% if items|length == 0 %}
+      <div class="alert alert-warning mb-0">No hay registros todavía.</div>
+    {% else %}
+      <div class="table-responsive">
+        <table class="table table-striped mb-0">
+          <thead class="table-dark">
+            <tr>
+              <th>Tipo</th>
+              <th style="width: 140px;">Cantidad</th>
+              <th style="width: 240px;">Acciones</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {% for it in items %}
+              <tr>
+                <td>{{ it.tipo }}</td>
+                <td>{{ it.cantidad }}</td>
+
+                <!-- =========================
+                     ACCIONES (EDITAR/ELIMINAR) o "REPORTE CERRADO"
+                ========================= -->
+                <td class="col-accion">
+                  {% if r.estado == "CERRADO" %}
+                    <span class="reporte-cerrado">Reporte cerrado</span>
+                  {% else %}
+                    <div class="d-inline-flex gap-2 align-items-center flex-nowrap">
+                      <a class="btn btn-sm btn-outline-primary"
+                         href="/reportes/{{ r.id }}/dist_camiones/{{ it.id }}/editar">
+                        ✏️ Editar
+                      </a>
+
+                      <form method="post"
+                            action="/reportes/{{ r.id }}/dist_camiones/{{ it.id }}/eliminar"
+                            class="m-0 d-inline">
+                        <button class="btn btn-sm btn-outline-danger"
+                                onclick="return confirm('¿Eliminar este registro?');">
+                          🗑 Eliminar
+                        </button>
+                      </form>
+                    </div>
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+
+        </table>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+{% endblock %}

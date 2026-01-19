@@ -1,0 +1,523 @@
+/* =========================================================
+   [ROOT] Variables corporativas
+   Colores base del sistema
+========================================================= */
+:root{
+  --rojo-empresa: #e31937;
+  --negro-empresa: #231f20;
+  --blanco-empresa: #ffffff;
+
+  --gris-empresa: #9d9d9c;
+  --beis-empresa: #d5c1a9;
+}
+
+/* =========================================================
+   [BASE] Estilos globales
+   - Fondo general
+   - Bloqueo de scroll horizontal global
+========================================================= */
+html,
+body{
+  overflow-x: hidden;   /* evita scroll horizontal global */
+}
+
+body{
+  background-color: var(--beis-empresa);
+  color: var(--negro-empresa);
+}
+
+
+/* =========================================================
+   [TOPBAR] Encabezado principal
+   - Título
+   - Subtítulo
+   - Logo corporativo
+========================================================= */
+.topbar{
+  background: var(--rojo-empresa);
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  box-sizing: border-box;
+}
+
+/* Branding (texto) */
+.brand{
+  text-decoration: none;
+  color: var(--blanco-empresa);
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.brand-titulo{
+  font-weight: 800;
+  font-size: 26px;
+  line-height: 1.1;
+  letter-spacing: 0.3px;
+}
+
+.brand-subtitulo{
+  font-size: 14px;
+  opacity: .95;
+  line-height: 1.1;
+}
+
+/* Logo */
+.logo-navbar{
+  height: 52px;
+  width: auto;
+  flex: 0 0 auto;
+}
+
+/* Responsive */
+@media (max-width: 576px){
+  .brand-titulo{ font-size: 20px; }
+  .brand-subtitulo{ font-size: 12px; }
+  .logo-navbar{ height: 42px; }
+}
+
+
+/* =========================================================
+   [BOTONES] Estilo corporativo
+========================================================= */
+.btn-primary{
+  background-color: var(--rojo-empresa);
+  border-color: var(--rojo-empresa);
+}
+
+.btn-primary:hover{
+  background-color: #c61630;
+  border-color: #c61630;
+}
+
+/* Botón outline rojo */
+.btn-outline-primary{
+  color: var(--rojo-empresa);
+  border-color: var(--rojo-empresa);
+}
+
+.btn-outline-primary:hover{
+  background-color: var(--rojo-empresa);
+  color: var(--blanco-empresa);
+}
+
+/* Botón outline verde (acciones positivas) */
+.btn-outline-verde{
+  color: #198754;
+  border-color: #198754;
+  background: transparent;
+}
+
+.btn-outline-verde:hover{
+  color: #ffffff;
+  background: #198754;
+  border-color: #198754;
+}
+
+
+/* =========================================================
+   [TABLAS] Estilo corporativo
+========================================================= */
+
+/* Encabezado negro */
+.table-dark th{
+  background-color: var(--negro-empresa) !important;
+  color: var(--blanco-empresa);
+}
+
+/* Hover suave corporativo */
+.table tbody tr:hover{
+  background-color: rgba(227, 25, 55, 0.08);
+}
+
+/* Alineación vertical */
+.table th,
+.table td{
+  vertical-align: middle;
+}
+
+
+/* =========================================================
+   [REPORTES] Header
+   - Título
+   - Botones de acción a la derecha
+========================================================= */
+.header-reportes{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.acciones-header{
+  display: flex;
+  gap: 8px;
+  flex-wrap: nowrap;
+  align-items: center;
+}
+
+/* Responsive */
+@media (max-width: 576px){
+  .header-reportes{
+    flex-wrap: nowrap;
+  }
+
+  .header-reportes h2{
+    font-size: 18px;
+    white-space: nowrap;
+  }
+
+  .acciones-header .btn{
+    font-size: 13px;
+    padding: 6px 8px;
+    white-space: nowrap;
+  }
+}
+
+
+/* =========================================================
+   [REPORTES] Scroll horizontal SOLO en tabla
+========================================================= */
+
+/* Contenedor con scroll */
+.table-reportes-wrap{
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;          /* el scroll vive aquí */
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Tabla estable (no colapsa botones) */
+.table-reportes{
+  table-layout: fixed;
+  width: 100%;
+  min-width: 900px;          /* fuerza scroll en móvil */
+}
+
+/* Evitar rompimiento de layout */
+.table-reportes th,
+.table-reportes td{
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Anchos sugeridos por columna */
+.table-reportes .col-id{ width: 52px; }
+.table-reportes .col-fecha{ width: 110px; }
+.table-reportes .col-turno{ width: 80px; }
+.table-reportes .col-estado{ width: 95px; }
+.table-reportes .col-accion{ width: 260px; }
+.table-reportes .col-mina{ width: 140px; }
+
+
+/* =========================================================
+   [REPORTES] Acciones en línea
+   - Botones siempre visibles
+   - Nunca se apilan
+========================================================= */
+
+/* Contenedor de acciones */
+.acciones-reportes{
+  display: flex;
+  flex-wrap: nowrap;   /* nunca apilar */
+  gap: 8px;
+  align-items: center;
+}
+
+/* Botones sin salto de línea */
+.acciones-reportes .btn{
+  white-space: nowrap;
+}
+
+
+/* =========================================================
+   [GESTIÓN] Alineación y marco visual en móvil
+========================================================= */
+.gestion-wrap{
+  width: 100%;
+}
+
+/* Ajustes móviles: evitar márgenes raros y desbordes */
+@media (max-width: 576px){
+  .gestion-wrap{
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .gestion-wrap .card,
+  .gestion-wrap .alert,
+  .gestion-wrap .table-responsive{
+    width: 100%;
+  }
+}
+
+
+/* =========================================================
+   [TEXTO] Indicador de reporte cerrado
+========================================================= */
+.reporte-cerrado{
+  color: var(--gris-empresa);
+  font-size: 0.875rem;
+  font-style: italic;
+  white-space: nowrap;
+}
+
+/* =========================================================
+   [NAV] Navegación del reporte (modo inline)
+========================================================= */
+.nav-reporte-inline{
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+/* Desactiva comportamiento fixed cuando va en header */
+.nav-reporte-inline .nav-reporte-fixed{
+  position: static !important;
+  top: auto !important;
+  right: auto !important;
+  left: auto !important;
+
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+}
+
+/* Wrapper inline */
+.nav-reporte-wrap-inline{
+  width: auto;
+}
+
+/* Barra de navegación */
+.nav-reporte-bar{
+  position: static;
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+}
+
+
+/* =========================================================
+   [ACCIONES] Scroll interno (no rompe la tabla)
+========================================================= */
+
+/* Contenedor con scroll horizontal SOLO para acciones */
+.acciones-reportes-scroll{
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  max-width: 100%;
+  padding-bottom: 2px; /* evita recorte inferior en iOS */
+}
+
+/* Acciones siempre en una sola fila */
+.acciones-reportes{
+  display: inline-flex;   /* se comporta como contenido ancho */
+  flex-wrap: nowrap;
+  gap: 8px;
+  align-items: center;
+}
+
+/* Evitar que la celda recorte botones */
+.table-reportes td.td-accion{
+  overflow: visible;
+}
+
+
+/* =========================================================
+   [TOPBAR] Lado derecho: Usuario + Logo pegados
+========================================================= */
+.topbar-right{
+  display: flex;
+  align-items: center;
+  gap: 14px;            /* separación entre usuario y logo */
+  flex: 0 0 auto;
+}
+
+.user-topbar{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #fff;
+  white-space: nowrap;
+  font-size: 14px;
+}
+
+.user-name{ font-weight: 600; }
+
+.user-sep{ opacity: 0.6; }
+
+/* Salir más grande/visible */
+.btn-salir{
+  color: #fff;
+  font-weight: 800;
+  font-size: 16px;
+  text-decoration: none;
+}
+
+.btn-salir:hover{
+  text-decoration: underline;
+  color: #fff;
+}
+
+
+/* =========================================================
+   [TOPBAR] Responsive móvil: evitar que usuario invada el brand
+========================================================= */
+@media (max-width: 576px){
+
+  /* Permite que el header pueda "romper" en 2 filas */
+  .topbar{
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+
+  /* El lado derecho (usuario + logo) pasa a segunda fila */
+  .topbar-right{
+    width: 100%;
+    justify-content: flex-end;   /* lo manda a la derecha */
+    margin-top: 6px;
+  }
+
+  /* Asegura que el brand use todo el ancho arriba */
+  .brand{
+    width: 100%;
+  }
+
+  /* El usuario no debe empujar hacia la izquierda */
+  .user-topbar{
+    font-size: 13px;
+    gap: 8px;
+  }
+
+  /* Botón salir un poquito grande pero controlado en móvil */
+  .btn-salir{
+    font-size: 15px;
+  }
+}
+
+
+/* =========================================================
+   [TOPBAR USER] Desktop: inline normal / Mobile: scroll
+========================================================= */
+
+.topbar{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.topbar-right{
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+/* Bloque usuario */
+.user-topbar{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.user-name{
+  font-weight: 600;
+  flex: 0 0 auto;
+}
+
+/* DESKTOP por defecto: sin scroll, todo visible */
+.user-actions-scroll{
+  overflow: visible;
+  max-width: none;
+}
+
+.user-actions{
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+}
+
+.user-link{
+  color: #fff;
+  text-decoration: underline;
+  font-size: 14px;
+}
+
+.user-sep{ opacity: .85; }
+
+.btn-salir{
+  color: #fff;
+  text-decoration: underline;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+/* SOLO móvil angosto: activar scroll para acciones */
+@media (max-width: 576px){
+  .user-actions-scroll{
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    max-width: 48vw;
+  }
+
+  .user-actions{
+    display: inline-flex;
+  }
+}
+
+
+/* =========================================================
+   [TABLAS] Fix altura desigual en columna Acciones (móvil)
+========================================================= */
+
+/* Asegura que las celdas ocupen toda la altura de la fila */
+.table-reportes td{
+  vertical-align: middle;
+}
+
+/* Columna acciones: estirarla al alto de la fila */
+.table-reportes td.td-accion{
+  display: flex;
+  align-items: center;     /* centra vertical */
+  min-height: 100%;        /* se estira al alto de la fila */
+}
+
+/* Si hay scroll interno de acciones */
+.table-reportes td.td-accion .acciones-reportes-scroll{
+  display: flex;
+  align-items: center;
+}
+
+
+/* =========================================================
+   [USUARIOS] Acciones alineadas y altura consistente
+========================================================= */
+.acciones-usuarios{
+  display: inline-flex;
+  gap: 8px;
+  flex-wrap: nowrap;
+  align-items: center;
+}
+
+td.td-accion{
+  vertical-align: middle;
+}
+
+/* En móvil: si hace falta, permitir scroll horizontal solo en la celda */
+@media (max-width: 576px){
+  td.td-accion{
+    white-space: nowrap;
+  }
+}

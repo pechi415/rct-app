@@ -1,0 +1,715 @@
+{% extends "base.html" %}
+{% block title %}Resumen{% endblock %}
+
+{% block content %}
+
+<!-- =========================================================
+     HEADER: TÍTULO + INFO REPORTE + SUPERVISORES REGISTRADOS
+========================================================== -->
+<div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+
+  <!-- Izquierda: Título + metadata del reporte -->
+  <div>
+    <h1 class="mb-1">Resumen del Reporte</h1>
+
+    <div class="text-muted">
+      Reporte #{{ r.id }} | {{ r.fecha }} | {{ r.turno }} | {{ r.mina }} | Estado: {{ r.estado }}
+    </div>
+
+    {% if supervisores and supervisores|length > 0 %}
+      <div class="text-muted small mt-1">
+        {{ supervisores
+           | map(attribute="supervisor")
+           | unique
+           | join(" | ")
+        }}
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Derecha: navegación del reporte -->
+  {% set nav_inline = true %}
+  <div class="nav-reporte-inline">
+    {% include "_nav_reporte.html" %}
+  </div>
+
+
+</div>
+
+
+<!-- =========================================================
+     HIGHLIGHTS (Lectura rápida)
+     - No reemplaza el PDF, solo prioriza lo importante arriba
+========================================================== -->
+<div class="row g-3 mb-1">
+
+  <!-- 1) Disponible para operar -->
+  <div class="col-12 col-md-6 col-xl-3">
+    <div class="card h-100">
+      <div class="card-header fw-bold">Disponible para operar</div>
+      <div class="card-body">
+        <div class="display-6 fw-bold">{{ disponible_p }}</div>
+        <div class="text-muted small">Personal disponible</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2) Camiones disponibles -->
+  <div class="col-12 col-md-6 col-xl-3">
+    <div class="card h-100">
+      <div class="card-header fw-bold">Camiones disponibles</div>
+      <div class="card-body">
+        <div class="display-6 fw-bold">{{ camiones_disponibles }}</div>
+        <div class="text-muted small">Operativos</div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- 3) Equipos varados -->
+  <div class="col-12 col-md-6 col-xl-3">
+    <div class="card h-100">
+      <div class="card-header fw-bold">Equipos varados</div>
+      <div class="card-body">
+        <div class="display-6 fw-bold">{{ equipos|length }}</div>
+        <div class="text-muted small">Registros en campo</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4) Ausentismo -->
+  <div class="col-12 col-md-6 col-xl-3">
+    <div class="card h-100">
+      <div class="card-header fw-bold">Ausentismo</div>
+      <div class="card-body">
+        <div class="display-6 fw-bold">{{ ausentismo|length }}</div>
+        <div class="text-muted small">Registros del turno</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+
+<!-- =========================================================
+     GRID: RESUMEN (Toda la información, organizada por prioridad)
+     Regla de layout:
+     - FULL: Gestión / Equipos varados
+     - MITAD: Operación / Personal / Seguridad / Distribución camiones (por tu regla)
+     - Complementarios: en acordeón para reducir scroll
+========================================================== -->
+<div class="row g-3">
+
+
+  <!-- =========================================================
+       1) GESTIÓN DE ÁREAS (FULL)
+  ========================================================== -->
+  <div class="col-12">
+    <div class="card h-100">
+      <div class="card-header fw-bold">Gestión de Áreas</div>
+      <div class="card-body">
+        {% if gestion|length == 0 %}
+          <div class="text-muted">Sin registros.</div>
+        {% else %}
+          <div class="table-responsive">
+            <table class="table table-striped mb-0">
+              <thead class="table-dark">
+                <tr>
+                  <th>Hora</th>
+                  <th>Hallazgo</th>
+                  <th>Acción</th>
+                  <th>Responsable</th>
+                  <th>¿Corregido?</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for g in gestion %}
+                <tr>
+                  <td>{{ g.hora }}</td>
+                  <td>{{ g.hallazgo }}</td>
+                  <td>{{ g.accion }}</td>
+                  <td>{{ g.responsable }}</td>
+                  <td>{% if g.corregido == 1 %}SÍ{% else %}NO{% endif %}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+
+  <!-- =========================================================
+       2) EQUIPOS VARADOS EN CAMPO (FULL)
+  ========================================================== -->
+  <div class="col-12">
+    <div class="card h-100">
+      <div class="card-header fw-bold">Equipos varados en campo</div>
+      <div class="card-body">
+        {% if equipos|length == 0 %}
+          <div class="text-muted">Sin registros.</div>
+        {% else %}
+          <div class="table-responsive">
+            <table class="table table-striped mb-0">
+              <thead class="table-dark">
+                <tr>
+                  <th>Equipo</th>
+                  <th>Ubicación</th>
+                  <th>Hora</th>
+                  <th>Motivo</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for e in equipos %}
+                <tr>
+                  <td>{{ e.equipo }}</td>
+                  <td>{{ e.ubicacion }}</td>
+                  <td>{{ e.hora }}</td>
+                  <td>{{ e.motivo }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+
+  <!-- =========================================================
+       3) OPERACIÓN (MITAD + MITAD)
+       3.1 Llegada de buses
+       3.2 First / Last
+  ========================================================== -->
+
+  <!-- 3.1 Buses -->
+  <div class="col-12 col-lg-6">
+    <div class="card h-100">
+      <div class="card-header fw-bold">Hora llegada buses a bahías</div>
+      <div class="card-body">
+        {% if buses|length == 0 %}
+          <div class="text-muted">Sin registros.</div>
+        {% else %}
+          <div class="table-responsive">
+            <table class="table table-striped mb-0">
+              <thead class="table-dark">
+                <tr>
+                  <th>Bahía</th>
+                  <th>Hora</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for b in buses %}
+                <tr>
+                  <td>{{ b.bahia }}</td>
+                  <td>{{ b.hora }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- 3.2 First / Last -->
+  <div class="col-12 col-lg-6">
+    <div class="card h-100">
+      <div class="card-header fw-bold">First - Last</div>
+      <div class="card-body">
+        {% if first_last %}
+          <div class="mb-2">
+            <div class="fw-bold">Inicio</div>
+            <div>Pit 2: {{ first_last.inicio_pit2 }} | Pit 5: {{ first_last.inicio_pit5 }}</div>
+          </div>
+
+          <div class="mb-2">
+            <div class="fw-bold">Final</div>
+            <div>Pit 2: {{ first_last.final_pit2 }} | Pit 5: {{ first_last.final_pit5 }}</div>
+          </div>
+
+          <div>
+            <div class="fw-bold">Cam. x Operador (1ra Hr)</div>
+            <div>Cantidad: {{ first_last.camiones_por_operador }}</div>
+            {% if first_last.camiones_por_operador > 0 %}
+              <div>Razón: {{ first_last.razon }}</div>
+            {% endif %}
+          </div>
+        {% else %}
+          <div class="text-muted">Sin registros.</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+
+  <!-- =========================================================
+       4) PERSONAL (MITAD + MITAD)
+       4.1 Distribución del personal
+       4.2 Ausentismo
+  ========================================================== -->
+
+  <!-- 4.1 Distribución del personal -->
+  <div class="col-12 col-lg-6">
+    <div class="card h-100">
+      <div class="card-header fw-bold">Distribución del personal</div>
+      <div class="card-body">
+        {% if personal_items|length == 0 %}
+          <div class="text-muted">Sin registros.</div>
+        {% else %}
+          <div class="table-responsive">
+            <table class="table table-striped mb-0">
+              <thead class="table-dark">
+                <tr>
+                  <th>Categoría</th>
+                  <th style="width:140px;">Cantidad</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for p in personal_items %}
+                  <tr>
+                    <td>{{ p.categoria }}</td>
+                    <td>{{ p.cantidad }}</td>
+                  </tr>
+                {% endfor %}
+                <tr class="fw-bold">
+                  <td>Disponible para operar</td>
+                  <td>{{ disponible_p }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- 4.2 Ausentismo -->
+  <div class="col-12 col-lg-6">
+    <div class="card h-100">
+      <div class="card-header fw-bold">Ausentismo</div>
+      <div class="card-body">
+        {% if ausentismo|length == 0 %}
+          <div class="text-muted">Sin registros.</div>
+        {% else %}
+          <div class="table-responsive">
+            <table class="table table-striped mb-0">
+              <thead class="table-dark">
+                <tr>
+                  <th>Nombre</th>
+                  <th>Motivo</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for a in ausentismo %}
+                <tr>
+                  <td>{{ a.nombre }}</td>
+                  <td>{{ a.motivo }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+
+  <!-- =========================================================
+       5) SEGURIDAD (MITAD)
+       - Observación + Charla en una sola card (acordeón)
+  ========================================================== -->
+  <div class="col-12 col-lg-6">
+    <div class="card h-100">
+      <div class="card-header fw-bold">Seguridad</div>
+
+      <div class="card-body">
+        <div class="accordion" id="accSeguridad">
+
+          <!-- 5.1 Observación -->
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="segObsH">
+              <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#segObs" aria-expanded="true" aria-controls="segObs">
+                Observación
+              </button>
+            </h2>
+            <div id="segObs" class="accordion-collapse collapse show" aria-labelledby="segObsH" data-bs-parent="#accSeguridad">
+              <div class="accordion-body">
+                {% if seguridad_obs|length == 0 %}
+                  <div class="text-muted">Sin registros de observación.</div>
+                {% else %}
+                  <div class="table-responsive">
+                    <table class="table table-striped mb-0">
+                      <thead class="table-dark">
+                        <tr>
+                          <th>Lugar</th>
+                          <th>Hallazgos</th>
+                          <th>Divulgada</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for x in seguridad_obs %}
+                        <tr>
+                          <td>{{ x.lugar }}</td>
+                          <td>{{ x.hallazgos }}</td>
+                          <td>{% if x.divulgada == 1 %}Sí{% else %}No{% endif %}</td>
+                        </tr>
+                        {% endfor %}
+                      </tbody>
+                    </table>
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+          <!-- 5.2 Charla -->
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="segCharH">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#segChar" aria-expanded="false" aria-controls="segChar">
+                Charla
+              </button>
+            </h2>
+            <div id="segChar" class="accordion-collapse collapse" aria-labelledby="segCharH" data-bs-parent="#accSeguridad">
+              <div class="accordion-body">
+                {% if seguridad_charlas|length == 0 %}
+                  <div class="text-muted">Sin registros de charla.</div>
+                {% else %}
+                  <div class="table-responsive">
+                    <table class="table table-striped mb-0">
+                      <thead class="table-dark">
+                        <tr>
+                          <th>Tema</th>
+                          <th>Personas</th>
+                          <th>Lugar</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for x in seguridad_charlas %}
+                        <tr>
+                          <td>{{ x.tema }}</td>
+                          <td>{{ x.personas }}</td>
+                          <td>{{ x.lugar }}</td>
+                        </tr>
+                        {% endfor %}
+                      </tbody>
+                    </table>
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- =========================================================
+       6) DISTRIBUCIÓN DE CAMIONES (MITAD) ✅ por tu regla
+  ========================================================== -->
+  <div class="col-12 col-lg-6">
+    <div class="card h-100">
+      <div class="card-header fw-bold d-flex justify-content-between align-items-center">
+        <span>Distribución de Camiones</span>
+        <span class="text-muted">Total: {{ total_camiones }}</span>
+      </div>
+
+      <div class="card-body">
+        {% if dist_camiones|length == 0 %}
+          <div class="text-muted">Sin registros.</div>
+        {% else %}
+          <div class="table-responsive">
+            <table class="table table-striped mb-0">
+              <thead class="table-dark">
+                <tr>
+                  <th>Tipo</th>
+                  <th>Cantidad</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for d in dist_camiones %}
+                <tr>
+                  <td>{{ d.tipo }}</td>
+                  <td>{{ d.cantidad }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+
+  <!-- =========================================================
+       7) PERSONAL EXTRA (MITAD + MITAD)
+       7.1 Operadores prestados a otras áreas
+       7.2 Personal en entrenamiento
+  ========================================================== -->
+
+  <!-- 7.1 Otras áreas -->
+  <div class="col-12 col-lg-6">
+    <div class="card h-100">
+      <div class="card-header fw-bold">Operadores prestados a otras áreas</div>
+      <div class="card-body">
+        {% if otras_areas|length == 0 %}
+          <div class="text-muted">Sin registros.</div>
+        {% else %}
+          <div class="table-responsive">
+            <table class="table table-striped mb-0">
+              <thead class="table-dark">
+                <tr>
+                  <th>Operador</th>
+                  <th>Área</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for x in otras_areas %}
+                <tr>
+                  <td>{{ x.nombre }}</td>
+                  <td>{{ x.area }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- 7.2 Entrenamientos -->
+  <div class="col-12 col-lg-6">
+    <div class="card h-100">
+      <div class="card-header fw-bold">Personal en entrenamiento</div>
+      <div class="card-body">
+        {% if entrenamiento_items|length == 0 %}
+          <div class="text-muted">Sin registros.</div>
+        {% else %}
+          <div class="table-responsive">
+            <table class="table table-striped mb-0">
+              <thead class="table-dark">
+                <tr>
+                  <th>Entrenamiento</th>
+                  <th>Cantidad</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for x in entrenamiento_items %}
+                <tr>
+                  <td>{{ x.entrenamiento }}</td>
+                  <td>{{ x.cantidad }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+
+  <!-- =========================================================
+       8) COMPLEMENTARIOS (FULL)
+       - Bombas / Equipo Liviano / Luminarias / Contactos
+       - En acordeón para que no sea scroll infinito
+  ========================================================== -->
+  <div class="col-12">
+    <div class="card h-100">
+      <div class="card-header fw-bold">Complementarios</div>
+      <div class="card-body">
+        <div class="accordion" id="accComplementarios">
+
+          <!-- 8.1 Bombas -->
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="bombasH">
+              <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#bombasC" aria-expanded="true" aria-controls="bombasC">
+                Bombas
+              </button>
+            </h2>
+            <div id="bombasC" class="accordion-collapse collapse show" aria-labelledby="bombasH" data-bs-parent="#accComplementarios">
+              <div class="accordion-body">
+                {% if bombas|length == 0 %}
+                  <div class="text-muted">Sin registros.</div>
+                {% else %}
+                  <div class="table-responsive">
+                    <table class="table table-striped mb-0">
+                      <thead class="table-dark">
+                        <tr>
+                          <th>Número</th>
+                          <th>Estado</th>
+                          <th>Ubicación</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for b in bombas %}
+                        <tr>
+                          <td>{{ b.numero }}</td>
+                          <td>{{ b.estado }}</td>
+                          <td>{{ b.ubicacion }}</td>
+                        </tr>
+                        {% endfor %}
+                      </tbody>
+                    </table>
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+          <!-- 8.2 Equipo Liviano -->
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="livianoH">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#livianoC" aria-expanded="false" aria-controls="livianoC">
+                Equipo Liviano (Camionetas)
+              </button>
+            </h2>
+            <div id="livianoC" class="accordion-collapse collapse" aria-labelledby="livianoH" data-bs-parent="#accComplementarios">
+              <div class="accordion-body">
+                {% if equipo_liviano|length == 0 %}
+                  <div class="text-muted">Sin registros.</div>
+                {% else %}
+                  <div class="table-responsive">
+                    <table class="table table-striped mb-0">
+                      <thead class="table-dark">
+                        <tr>
+                          <th>Camioneta</th>
+                          <th>Estado</th>
+                          <th>Comentario</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for it in equipo_liviano %}
+                        <tr>
+                          <td>{{ it.camioneta }}</td>
+                          <td>{{ it.estado }}</td>
+                          <td>{{ it.comentario }}</td>
+                        </tr>
+                        {% endfor %}
+                      </tbody>
+                    </table>
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+          <!-- 8.3 Luminarias -->
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="luminH">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#luminC" aria-expanded="false" aria-controls="luminC">
+                Luminarias
+              </button>
+            </h2>
+            <div id="luminC" class="accordion-collapse collapse" aria-labelledby="luminH" data-bs-parent="#accComplementarios">
+              <div class="accordion-body">
+                {% if luminarias|length == 0 %}
+                  <div class="text-muted">Sin registros.</div>
+                {% else %}
+                  <div class="table-responsive">
+                    <table class="table table-striped mb-0">
+                      <thead class="table-dark">
+                        <tr>
+                          <th>Número</th>
+                          <th>Ubicación</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for x in luminarias %}
+                        <tr>
+                          <td>{{ x.numero }}</td>
+                          <td>{{ x.ubicacion }}</td>
+                        </tr>
+                        {% endfor %}
+                      </tbody>
+                    </table>
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+          <!-- 8.4 Contactos con Operadores -->
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="contH">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#contC" aria-expanded="false" aria-controls="contC">
+                Contactos con Operadores
+              </button>
+            </h2>
+            <div id="contC" class="accordion-collapse collapse" aria-labelledby="contH" data-bs-parent="#accComplementarios">
+              <div class="accordion-body">
+                {% if contactos|length == 0 %}
+                  <div class="text-muted">Sin registros.</div>
+                {% else %}
+                  <div class="table-responsive">
+                    <table class="table table-striped mb-0">
+                      <thead class="table-dark">
+                        <tr>
+                          <th>Tipo</th>
+                          <th>Operador</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for x in contactos %}
+                        <tr>
+                          <td>{{ x.tipo }}</td>
+                          <td>{{ x.operador }}</td>
+                        </tr>
+                        {% endfor %}
+                      </tbody>
+                    </table>
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- =========================================================
+       9) TEXTOS DEL TURNO (MITAD + MITAD)
+       - PTS (solo si existe)
+       - Comentarios (solo si hay)
+  ========================================================== -->
+  {% if pts and pts.texto %}
+    <div class="col-12 col-lg-6">
+      <div class="card h-100">
+        <div class="card-header fw-bold">Divulgación PTS</div>
+        <div class="card-body">
+          <div style="white-space: pre-wrap;">{{ pts.texto }}</div>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
+  {% if comentarios and comentarios|length > 0 %}
+    <div class="col-12 col-lg-6">
+      <div class="card h-100">
+        <div class="card-header fw-bold">Comentarios del turno</div>
+        <div class="card-body">
+          <ul class="mb-0">
+            {% for c in comentarios %}
+              <li style="white-space: pre-wrap;">{{ c.comentario }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}Editar First - Last{% endblock %}
+
+{% block content %}
+
+<!-- =======================
+     HEADER: TÍTULO + NAV REPORTE
+======================= -->
+<div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+  <div>
+    <h2 class="mb-1">Editar First - Last</h2>
+    <div class="text-muted">
+      Reporte #{{ r.id }} | {{ r.fecha }} | {{ r.turno }} | {{ r.mina }} | Estado: {{ r.estado }}
+    </div>
+  </div>
+
+  {% include "_nav_reporte.html" %}
+</div>
+
+<!-- =======================
+     MENSAJES
+======================= -->
+{% if error %}
+  <div class="alert alert-danger">{{ error }}</div>
+{% endif %}
+
+<!-- =======================
+     FORM EDITAR
+======================= -->
+<form method="POST" class="card card-body">
+
+  <h5 class="mb-2">Arribo a palas - Inicio de turno</h5>
+  <div class="row g-2 mb-3">
+    <div class="col-md-6">
+      <label class="form-label">Pit 2 (hora)</label>
+      <input class="form-control" type="text" name="inicio_pit2" value="{{ it.inicio_pit2 }}">
+      <div class="form-text">Guía: Utilice el Formato de Hora militar (HH:MM) para registrar la Hora.</div>
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">Pit 5 (hora)</label>
+      <input class="form-control" type="text" name="inicio_pit5" value="{{ it.inicio_pit5 }}">
+      <div class="form-text">Guía: Utilice el Formato de Hora militar (HH:MM) para registrar la Hora.</div>
+    </div>
+  </div>
+
+  <h5 class="mb-2">Arribo a palas - Final de turno</h5>
+  <div class="row g-2 mb-3">
+    <div class="col-md-6">
+      <label class="form-label">Pit 2 (hora)</label>
+      <input class="form-control" type="text" name="final_pit2" value="{{ it.final_pit2 }}">
+      <div class="form-text">Guía: Utilice el Formato de Hora militar (HH:MM) para registrar la Hora.</div>
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">Pit 5 (hora)</label>
+      <input class="form-control" type="text" name="final_pit5" value="{{ it.final_pit5 }}">
+      <div class="form-text">Guía: Utilice el Formato de Hora militar (HH:MM) para registrar la Hora.</div>
+    </div>
+  </div>
+
+  <h5 class="mb-2">Camiones por operador (1ra hora)</h5>
+  <div class="row g-2">
+    <div class="col-md-4">
+      <label class="form-label">Cantidad (entero)</label>
+      <input class="form-control" type="number" name="camiones_por_operador" min="0" step="1"
+             value="{{ it.camiones_por_operador }}">
+      <div class="form-text">Guía: Solo números enteros. Se permite 0.</div>
+    </div>
+
+    <div class="col-md-8">
+      <label class="form-label">Razón</label>
+      <input class="form-control" type="text" name="razon" value="{{ it.razon }}">
+      <div class="form-text">Guía: Si la cantidad es mayor que 0, la razón es obligatoria.</div>
+    </div>
+  </div>
+
+  <div class="d-flex gap-2 mt-3">
+    <button class="btn btn-primary" type="submit">💾 Guardar cambios</button>
+    <a class="btn btn-outline-secondary" href="/reportes/{{ r.id }}/first_last">Cancelar</a>
+  </div>
+</form>
+
+{% endblock %}

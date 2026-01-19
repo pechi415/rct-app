@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Editar Equipo Liviano{% endblock %}
+
+{% block content %}
+<div class="reporte-header d-flex justify-content-between align-items-start gap-3 mb-3">
+  <div>
+    <h1 class="mb-1">Editar Equipo Liviano</h1>
+    <div class="text-muted">
+      Reporte #{{ r.id }} | {{ r.fecha }} | {{ r.turno }} | Estado: {{ r.estado }}
+    </div>
+  </div>
+  {% include "_nav_reporte.html" %}
+</div>
+
+{% if error %}
+  <div class="alert alert-danger">{{ error }}</div>
+{% endif %}
+
+<div class="card">
+  <div class="card-header fw-bold">Editar registro</div>
+
+  <div class="card-body">
+    {# Nota UX: si falla validación, preserva lo escrito con request.form #}
+    <form method="post" class="row g-2 align-items-end">
+
+      <div class="col-md-4">
+        <label class="form-label">Camioneta</label>
+        <select class="form-select" name="camioneta" required>
+          <option value="">Seleccione...</option>
+          {% set sel_camioneta = request.form.get('camioneta', it.camioneta|string) %}
+          {% for c in camionetas %}
+            <option value="{{ c }}"
+              {% if (c|string) == (sel_camioneta|string) %}selected{% endif %}>
+              {{ c }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="col-md-3">
+        <label class="form-label">Estado</label>
+        {% set sel_estado = request.form.get('estado', it.estado) %}
+        <select class="form-select" name="estado" required>
+          <option value="OK" {% if sel_estado == "OK" %}selected{% endif %}>OK</option>
+          <option value="PM" {% if sel_estado == "PM" %}selected{% endif %}>PM</option>
+          <option value="DOWN" {% if sel_estado == "DOWN" %}selected{% endif %}>DOWN</option>
+        </select>
+      </div>
+
+      <div class="col-md-5">
+        <label class="form-label">Comentario</label>
+        <input class="form-control"
+               name="comentario"
+               value="{{ request.form.get('comentario', it.comentario) }}"
+               placeholder="Opcional">
+      </div>
+
+      <div class="mt-3 d-flex gap-2">
+        <button class="btn btn-primary">💾 Guardar</button>
+        <a class="btn btn-outline-secondary" href="/reportes/{{ r.id }}/equipo_liviano">❌ Cancelar</a>
+      </div>
+
+    </form>
+  </div>
+</div>
+{% endblock %}

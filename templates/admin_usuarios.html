@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h3 class="m-0">Usuarios</h3>
+    <a class="btn btn-primary" href="{{ url_for('admin_usuario_nuevo') }}">+ Nuevo usuario</a>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-striped align-middle">
+      <thead class="table-dark">
+        <tr>
+          <th>ID</th>
+          <th>Usuario</th>
+          <th>Rol</th>
+          <th>Activo</th>
+          <th>Minas</th>
+          <th style="width:140px;">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for u in users %}
+        <tr>
+          <td>{{ u.id }}</td>
+          <td>{{ u.username }}</td>
+          <td>{{ u.rol }}</td>
+          <td>{{ "Sí" if u.is_active == 1 else "No" }}</td>
+          <td>
+            {% set ms = minas_por_user.get(u.id, []) %}
+            {% if ms %}
+              {{ ms | join(", ") }}
+            {% else %}
+              <span class="text-muted">—</span>
+            {% endif %}
+          </td>
+
+          <!-- ✅ FIX: NO d-flex en <td>. Se usa un wrapper interno -->
+          <td class="td-accion">
+            <div class="acciones-usuarios">
+              <a class="btn btn-sm btn-outline-primary"
+                 href="{{ url_for('admin_usuario_editar', user_id=u.id) }}">
+                Editar
+              </a>
+
+              {% if u.id != g.user.id %}
+                <form method="post"
+                      action="{{ url_for('admin_usuario_eliminar', user_id=u.id) }}"
+                      onsubmit="return confirm('¿Seguro que deseas eliminar este usuario?');"
+                      class="d-inline">
+                  <button type="submit" class="btn btn-sm btn-outline-danger">
+                    Eliminar
+                  </button>
+                </form>
+              {% endif %}
+            </div>
+          </td>
+
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+

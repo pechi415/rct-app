@@ -1,0 +1,98 @@
+
+{% extends "base.html" %}
+{% block title %}Editar Gestión{% endblock %}
+
+{% block content %}
+<div class="contenido-reporte">
+
+  <!-- =========================
+       HEADER
+  ========================= -->
+  <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+    <div>
+      <h2 class="mb-1">Editar Gestión de Áreas</h2>
+      <div class="text-muted">Reporte #{{ r.id }}</div>
+    </div>
+    {% include "_nav_reporte.html" %}
+  </div>
+
+  <!-- =========================
+       MENSAJE DE ERROR
+  ========================= -->
+  {% if error %}
+    <div class="alert alert-danger mb-2">{{ error }}</div>
+  {% endif %}
+
+  <div class="card">
+    <div class="card-header fw-bold">Editar registro</div>
+
+    <div class="card-body">
+      <form method="post">
+
+        <!-- =========================
+             CAMPOS (MISMA ESTRUCTURA)
+        ========================= -->
+        <div class="row g-3 align-items-end">
+
+          <div class="col-md-2">
+            <label class="form-label">Hora</label>
+            <input class="form-control"
+                   type="text"
+                   name="hora"
+                   value="{{ item.hora }}"
+                   placeholder="Ej: 05:52"
+                   required>
+            <div class="form-text">Guía: Utilice el Formato de Hora militar (HH:MM) para registrar la Hora.</div>
+          </div>
+
+          <div class="col-md-3">
+            <label class="form-label">Hallazgo</label>
+            <input type="text"
+                   name="hallazgo"
+                   class="form-control"
+                   value="{{ item.hallazgo }}"
+                   required>
+          </div>
+
+          <div class="col-md-3">
+            <label class="form-label">Acción</label>
+            <input type="text"
+                   name="accion"
+                   class="form-control"
+                   value="{{ item.accion }}"
+                   required>
+          </div>
+
+          <div class="col-md-2">
+            <label class="form-label">Responsable</label>
+            <input type="text"
+                   name="responsable"
+                   class="form-control"
+                   value="{{ item.responsable }}"
+                   required>
+          </div>
+
+          <div class="col-md-2">
+            <label class="form-label">¿Corregido?</label>
+            <select name="corregido" class="form-select">
+              <option value="0" {% if item.corregido == 0 %}selected{% endif %}>NO</option>
+              <option value="1" {% if item.corregido == 1 %}selected{% endif %}>SÍ</option>
+            </select>
+          </div>
+
+        </div>
+
+        <!-- =========================
+             BOTONES
+        ========================= -->
+        <div class="d-flex gap-2 mt-3">
+          <button type="submit" class="btn btn-primary">💾 Guardar</button>
+          <a class="btn btn-outline-secondary" href="/reportes/{{ r.id }}/gestion">Cancelar</a>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

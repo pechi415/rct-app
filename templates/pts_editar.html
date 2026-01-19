@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Editar Divulgación PTS{% endblock %}
+
+{% block content %}
+
+<div class="contenido-reporte">
+
+  <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+    <div>
+      <h2 class="mb-1">Editar divulgación del PTS</h2>
+      <div class="text-muted">
+        Reporte #{{ r.id }} | {{ r.fecha }} | {{ r.turno }} | {{ r.mina }}
+      </div>
+    </div>
+    {% include "_nav_reporte.html" %}
+  </div>
+
+  {% if error %}
+    <div class="alert alert-danger">{{ error }}</div>
+  {% endif %}
+
+  <div class="card">
+    <div class="card-header fw-bold">Editar registro</div>
+    <div class="card-body">
+      <form method="POST">
+        <label class="form-label">Divulgación</label>
+        <textarea class="form-control" name="texto" rows="5"
+                  required>{{ item.texto }}</textarea>
+
+        <div class="d-flex gap-2 mt-3">
+          <button class="btn btn-primary" type="submit">💾 Guardar</button>
+          <a class="btn btn-outline-secondary" href="/reportes/{{ r.id }}/pts">Cancelar</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Editar luminaria{% endblock %}
+{% block content %}
+
+<div class="contenido-reporte">
+
+  <!-- =========================
+    HEADER: TÍTULO + NAV REPORTE
+  ========================= -->
+  <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+    <div>
+      <h1 class="mb-1">Editar luminaria</h1>
+      <div class="text-muted">
+        Reporte #{{ r.id }} | {{ r.fecha }} | {{ r.turno }} | {{ r.mina }} | Estado: {{ r.estado }}
+      </div>
+    </div>
+    {% include "_nav_reporte.html" %}
+  </div>
+
+  <!-- =========================
+    MENSAJES
+  ========================= -->
+  {% if error %}
+    <div class="alert alert-danger">{{ error }}</div>
+  {% endif %}
+
+  <!-- =========================
+    FORM: EDITAR REGISTRO
+  ========================= -->
+  <form method="POST" class="card card-body">
+    <div class="row g-2">
+
+      <div class="col-md-3">
+        <label class="form-label">Número de luminaria</label>
+        <input class="form-control" name="numero"
+               value="{{ it.numero }}" required>
+      </div>
+
+      <div class="col-md-9">
+        <label class="form-label">Ubicación</label>
+        <input class="form-control" name="ubicacion"
+               value="{{ it.ubicacion }}" required>
+      </div>
+
+    </div>
+
+    <!-- BOTONES -->
+    <div class="mt-3 d-flex gap-2">
+      <button class="btn btn-primary" type="submit">💾 Guardar cambios</button>
+      <a class="btn btn-outline-secondary" href="/reportes/{{ r.id }}/luminarias">Cancelar</a>
+    </div>
+  </form>
+
+</div>
+{% endblock %}

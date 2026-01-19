@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+{% block title %}Seguridad{% endblock %}
+
+{% block content %}
+
+<div class="contenido-reporte">
+
+  <!-- =========================
+    HEADER: TÍTULO + NAV REPORTE
+  ========================= -->
+  <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+    <div>
+      <h1 class="mb-1">Seguridad</h1>
+      <div class="text-muted">
+        Reporte #{{ r.id }} | {{ r.fecha }} | {{ r.turno }} | {{ r.mina }} | Estado: {{ r.estado }}
+      </div>
+    </div>
+    {% include "_nav_reporte.html" %}
+  </div>
+
+  {% if r.estado == "CERRADO" %}
+    <div class="alert alert-warning">
+      Este reporte está cerrado. No se puede editar.
+    </div>
+  {% endif %}
+
+  <div class="row g-3">
+
+    <!-- =====================================================
+      CARD 1: Observación de seguridad
+    ====================================================== -->
+    <div class="col-12 col-lg-6">
+      <div class="card h-100">
+        <div class="card-header fw-bold">Observación de seguridad</div>
+        <div class="card-body">
+
+          {% if error_obs %}
+            <div class="alert alert-danger mb-2">{{ error_obs }}</div>
+          {% endif %}
+
+          <!-- FORM: agregar observación -->
+          <form method="POST" class="card card-body mb-3">
+            <input type="hidden" name="form_type" value="obs">
+
+            <div class="row g-2 align-items-end">
+              <div class="col-md-5">
+                <label class="form-label">Lugar</label>
+                <input class="form-control" name="lugar" placeholder="Ej: Oficina 2 / Bahía 5">
+              </div>
+
+              <div class="col-md-3">
+                <label class="form-label"># Hallazgos</label>
+                <input class="form-control" name="hallazgos" inputmode="numeric" placeholder="Ej: 0">
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label">¿Divulgada?</label>
+                <select class="form-select" name="divulgada">
+                  {% for v, t in tipos_divulgada %}
+                    <option value="{{ v }}">{{ t }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+
+            {% if r.estado != "CERRADO" %}
+              <div class="mt-3">
+                <button class="btn btn-primary">✅ Agregar</button>
+              </div>
+            {% endif %}
+          </form>
+
+          <!-- TABLA: observaciones -->
+          {% if obs_items|length == 0 %}
+            <div class="text-muted">Sin registros.</div>
+          {% else %}
+            <div class="table-responsive">
+              <table class="table table-striped mb-0">
+                <thead class="table-dark">
+                  <tr>
+                    <th>Lugar</th>
+                    <th>Hallazgos</th>
+                    <th>Divulgada</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for it in obs_items %}
+                    <tr>
+                      <td>{{ it.lugar }}</td>
+                      <td>{{ it.hallazgos }}</td>
+                      <td>{% if it.divulgada == 1 %}Sí{% else %}No{% endif %}</td>
+                      <td class="acciones-td">
+                        <div class="d-flex gap-1 align-items-center">
+                          {% if r.estado == "CERRADO" %}
+                            <span class="reporte-cerrado">Reporte cerrado</span>
+                          {% else %}
+                            <a class="btn btn-sm btn-outline-primary"
+                               href="/reportes/{{ r.id }}/seguridad/obs/{{ it.id }}/editar">✏️ Editar</a>
+
+                            <form method="POST"
+                                  action="/reportes/{{ r.id }}/seguridad/obs/{{ it.id }}/eliminar"
+                                  class="m-0">
+                              <button class="btn btn-sm btn-outline-danger"
+                                      onclick="return confirm('¿Eliminar este registro?');">
+                                🗑 Eliminar
+                              </button>
+                            </form>
+                          {% endif %}
+                        </div>
+                      </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          {% endif %}
+
+        </div>
+      </div>
+    </div>
+
+    <!-- =====================================================
+      CARD 2: Charla de seguridad
+      Orden formulario: Tema, # Personas, Lugar
+    ====================================================== -->
+    <div class="col-12 col-lg-6">
+      <div class="card h-100">
+        <div class="card-header fw-bold">Charla de seguridad</div>
+        <div class="card-body">
+
+          {% if error_charla %}
+            <div class="alert alert-danger mb-2">{{ error_charla }}</div>
+          {% endif %}
+
+          <!-- FORM: agregar charla -->
+          <form method="POST" class="card card-body mb-3">
+            <input type="hidden" name="form_type" value="charla">
+
+            <div class="row g-2 align-items-end">
+              <div class="col-md-5">
+                <label class="form-label">Tema</label>
+                <input class="form-control" name="tema" placeholder="Ej: uso de EPP">
+              </div>
+
+              <div class="col-md-3">
+                <label class="form-label"># Personas</label>
+                <input class="form-control" name="personas" inputmode="numeric" placeholder="Ej: 12">
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label">Lugar</label>
+                <input class="form-control" name="lugar" placeholder="Ej: Oficina / Campo">
+              </div>
+            </div>
+
+            {% if r.estado != "CERRADO" %}
+              <div class="mt-3">
+                <button class="btn btn-primary">✅ Agregar</button>
+              </div>
+            {% endif %}
+          </form>
+
+          <!-- TABLA: charlas -->
+          {% if charla_items|length == 0 %}
+            <div class="text-muted">Sin registros.</div>
+          {% else %}
+            <div class="table-responsive">
+              <table class="table table-striped mb-0">
+                <thead class="table-dark">
+                  <tr>
+                    <th>Tema</th>
+                    <th>Personas</th>
+                    <th>Lugar</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for it in charla_items %}
+                    <tr>
+                      <td>{{ it.tema }}</td>
+                      <td>{{ it.personas }}</td>
+                      <td>{{ it.lugar }}</td>
+                      <td class="acciones-td">
+                        <div class="d-flex gap-1 align-items-center">
+                          {% if r.estado == "CERRADO" %}
+                            <span class="reporte-cerrado">Reporte cerrado</span>
+                          {% else %}
+                            <a class="btn btn-sm btn-outline-primary"
+                               href="/reportes/{{ r.id }}/seguridad/charla/{{ it.id }}/editar">✏️ Editar</a>
+
+                            <form method="POST"
+                                  action="/reportes/{{ r.id }}/seguridad/charla/{{ it.id }}/eliminar"
+                                  class="m-0">
+                              <button class="btn btn-sm btn-outline-danger"
+                                      onclick="return confirm('¿Eliminar este registro?');">
+                                🗑 Eliminar
+                              </button>
+                            </form>
+                          {% endif %}
+                        </div>
+                      </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          {% endif %}
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+{% endblock %}

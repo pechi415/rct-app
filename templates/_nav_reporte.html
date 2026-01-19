@@ -1,0 +1,27 @@
+<div class="nav-reporte-wrap">
+  {% set _inline = nav_inline|default(false) %}
+
+  <div class="nav-reporte-wrap {% if _inline %}nav-reporte-wrap-inline{% endif %}">
+    <div class="{% if _inline %}nav-reporte-bar{% else %}nav-reporte-fixed{% endif %}">
+
+      <!-- Inicio: vuelve a la lista de reportes -->
+      <a class="btn btn-sm btn-outline-primary" href="/reportes">
+        🏠 Inicio
+      </a>
+
+      <!-- Secciones (Dashboard): vuelve al dashboard del reporte -->
+      <a class="btn btn-sm btn-outline-primary" href="/reportes/{{ r.id }}">
+        🗃️ Secciones
+      </a>
+
+      <!-- Estado del reporte -->
+      {% if r.estado == "ABIERTO" %}
+        <span class="badge bg-success">ABIERTO</span>
+      {% else %}
+        <span class="badge bg-secondary">CERRADO</span>
+      {% endif %}
+
+    </div>
+  </div>
+
+</div>

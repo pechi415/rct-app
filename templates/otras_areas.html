@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% block title %}Operadores en otras áreas{% endblock %}
+
+{% block content %}
+
+<!-- =======================
+     HEADER: TÍTULO + NAV REPORTE
+======================= -->
+<div class="d-flex justify-content-between align-items-center gap-3 mb-2">
+  <div>
+    <h1 class="mb-1">Operadores prestados a otras áreas</h1>
+    <div class="text-muted">
+      Reporte #{{ r.id }} | {{ r.fecha }} | {{ r.turno }} | {{ r.mina }} | Estado: {{ r.estado }}
+    </div>
+  </div>
+
+  {% include "_nav_reporte.html" %}
+</div>
+
+<!-- =======================
+     MENSAJES
+======================= -->
+{% if error %}
+  <div class="alert alert-danger">{{ error }}</div>
+{% endif %}
+
+{% if r.estado == "CERRADO" %}
+  <div class="alert alert-warning">
+    Este reporte está cerrado. No se puede editar.
+  </div>
+{% endif %}
+
+<!-- =======================
+     FORM: AGREGAR REGISTRO
+======================= -->
+<form method="POST" class="card card-body mb-3">
+  <div class="row g-2">
+
+    <div class="col-md-6">
+      <label class="form-label">Operador</label>
+      <input class="form-control" name="nombre" placeholder="Ej: Juan Pérez">
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">Área / Departamento</label>
+      <select class="form-select" name="area">
+        <option value="">Seleccione...</option>
+        {% for a in areas %}
+          <option value="{{ a }}">{{ a }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+  </div>
+
+  {% if r.estado != "CERRADO" %}
+  <div class="mt-3">
+    <button class="btn btn-primary">✅ Agregar</button>
+  </div>
+  {% endif %}
+</form>
+
+<!-- =======================
+     TABLA: REGISTROS
+======================= -->
+{% if items|length == 0 %}
+  <div class="alert alert-warning">No hay operadores prestados registrados.</div>
+{% else %}
+<table class="table table-striped">
+  <thead class="table-dark">
+    <tr>
+      <th>Operador</th>
+      <th>Área</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    {% for it in items %}
+    <tr>
+      <td>{{ it.nombre }}</td>
+      <td>{{ it.area }}</td>
+
+      <td class="acciones-td">
+        <div class="d-flex gap-1 align-items-center">
+          {% if r.estado == "CERRADO" %}
+            <span class="reporte-cerrado">Reporte cerrado</span>
+          {% else %}
+            <!-- Editar -->
+            <a class="btn btn-sm btn-outline-primary"
+               href="/reportes/{{ r.id }}/otras_areas/{{ it.id }}/editar">
+              ✏️ Editar
+            </a>
+
+            <!-- Eliminar -->
+            <form method="POST"
+                  action="/reportes/{{ r.id }}/otras_areas/eliminar/{{ it.id }}"
+                  class="m-0">
+              <button class="btn btn-sm btn-outline-danger"
+                      onclick="return confirm('¿Eliminar este registro?');">
+                🗑 Eliminar
+              </button>
+            </form>
+          {% endif %}
+        </div>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block title %}Editar Buses a Bahías{% endblock %}
+
+{% block content %}
+
+<!-- =======================
+     HEADER: TÍTULO + NAV REPORTE
+======================= -->
+<div class="contenido-reporte">
+  <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+    <div>
+      <h1 class="mb-1">Editar registro (Buses a Bahías)</h1>
+      <div class="text-muted">
+        Reporte #{{ r.id }} | {{ r.fecha }} | {{ r.turno }} | {{ r.mina }} | Estado: {{ r.estado }}
+      </div>
+    </div>
+    {% include "_nav_reporte.html" %}
+  </div>
+
+  <!-- =======================
+       MENSAJES
+  ======================= -->
+  {% if error %}
+    <div class="alert alert-danger">{{ error }}</div>
+  {% endif %}
+
+  {% if r.estado == "CERRADO" %}
+    <div class="alert alert-warning">
+      Este reporte está cerrado. No se puede editar.
+    </div>
+  {% endif %}
+
+  <!-- =======================
+       FORM EDITAR
+  ======================= -->
+  <div class="card">
+    <div class="card-header fw-bold">Editar registro</div>
+    <div class="card-body">
+      <form method="POST">
+        <div class="row g-3 align-items-end">
+
+          <div class="col-md-4">
+            <label class="form-label">Bahía</label>
+            <select class="form-select" name="bahia" required {% if r.estado == "CERRADO" %}disabled{% endif %}>
+              <option value="">Seleccione...</option>
+              {% for b in bahias %}
+                <option value="{{ b }}" {% if item.bahia == b %}selected{% endif %}>{{ b }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="col-md-3">
+            <label class="form-label">Hora llegada</label>
+            <!-- Hora libre: texto -->
+            <input class="form-control"
+                   type="text"
+                   name="hora"
+                   value="{{ item.hora }}"
+                   placeholder="Ej: 05:52"
+                   required
+                   {% if r.estado == "CERRADO" %}disabled{% endif %}>
+            <div class="form-text">Guía: Utilice el Formato de Hora militar (HH:MM) para registrar la Hora.</div>
+          </div>
+
+          <div class="col-md-5">
+            <label class="form-label">Observación (opcional)</label>
+            <input type="text"
+                   name="observacion"
+                   class="form-control"
+                   value="{{ item.observacion }}"
+                   placeholder="Ej: sin novedad / retraso / etc."
+                   {% if r.estado == "CERRADO" %}disabled{% endif %}>
+          </div>
+
+        </div>
+
+        <div class="d-flex gap-2 mt-3">
+          {% if r.estado != "CERRADO" %}
+            <button type="submit" class="btn btn-primary">💾 Guardar</button>
+          {% else %}
+            <button type="button" class="btn btn-secondary" disabled>Reporte cerrado</button>
+          {% endif %}
+
+          <a class="btn btn-outline-secondary"
+             href="{{ url_for('buses_bahias', reporte_id=r.id) }}">
+            Cancelar
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

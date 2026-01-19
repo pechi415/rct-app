@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+{% block title %}Equipo liviano{% endblock %}
+
+{% block content %}
+
+<!-- =======================
+     HEADER: TÍTULO + NAV REPORTE
+======================= -->
+<div class="d-flex justify-content-between align-items-center gap-3 mb-2">
+  <div>
+    <h1 class="mb-1">Equipo liviano</h1>
+    <div class="text-muted">
+      Reporte #{{ r.id }} | {{ r.fecha }} | {{ r.turno }} | {{ r.mina }} | Estado: {{ r.estado }}
+    </div>
+  </div>
+
+  {% include "_nav_reporte.html" %}
+</div>
+
+<!-- =======================
+     MENSAJES
+======================= -->
+{% if error %}
+  <div class="alert alert-danger">{{ error }}</div>
+{% endif %}
+
+{% if r.estado == "CERRADO" %}
+  <div class="alert alert-warning">
+    Este reporte está cerrado. No se puede editar.
+  </div>
+{% endif %}
+
+<!-- =======================
+     CARD: ACCIÓN RÁPIDA + FORM
+======================= -->
+<div class="card card-body mb-3">
+
+  <!-- 🔥 ACCIÓN RÁPIDA: MARCAR TODAS OK (solo pendientes) -->
+  <div class="d-flex justify-content-end mb-2">
+    {% if r.estado != "CERRADO" %}
+      {% if camionetas|length > 0 %}
+        <form method="POST" action="/reportes/{{ r.id }}/equipo_liviano/todas_ok" class="m-0">
+          {# Enviamos SOLO las pendientes actuales para que no pise las ya registradas #}
+          {% for c in camionetas %}
+            <input type="hidden" name="pendientes" value="{{ c }}">
+          {% endfor %}
+
+          <button class="btn btn-outline-primary btn-sm"
+                  onclick="return confirm('¿Marcar como OK solo las camionetas pendientes (sin cambiar las ya registradas)?');">
+            ✅ Marcar todas OK
+          </button>
+        </form>
+      {% else %}
+        <button class="btn btn-outline-secondary btn-sm" disabled>
+          ✅ Todas registradas
+        </button>
+      {% endif %}
+    {% endif %}
+  </div>
+
+  <!-- =======================
+       FORM: AGREGAR REGISTRO
+  ======================= -->
+  <form method="POST">
+    <div class="row g-2">
+
+      <div class="col-md-4">
+        <label class="form-label">Camioneta</label>
+        <select class="form-select" name="camioneta">
+          <option value="">Seleccione...</option>
+          {% for c in camionetas %}
+            <option value="{{ c }}">{{ c }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="col-md-3">
+        <label class="form-label">Estado</label>
+        <select class="form-select" name="estado_liviano">
+          <option value="OK" selected>OK</option>
+          <option value="PM">PM</option>
+          <option value="DOWN">DOWN</option>
+        </select>
+      </div>
+
+      <div class="col-md-5">
+        <label class="form-label">Comentario (opcional)</label>
+        <input class="form-control" name="comentario" placeholder="Novedad / observación">
+      </div>
+
+    </div>
+
+    {% if r.estado != "CERRADO" %}
+    <div class="mt-3">
+      <button class="btn btn-primary">✅ Agregar</button>
+    </div>
+    {% endif %}
+  </form>
+
+</div>
+
+<!-- =======================
+     TABLA: REGISTROS
+======================= -->
+{% if items|length == 0 %}
+  <div class="alert alert-warning">No hay registros de equipo liviano.</div>
+{% else %}
+<table class="table table-striped">
+  <thead class="table-dark">
+    <tr>
+      <th>Camioneta</th>
+      <th>Estado</th>
+      <th>Comentario</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    {% for it in items %}
+    <tr>
+      <td>{{ it.camioneta }}</td>
+      <td>{{ it.estado }}</td>
+      <td>{{ it.comentario }}</td>
+
+      <td class="acciones-td">
+        <div class="d-flex gap-1 align-items-center">
+          {% if r.estado == "CERRADO" %}
+            <span class="reporte-cerrado">Reporte cerrado</span>
+          {% else %}
+            <a class="btn btn-sm btn-outline-primary"
+               href="/reportes/{{ r.id }}/equipo_liviano/{{ it.id }}/editar">
+              ✏️ Editar
+            </a>
+
+            <form method="POST"
+                  action="/reportes/{{ r.id }}/equipo_liviano/eliminar/{{ it.id }}"
+                  class="m-0">
+              <button class="btn btn-sm btn-outline-danger"
+                      onclick="return confirm('¿Eliminar este registro?');">
+                🗑 Eliminar
+              </button>
+            </form>
+          {% endif %}
+        </div>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+
+{% endblock %}

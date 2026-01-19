@@ -1,0 +1,15 @@
+# Entornos / caches
+venv/
+.env
+__pycache__/
+*.pyc
+
+# Base de datos y carpeta instance (NO subir)
+instance/
+*.db
+*.sqlite
+*.sqlite3
+
+# PDFs y temporales
+*.pdf
+*.log

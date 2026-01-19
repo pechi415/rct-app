@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Editar Observación{% endblock %}
+
+{% block content %}
+<div class="contenido-reporte">
+
+  <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+    <div>
+      <h2 class="mb-1">Editar observación de seguridad</h2>
+      <div class="text-muted">Reporte #{{ r.id }}</div>
+    </div>
+    {% include "_nav_reporte.html" %}
+  </div>
+
+  {% if error %}
+    <div class="alert alert-danger">{{ error }}</div>
+  {% endif %}
+
+  <div class="card">
+    <div class="card-header fw-bold">Editar registro</div>
+    <div class="card-body">
+      <form method="POST">
+        <div class="row g-3 align-items-end">
+
+          <div class="col-md-5">
+            <label class="form-label">Lugar</label>
+            <input class="form-control" name="lugar" value="{{ it.lugar }}" required>
+          </div>
+
+          <div class="col-md-3">
+            <label class="form-label"># Hallazgos</label>
+            <input class="form-control" name="hallazgos" value="{{ it.hallazgos }}" required>
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label">¿Divulgada?</label>
+            <select class="form-select" name="divulgada" required>
+              {% for v, t in tipos_divulgada %}
+                <option value="{{ v }}" {% if (it.divulgada|string) == v %}selected{% endif %}>{{ t }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+        </div>
+
+        <div class="d-flex gap-2 mt-3">
+          <button type="submit" class="btn btn-primary">💾 Guardar</button>
+          <a class="btn btn-outline-secondary" href="/reportes/{{ r.id }}/seguridad">Cancelar</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

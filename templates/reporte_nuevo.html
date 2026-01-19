@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Nuevo reporte{% endblock %}
+
+{% block content %}
+<h2 class="mb-3">Nuevo reporte</h2>
+
+{% if error %}
+  <div class="alert alert-danger">{{ error }}</div>
+{% endif %}
+
+<form method="POST" class="card card-body">
+
+  <!-- Fecha -->
+  <div class="mb-3">
+    <label class="form-label">Fecha</label>
+    <input class="form-control" type="date" name="fecha" value="{{ hoy }}">
+  </div>
+
+  <!-- Mina -->
+  <div class="mb-3">
+    <label class="form-label">Mina</label>
+
+    {% if mina_locked %}
+      <div class="form-control-plaintext fw-semibold">
+        {{ mina_label(mina_sel) }}
+      </div>
+      <input type="hidden" name="mina" value="{{ mina_sel }}">
+    {% else %}
+      <select class="form-select" name="mina">
+        {% for code, label in minas %}
+          <option value="{{ code }}" {% if code == mina_sel %}selected{% endif %}>
+            {{ label }}
+          </option>
+        {% endfor %}
+      </select>
+    {% endif %}
+  </div>
+
+
+  <!-- Turno (por defecto DÍA) -->
+  <div class="mb-3">
+    <label class="form-label">Turno</label>
+    <select class="form-select" name="turno">
+      <option value="DIA" selected>DÍA</option>
+      <option value="NOCHE">NOCHE</option>
+    </select>
+  </div>
+
+  <div class="d-flex gap-2">
+    <button class="btn btn-success">
+      ✅ Crear
+    </button>
+
+    <a class="btn btn-secondary" href="/reportes">
+      ❌ Cancelar
+    </a>
+  </div>
+</form>
+{% endblock %}

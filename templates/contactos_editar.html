@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Editar Contacto{% endblock %}
+
+{% block content %}
+<div class="contenido-reporte">
+
+  <!-- =========================
+    HEADER: TÍTULO + NAV REPORTE
+  ========================= -->
+  <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+    <div>
+      <h1 class="mb-1">Editar contacto</h1>
+      <div class="text-muted">
+        Reporte #{{ r.id }} | {{ r.fecha }} | {{ r.turno }} | {{ r.mina }} | Estado: {{ r.estado }}
+      </div>
+    </div>
+    {% include "_nav_reporte.html" %}
+  </div>
+
+  <!-- =========================
+    MENSAJES
+  ========================= -->
+  {% if error %}
+    <div class="alert alert-danger">{{ error }}</div>
+  {% endif %}
+
+  <!-- =========================
+    FORM: EDITAR
+  ========================= -->
+  <div class="card">
+    <div class="card-header fw-bold">Editar registro</div>
+    <div class="card-body">
+      <form method="POST">
+        <div class="row g-2 align-items-end">
+
+          <div class="col-md-4">
+            <label class="form-label">Tipo de contacto</label>
+            <select class="form-select" name="tipo" required>
+              <option value="">Seleccione...</option>
+              {% for t in tipos %}
+                <option value="{{ t }}" {% if it.tipo == t %}selected{% endif %}>{{ t }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="col-md-8">
+            <label class="form-label">Operador</label>
+            <input class="form-control" name="operador" value="{{ it.operador }}" required>
+          </div>
+
+        </div>
+
+        <div class="d-flex gap-2 mt-3">
+          <button class="btn btn-primary" type="submit">💾 Guardar</button>
+          <a class="btn btn-outline-secondary" href="/reportes/{{ r.id }}/contactos">Cancelar</a>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

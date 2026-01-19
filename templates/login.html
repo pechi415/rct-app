@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 420px;">
+  <h3 class="mb-3">Iniciar sesión</h3>
+
+  {% if error %}
+    <div class="alert alert-danger">{{ error }}</div>
+  {% endif %}
+
+  <form method="POST" class="card card-body">
+    <label class="form-label">Usuario</label>
+    <input class="form-control mb-2" name="username" autocomplete="username" required>
+
+    <label class="form-label">Contraseña</label>
+    <input class="form-control mb-3" type="password" name="password" autocomplete="current-password" required>
+
+    <button class="btn btn-primary" type="submit">Entrar</button>
+  </form>
+</div>
+{% endblock %}
