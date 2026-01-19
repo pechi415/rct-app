@@ -31,7 +31,7 @@ def get_db_connection():
         )
     else:
         # Local / SQLite
-        conn = sqlite3.connect("rct.db")
+        conn = sqlite3.connect(DB_PATH)
         conn.row_factory = sqlite3.Row
         return conn
 
@@ -743,23 +743,38 @@ def init_db():
 # [SEED] Crear admin por única vez
 # ---------------------------------------------------------
 def seed_admin_once():
-    username = "admin"
-    password = "admin123"
-    rol = "ADMIN"
+    # Asegura tablas antes de seed
 
-    with get_conn() as conn:
-        existe = conn.execute(
-            "SELECT 1 FROM users WHERE username = ? LIMIT 1",
+    username = os.environ.get("SEED_ADMIN_USER", "admin").strip().lower()
+    password = os.environ.get("SEED_ADMIN_PASS", "admin123")
+
+    conn = get_db_connection()
+    cur = conn.cursor()
+
+    try:
+        cur.execute(
+            sql_params("SELECT 1 FROM users WHERE LOWER(username) = ? LIMIT 1"),
             (username,)
-        ).fetchone()
+        )
+        existe = cur.fetchone()
 
-        if existe:
-            return
+        if not existe:
+            pwd_hash = generate_password_hash(password)
+            cur.execute(
+                sql_params("""
+                    INSERT INTO users (username, password_hash, rol, is_active)
+                    VALUES (?, ?, 'ADMIN', 1)
+                """),
+                (username, pwd_hash)
+            )
+            conn.commit()
+    finally:
+        try:
+            cur.close()
+        except Exception:
+            pass
+        conn.close()
 
-        conn.execute("""
-            INSERT INTO users (username, password_hash, rol, is_active)
-            VALUES (?, ?, ?, 1)
-        """, (username, generate_password_hash(password), rol))
 
 
 # ---------------------------------------------------------
