@@ -36,7 +36,9 @@ def get_db_connection():
         return conn
 
 def is_postgres() -> bool:
-    return bool(os.environ.get("DATABASE_URL"))
+    url = os.environ.get("DATABASE_URL", "")
+    return url.strip() != ""
+
 
 
 def sql_params(query: str) -> str:
@@ -559,232 +561,470 @@ def init_auth_tables():
 # [DB] Tablas principales del RCT
 # ---------------------------------------------------------
 def init_db():
+    print("DEBUG DATABASE_URL:", bool(os.environ.get("DATABASE_URL")))
+    print("DEBUG is_postgres():", is_postgres())
     with get_conn() as conn:
-        conn.execute("""
-            CREATE TABLE IF NOT EXISTS reportes (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                fecha TEXT NOT NULL,
-                turno TEXT NOT NULL,
-                mina TEXT NOT NULL DEFAULT 'ED',
-                estado TEXT NOT NULL DEFAULT 'ABIERTO'
-            )
-        """)
+        if is_postgres():
+            # =========================================================
+            # POSTGRESQL (Render)
+            # =========================================================
 
-        conn.execute("""
-            CREATE TABLE IF NOT EXISTS gestion_areas (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                reporte_id INTEGER NOT NULL,
-                hora TEXT NOT NULL,
-                hallazgo TEXT NOT NULL,
-                accion TEXT NOT NULL,
-                corregido INTEGER NOT NULL,
-                responsable TEXT NOT NULL,
-                FOREIGN KEY(reporte_id) REFERENCES reportes(id)
-            )
-        """)
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS reportes (
+                    id BIGSERIAL PRIMARY KEY,
+                    fecha TEXT NOT NULL,
+                    turno TEXT NOT NULL,
+                    mina TEXT NOT NULL DEFAULT 'ED',
+                    estado TEXT NOT NULL DEFAULT 'ABIERTO'
+                );
+            """)
 
-        conn.execute("""
-            CREATE TABLE IF NOT EXISTS buses_bahias (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                reporte_id INTEGER NOT NULL,
-                bahia TEXT NOT NULL,
-                hora TEXT NOT NULL,
-                observacion TEXT NOT NULL DEFAULT '',
-                FOREIGN KEY(reporte_id) REFERENCES reportes(id)
-            )
-        """)
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS gestion_areas (
+                    id BIGSERIAL PRIMARY KEY,
+                    reporte_id BIGINT NOT NULL,
+                    hora TEXT NOT NULL,
+                    hallazgo TEXT NOT NULL,
+                    accion TEXT NOT NULL,
+                    corregido SMALLINT NOT NULL,
+                    responsable TEXT NOT NULL,
+                    FOREIGN KEY(reporte_id) REFERENCES reportes(id)
+                );
+            """)
 
-        conn.execute("""
-            CREATE TABLE IF NOT EXISTS equipos_varados (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                reporte_id INTEGER NOT NULL,
-                equipo INTEGER NOT NULL,
-                ubicacion TEXT NOT NULL,
-                hora TEXT NOT NULL,
-                motivo TEXT NOT NULL,
-                FOREIGN KEY(reporte_id) REFERENCES reportes(id)
-            )
-        """)
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS buses_bahias (
+                    id BIGSERIAL PRIMARY KEY,
+                    reporte_id BIGINT NOT NULL,
+                    bahia TEXT NOT NULL,
+                    hora TEXT NOT NULL,
+                    observacion TEXT NOT NULL DEFAULT '',
+                    FOREIGN KEY(reporte_id) REFERENCES reportes(id)
+                );
+            """)
 
-        conn.execute("""
-            CREATE TABLE IF NOT EXISTS ausentismo (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                reporte_id INTEGER NOT NULL,
-                nombre TEXT NOT NULL,
-                motivo TEXT NOT NULL,
-                FOREIGN KEY(reporte_id) REFERENCES reportes(id)
-            )
-        """)
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS equipos_varados (
+                    id BIGSERIAL PRIMARY KEY,
+                    reporte_id BIGINT NOT NULL,
+                    equipo INTEGER NOT NULL,
+                    ubicacion TEXT NOT NULL,
+                    hora TEXT NOT NULL,
+                    motivo TEXT NOT NULL,
+                    FOREIGN KEY(reporte_id) REFERENCES reportes(id)
+                );
+            """)
 
-        conn.execute("""
-            CREATE TABLE IF NOT EXISTS bombas (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                reporte_id INTEGER NOT NULL,
-                numero TEXT NOT NULL,
-                estado TEXT NOT NULL,
-                ubicacion TEXT NOT NULL,
-                FOREIGN KEY(reporte_id) REFERENCES reportes(id)
-            )
-        """)
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS ausentismo (
+                    id BIGSERIAL PRIMARY KEY,
+                    reporte_id BIGINT NOT NULL,
+                    nombre TEXT NOT NULL,
+                    motivo TEXT NOT NULL,
+                    FOREIGN KEY(reporte_id) REFERENCES reportes(id)
+                );
+            """)
 
-        conn.execute("""
-            CREATE TABLE IF NOT EXISTS distribucion_camiones (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                reporte_id INTEGER NOT NULL,
-                tipo TEXT NOT NULL,
-                cantidad REAL NOT NULL,
-                creado_en TEXT DEFAULT CURRENT_TIMESTAMP
-            )
-        """)
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS bombas (
+                    id BIGSERIAL PRIMARY KEY,
+                    reporte_id BIGINT NOT NULL,
+                    numero TEXT NOT NULL,
+                    estado TEXT NOT NULL,
+                    ubicacion TEXT NOT NULL,
+                    FOREIGN KEY(reporte_id) REFERENCES reportes(id)
+                );
+            """)
 
-        conn.execute("""
-            CREATE TABLE IF NOT EXISTS equipo_liviano (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                reporte_id INTEGER NOT NULL,
-                camioneta INTEGER NOT NULL,
-                estado TEXT NOT NULL DEFAULT 'OK',
-                comentario TEXT NOT NULL DEFAULT '',
-                FOREIGN KEY(reporte_id) REFERENCES reportes(id)
-            )
-        """)
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS distribucion_camiones (
+                    id BIGSERIAL PRIMARY KEY,
+                    reporte_id BIGINT NOT NULL,
+                    tipo TEXT NOT NULL,
+                    cantidad DOUBLE PRECISION NOT NULL,
+                    creado_en TIMESTAMPTZ DEFAULT NOW()
+                );
+            """)
 
-        conn.execute("""
-            CREATE TABLE IF NOT EXISTS distribucion_personal (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                reporte_id INTEGER NOT NULL,
-                categoria TEXT NOT NULL,
-                cantidad INTEGER NOT NULL,
-                creado_en TEXT DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY(reporte_id) REFERENCES reportes(id),
-                UNIQUE(reporte_id, categoria)
-            )
-        """)
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS equipo_liviano (
+                    id BIGSERIAL PRIMARY KEY,
+                    reporte_id BIGINT NOT NULL,
+                    camioneta INTEGER NOT NULL,
+                    estado TEXT NOT NULL DEFAULT 'OK',
+                    comentario TEXT NOT NULL DEFAULT '',
+                    FOREIGN KEY(reporte_id) REFERENCES reportes(id)
+                );
+            """)
 
-        conn.execute("""
-            CREATE TABLE IF NOT EXISTS operadores_otras_areas (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                reporte_id INTEGER NOT NULL,
-                nombre TEXT NOT NULL,
-                area TEXT NOT NULL,
-                FOREIGN KEY(reporte_id) REFERENCES reportes(id)
-            )
-        """)
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS distribucion_personal (
+                    id BIGSERIAL PRIMARY KEY,
+                    reporte_id BIGINT NOT NULL,
+                    categoria TEXT NOT NULL,
+                    cantidad INTEGER NOT NULL,
+                    creado_en TIMESTAMPTZ DEFAULT NOW(),
+                    FOREIGN KEY(reporte_id) REFERENCES reportes(id),
+                    UNIQUE(reporte_id, categoria)
+                );
+            """)
 
-        conn.execute("""
-            CREATE TABLE IF NOT EXISTS entrenamiento_personal (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                reporte_id INTEGER NOT NULL,
-                entrenamiento TEXT NOT NULL,
-                cantidad INTEGER NOT NULL,
-                creado_en TEXT DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY(reporte_id) REFERENCES reportes(id),
-                UNIQUE(reporte_id, entrenamiento)
-            )
-        """)
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS operadores_otras_areas (
+                    id BIGSERIAL PRIMARY KEY,
+                    reporte_id BIGINT NOT NULL,
+                    nombre TEXT NOT NULL,
+                    area TEXT NOT NULL,
+                    FOREIGN KEY(reporte_id) REFERENCES reportes(id)
+                );
+            """)
 
-        conn.execute("""
-            CREATE TABLE IF NOT EXISTS luminarias (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                reporte_id INTEGER NOT NULL,
-                numero TEXT NOT NULL,
-                ubicacion TEXT NOT NULL,
-                creado_en TEXT DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY(reporte_id) REFERENCES reportes(id),
-                UNIQUE(reporte_id, numero)
-            )
-        """)
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS entrenamiento_personal (
+                    id BIGSERIAL PRIMARY KEY,
+                    reporte_id BIGINT NOT NULL,
+                    entrenamiento TEXT NOT NULL,
+                    cantidad INTEGER NOT NULL,
+                    creado_en TIMESTAMPTZ DEFAULT NOW(),
+                    FOREIGN KEY(reporte_id) REFERENCES reportes(id),
+                    UNIQUE(reporte_id, entrenamiento)
+                );
+            """)
 
-        conn.execute("""
-            CREATE TABLE IF NOT EXISTS contactos_operadores (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                reporte_id INTEGER NOT NULL,
-                tipo TEXT NOT NULL,
-                operador TEXT NOT NULL,
-                creado_en TEXT DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY(reporte_id) REFERENCES reportes(id)
-            )
-        """)
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS luminarias (
+                    id BIGSERIAL PRIMARY KEY,
+                    reporte_id BIGINT NOT NULL,
+                    numero TEXT NOT NULL,
+                    ubicacion TEXT NOT NULL,
+                    creado_en TIMESTAMPTZ DEFAULT NOW(),
+                    FOREIGN KEY(reporte_id) REFERENCES reportes(id),
+                    UNIQUE(reporte_id, numero)
+                );
+            """)
 
-        conn.execute("""
-            CREATE TABLE IF NOT EXISTS seguridad_observaciones (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                reporte_id INTEGER NOT NULL,
-                lugar TEXT NOT NULL,
-                lugar_norm TEXT NOT NULL,
-                hallazgos INTEGER NOT NULL,
-                divulgada INTEGER NOT NULL,
-                creado_en TEXT DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY(reporte_id) REFERENCES reportes(id),
-                UNIQUE(reporte_id, lugar_norm, hallazgos, divulgada)
-            )
-        """)
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS contactos_operadores (
+                    id BIGSERIAL PRIMARY KEY,
+                    reporte_id BIGINT NOT NULL,
+                    tipo TEXT NOT NULL,
+                    operador TEXT NOT NULL,
+                    creado_en TIMESTAMPTZ DEFAULT NOW(),
+                    FOREIGN KEY(reporte_id) REFERENCES reportes(id)
+                );
+            """)
 
-        conn.execute("""
-            CREATE TABLE IF NOT EXISTS seguridad_charlas (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                reporte_id INTEGER NOT NULL,
-                tema TEXT NOT NULL,
-                tema_norm TEXT NOT NULL,
-                personas INTEGER NOT NULL,
-                lugar TEXT NOT NULL,
-                lugar_norm TEXT NOT NULL,
-                creado_en TEXT DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY(reporte_id) REFERENCES reportes(id),
-                UNIQUE(reporte_id, tema_norm, personas, lugar_norm)
-            )
-        """)
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS seguridad_observaciones (
+                    id BIGSERIAL PRIMARY KEY,
+                    reporte_id BIGINT NOT NULL,
+                    lugar TEXT NOT NULL,
+                    lugar_norm TEXT NOT NULL,
+                    hallazgos INTEGER NOT NULL,
+                    divulgada SMALLINT NOT NULL,
+                    creado_en TIMESTAMPTZ DEFAULT NOW(),
+                    FOREIGN KEY(reporte_id) REFERENCES reportes(id),
+                    UNIQUE(reporte_id, lugar_norm, hallazgos, divulgada)
+                );
+            """)
 
-        conn.execute("""
-            CREATE TABLE IF NOT EXISTS first_last (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                reporte_id INTEGER NOT NULL UNIQUE,
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS seguridad_charlas (
+                    id BIGSERIAL PRIMARY KEY,
+                    reporte_id BIGINT NOT NULL,
+                    tema TEXT NOT NULL,
+                    tema_norm TEXT NOT NULL,
+                    personas INTEGER NOT NULL,
+                    lugar TEXT NOT NULL,
+                    lugar_norm TEXT NOT NULL,
+                    creado_en TIMESTAMPTZ DEFAULT NOW(),
+                    FOREIGN KEY(reporte_id) REFERENCES reportes(id),
+                    UNIQUE(reporte_id, tema_norm, personas, lugar_norm)
+                );
+            """)
 
-                inicio_pit2 TEXT NOT NULL,
-                inicio_pit5 TEXT NOT NULL,
-                final_pit2  TEXT NOT NULL,
-                final_pit5  TEXT NOT NULL,
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS first_last (
+                    id BIGSERIAL PRIMARY KEY,
+                    reporte_id BIGINT NOT NULL UNIQUE,
 
-                camiones_por_operador INTEGER NOT NULL DEFAULT 0,
-                razon TEXT NOT NULL DEFAULT "",
+                    inicio_pit2 TEXT NOT NULL,
+                    inicio_pit5 TEXT NOT NULL,
+                    final_pit2  TEXT NOT NULL,
+                    final_pit5  TEXT NOT NULL,
 
-                created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-                updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
+                    camiones_por_operador INTEGER NOT NULL DEFAULT 0,
+                    razon TEXT NOT NULL DEFAULT '',
 
-                FOREIGN KEY (reporte_id) REFERENCES reportes(id) ON DELETE CASCADE
-            )
-        """)
+                    created_at TIMESTAMPTZ DEFAULT NOW(),
+                    updated_at TIMESTAMPTZ DEFAULT NOW(),
 
-        conn.execute("""
-            CREATE TABLE IF NOT EXISTS pts_divulgacion (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                reporte_id INTEGER NOT NULL UNIQUE,
-                texto TEXT NOT NULL DEFAULT '',
-                creado_en TEXT DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY(reporte_id) REFERENCES reportes(id)
-            )
-        """)
+                    FOREIGN KEY (reporte_id) REFERENCES reportes(id) ON DELETE CASCADE
+                );
+            """)
 
-        conn.execute("""
-            CREATE TABLE IF NOT EXISTS comentarios_turno (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                reporte_id INTEGER NOT NULL,
-                comentario TEXT NOT NULL,
-                creado_en TEXT DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY(reporte_id) REFERENCES reportes(id)
-            )
-        """)
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS pts_divulgacion (
+                    id BIGSERIAL PRIMARY KEY,
+                    reporte_id BIGINT NOT NULL UNIQUE,
+                    texto TEXT NOT NULL DEFAULT '',
+                    creado_en TIMESTAMPTZ DEFAULT NOW(),
+                    FOREIGN KEY(reporte_id) REFERENCES reportes(id)
+                );
+            """)
 
-        conn.execute("""
-            CREATE TABLE IF NOT EXISTS supervisores_turno (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                reporte_id INTEGER NOT NULL,
-                grupo TEXT NOT NULL,
-                supervisor TEXT NOT NULL,
-                creado_en TEXT DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY(reporte_id) REFERENCES reportes(id),
-                UNIQUE(reporte_id, grupo, supervisor)
-            )
-        """)
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS comentarios_turno (
+                    id BIGSERIAL PRIMARY KEY,
+                    reporte_id BIGINT NOT NULL,
+                    comentario TEXT NOT NULL,
+                    creado_en TIMESTAMPTZ DEFAULT NOW(),
+                    FOREIGN KEY(reporte_id) REFERENCES reportes(id)
+                );
+            """)
+
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS supervisores_turno (
+                    id BIGSERIAL PRIMARY KEY,
+                    reporte_id BIGINT NOT NULL,
+                    grupo TEXT NOT NULL,
+                    supervisor TEXT NOT NULL,
+                    creado_en TIMESTAMPTZ DEFAULT NOW(),
+                    FOREIGN KEY(reporte_id) REFERENCES reportes(id),
+                    UNIQUE(reporte_id, grupo, supervisor)
+                );
+            """)
+
+        else:
+            # =========================================================
+            # SQLITE (Local)
+            # =========================================================
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS reportes (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    fecha TEXT NOT NULL,
+                    turno TEXT NOT NULL,
+                    mina TEXT NOT NULL DEFAULT 'ED',
+                    estado TEXT NOT NULL DEFAULT 'ABIERTO'
+                )
+            """)
+
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS gestion_areas (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    reporte_id INTEGER NOT NULL,
+                    hora TEXT NOT NULL,
+                    hallazgo TEXT NOT NULL,
+                    accion TEXT NOT NULL,
+                    corregido INTEGER NOT NULL,
+                    responsable TEXT NOT NULL,
+                    FOREIGN KEY(reporte_id) REFERENCES reportes(id)
+                )
+            """)
+
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS buses_bahias (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    reporte_id INTEGER NOT NULL,
+                    bahia TEXT NOT NULL,
+                    hora TEXT NOT NULL,
+                    observacion TEXT NOT NULL DEFAULT '',
+                    FOREIGN KEY(reporte_id) REFERENCES reportes(id)
+                )
+            """)
+
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS equipos_varados (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    reporte_id INTEGER NOT NULL,
+                    equipo INTEGER NOT NULL,
+                    ubicacion TEXT NOT NULL,
+                    hora TEXT NOT NULL,
+                    motivo TEXT NOT NULL,
+                    FOREIGN KEY(reporte_id) REFERENCES reportes(id)
+                )
+            """)
+
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS ausentismo (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    reporte_id INTEGER NOT NULL,
+                    nombre TEXT NOT NULL,
+                    motivo TEXT NOT NULL,
+                    FOREIGN KEY(reporte_id) REFERENCES reportes(id)
+                )
+            """)
+
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS bombas (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    reporte_id INTEGER NOT NULL,
+                    numero TEXT NOT NULL,
+                    estado TEXT NOT NULL,
+                    ubicacion TEXT NOT NULL,
+                    FOREIGN KEY(reporte_id) REFERENCES reportes(id)
+                )
+            """)
+
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS distribucion_camiones (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    reporte_id INTEGER NOT NULL,
+                    tipo TEXT NOT NULL,
+                    cantidad REAL NOT NULL,
+                    creado_en TEXT DEFAULT CURRENT_TIMESTAMP
+                )
+            """)
+
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS equipo_liviano (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    reporte_id INTEGER NOT NULL,
+                    camioneta INTEGER NOT NULL,
+                    estado TEXT NOT NULL DEFAULT 'OK',
+                    comentario TEXT NOT NULL DEFAULT '',
+                    FOREIGN KEY(reporte_id) REFERENCES reportes(id)
+                )
+            """)
+
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS distribucion_personal (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    reporte_id INTEGER NOT NULL,
+                    categoria TEXT NOT NULL,
+                    cantidad INTEGER NOT NULL,
+                    creado_en TEXT DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY(reporte_id) REFERENCES reportes(id),
+                    UNIQUE(reporte_id, categoria)
+                )
+            """)
+
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS operadores_otras_areas (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    reporte_id INTEGER NOT NULL,
+                    nombre TEXT NOT NULL,
+                    area TEXT NOT NULL,
+                    FOREIGN KEY(reporte_id) REFERENCES reportes(id)
+                )
+            """)
+
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS entrenamiento_personal (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    reporte_id INTEGER NOT NULL,
+                    entrenamiento TEXT NOT NULL,
+                    cantidad INTEGER NOT NULL,
+                    creado_en TEXT DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY(reporte_id) REFERENCES reportes(id),
+                    UNIQUE(reporte_id, entrenamiento)
+                )
+            """)
+
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS luminarias (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    reporte_id INTEGER NOT NULL,
+                    numero TEXT NOT NULL,
+                    ubicacion TEXT NOT NULL,
+                    creado_en TEXT DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY(reporte_id) REFERENCES reportes(id),
+                    UNIQUE(reporte_id, numero)
+                )
+            """)
+
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS contactos_operadores (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    reporte_id INTEGER NOT NULL,
+                    tipo TEXT NOT NULL,
+                    operador TEXT NOT NULL,
+                    creado_en TEXT DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY(reporte_id) REFERENCES reportes(id)
+                )
+            """)
+
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS seguridad_observaciones (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    reporte_id INTEGER NOT NULL,
+                    lugar TEXT NOT NULL,
+                    lugar_norm TEXT NOT NULL,
+                    hallazgos INTEGER NOT NULL,
+                    divulgada INTEGER NOT NULL,
+                    creado_en TEXT DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY(reporte_id) REFERENCES reportes(id),
+                    UNIQUE(reporte_id, lugar_norm, hallazgos, divulgada)
+                )
+            """)
+
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS seguridad_charlas (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    reporte_id INTEGER NOT NULL,
+                    tema TEXT NOT NULL,
+                    tema_norm TEXT NOT NULL,
+                    personas INTEGER NOT NULL,
+                    lugar TEXT NOT NULL,
+                    lugar_norm TEXT NOT NULL,
+                    creado_en TEXT DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY(reporte_id) REFERENCES reportes(id),
+                    UNIQUE(reporte_id, tema_norm, personas, lugar_norm)
+                )
+            """)
+
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS first_last (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    reporte_id INTEGER NOT NULL UNIQUE,
+
+                    inicio_pit2 TEXT NOT NULL,
+                    inicio_pit5 TEXT NOT NULL,
+                    final_pit2  TEXT NOT NULL,
+                    final_pit5  TEXT NOT NULL,
+
+                    camiones_por_operador INTEGER NOT NULL DEFAULT 0,
+                    razon TEXT NOT NULL DEFAULT "",
+
+                    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
+
+                    FOREIGN KEY (reporte_id) REFERENCES reportes(id) ON DELETE CASCADE
+                )
+            """)
+
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS pts_divulgacion (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    reporte_id INTEGER NOT NULL UNIQUE,
+                    texto TEXT NOT NULL DEFAULT '',
+                    creado_en TEXT DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY(reporte_id) REFERENCES reportes(id)
+                )
+            """)
+
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS comentarios_turno (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    reporte_id INTEGER NOT NULL,
+                    comentario TEXT NOT NULL,
+                    creado_en TEXT DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY(reporte_id) REFERENCES reportes(id)
+                )
+            """)
+
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS supervisores_turno (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    reporte_id INTEGER NOT NULL,
+                    grupo TEXT NOT NULL,
+                    supervisor TEXT NOT NULL,
+                    creado_en TEXT DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY(reporte_id) REFERENCES reportes(id),
+                    UNIQUE(reporte_id, grupo, supervisor)
+                )
+            """)
+
 
 
 # ---------------------------------------------------------
