@@ -781,22 +781,48 @@ def seed_admin_once():
 # [SEED] Minas por única vez para admin
 # ---------------------------------------------------------
 def seed_user_minas_once():
-    with get_conn() as conn:
-        admin = conn.execute(
-            "SELECT id FROM users WHERE username = 'admin' LIMIT 1"
-        ).fetchone()
+    # Configurable por variables, con defaults razonables
+    admin_username = os.environ.get("SEED_ADMIN_USER", "admin").strip().lower()
+    minas_raw = os.environ.get("SEED_ADMIN_MINAS", "").strip()  # ej: "EL DESCANSO,OTRA"
+    minas = [m.strip() for m in minas_raw.split(",") if m.strip()]
 
+    # Si no definiste minas, no hacemos nada (evita ruido en producción)
+    if not minas:
+        return
+
+    conn = get_db_connection()
+    cur = conn.cursor()
+    try:
+        # Buscar admin
+        cur.execute(
+            sql_params("SELECT id FROM users WHERE LOWER(username) = ? LIMIT 1"),
+            (admin_username,)
+        )
+        admin = cur.fetchone()
         if not admin:
             return
 
-        user_id = admin["id"]
-        minas = ["ED", "PB"]  # ajusta si quieres
+        admin_id = admin["id"] if isinstance(admin, dict) else admin[0]
 
-        for m in minas:
-            conn.execute("""
-                INSERT OR IGNORE INTO user_minas (user_id, mina)
-                VALUES (?, ?)
-            """, (user_id, m))
+        # Insertar minas (idempotente)
+        for mina in minas:
+            cur.execute(
+                sql_params("""
+                    INSERT INTO user_minas (user_id, mina)
+                    VALUES (?, ?)
+                    ON CONFLICT (user_id, mina) DO NOTHING
+                """),
+                (admin_id, mina)
+            )
+
+        conn.commit()
+    finally:
+        try:
+            cur.close()
+        except Exception:
+            pass
+        conn.close()
+
 
 
 # ---------------------------------------------------------
