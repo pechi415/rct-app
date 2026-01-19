@@ -8,6 +8,8 @@ from __future__ import annotations
 import os
 import re
 import sqlite3
+import psycopg2
+from psycopg2.extras import RealDictCursor
 from datetime import date, datetime
 from functools import wraps
 
@@ -18,6 +20,33 @@ from flask import (
 from weasyprint import HTML
 from werkzeug.security import generate_password_hash, check_password_hash
 
+def get_db_connection():
+    database_url = os.environ.get("DATABASE_URL")
+
+    if database_url:
+        # Render / PostgreSQL
+        return psycopg2.connect(
+            database_url,
+            cursor_factory=RealDictCursor
+        )
+    else:
+        # Local / SQLite
+        conn = sqlite3.connect("rct.db")
+        conn.row_factory = sqlite3.Row
+        return conn
+
+def is_postgres() -> bool:
+    return bool(os.environ.get("DATABASE_URL"))
+
+
+def sql_params(query: str) -> str:
+    """
+    Convierte placeholders de SQLite (?) a psycopg2 (%s) cuando estamos en Postgres.
+    En SQLite deja la query igual.
+    """
+    if is_postgres():
+        return query.replace("?", "%s")
+    return query
 
 # =========================================================
 # [APP] Flask
@@ -420,26 +449,62 @@ GRUPOS_SUP = ["G1", "G2", "G3"]
 # [DB] Tablas de autenticación / autorización
 # ---------------------------------------------------------
 def init_auth_tables():
-    with get_conn() as conn:
-        conn.execute("""
-        CREATE TABLE IF NOT EXISTS users (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          username TEXT NOT NULL UNIQUE,
-          password_hash TEXT NOT NULL,
-          rol TEXT NOT NULL CHECK (rol IN ('ADMIN','SUPERVISOR','DIGITADOR','LECTOR')),
-          is_active INTEGER NOT NULL DEFAULT 1,
-          created_at TEXT NOT NULL DEFAULT (datetime('now'))
-        )
-        """)
+    conn = get_db_connection()
+    cur = conn.cursor()
 
-        conn.execute("""
-        CREATE TABLE IF NOT EXISTS user_minas (
-          user_id INTEGER NOT NULL,
-          mina TEXT NOT NULL,
-          PRIMARY KEY (user_id, mina),
-          FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-        )
-        """)
+    try:
+        if is_postgres():
+            # PostgreSQL
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS users (
+                  id BIGSERIAL PRIMARY KEY,
+                  username TEXT NOT NULL UNIQUE,
+                  password_hash TEXT NOT NULL,
+                  rol TEXT NOT NULL CHECK (rol IN ('ADMIN','SUPERVISOR','DIGITADOR','LECTOR')),
+                  is_active SMALLINT NOT NULL DEFAULT 1,
+                  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+                );
+            """)
+
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS user_minas (
+                  user_id BIGINT NOT NULL,
+                  mina TEXT NOT NULL,
+                  PRIMARY KEY (user_id, mina),
+                  CONSTRAINT fk_user_minas_user
+                    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+                );
+            """)
+        else:
+            # SQLite
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS users (
+                  id INTEGER PRIMARY KEY AUTOINCREMENT,
+                  username TEXT NOT NULL UNIQUE,
+                  password_hash TEXT NOT NULL,
+                  rol TEXT NOT NULL CHECK (rol IN ('ADMIN','SUPERVISOR','DIGITADOR','LECTOR')),
+                  is_active INTEGER NOT NULL DEFAULT 1,
+                  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+                )
+            """)
+
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS user_minas (
+                  user_id INTEGER NOT NULL,
+                  mina TEXT NOT NULL,
+                  PRIMARY KEY (user_id, mina),
+                  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+                )
+            """)
+
+        conn.commit()
+    finally:
+        try:
+            cur.close()
+        except Exception:
+            pass
+        conn.close()
+
 
 
 # ---------------------------------------------------------
@@ -3793,13 +3858,22 @@ def login():
         username = request.form.get("username", "").strip().lower()
         password = request.form.get("password", "")
 
-        with get_conn() as conn:
-            user = conn.execute("""
+        conn = get_db_connection()
+        cur = conn.cursor()
+
+        cur.execute(
+            sql_params("""
                 SELECT id, username, password_hash, rol, is_active
                 FROM users
                 WHERE LOWER(username) = ?
                 LIMIT 1
-            """, (username,)).fetchone()
+            """),
+            (username,)
+        )
+
+        user = cur.fetchone()
+        cur.close()
+        conn.close()
 
         if user is None:
             error = "Usuario o contraseña incorrectos."
@@ -3813,6 +3887,7 @@ def login():
             return redirect(url_for("ver_reportes"))
 
     return render_template("login.html", error=error)
+
 
 
 
