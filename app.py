@@ -561,10 +561,12 @@ def init_auth_tables():
 # [DB] Tablas principales del RCT
 # ---------------------------------------------------------
 def init_db():
-    print("DEBUG DATABASE_URL:", bool(os.environ.get("DATABASE_URL")))
-    print("DEBUG is_postgres():", is_postgres())
+    print("INIT_DB: corriendo init_db()")
+
     with get_conn() as conn:
         if is_postgres():
+            print("INIT_DB: creando tablas POSTGRES")
+
             # =========================================================
             # POSTGRESQL (Render)
             # =========================================================
@@ -1158,14 +1160,7 @@ def _seed_test_user():
     return {"ok": True, "user": username, "pass": password, "rol": rol, "minas": minas}
 
 
-# ---------------------------------------------------------
-# [INIT] Ejecutar inicialización (ORDEN CORRECTO)
-# ---------------------------------------------------------
-init_auth_tables()
-init_db()
 
-seed_admin_once()
-seed_user_minas_once()
 
 
 # =========================================================
@@ -4228,12 +4223,13 @@ def logout():
 
 
 # ---------------------------------------------------------
-# [INIT] Auth tables + seeds
+# [INIT] Ejecutar inicialización (ORDEN CORRECTO)
 # ---------------------------------------------------------
 init_auth_tables()
-# seed_admin_once()
-# seed_user_minas_once()
+init_db()
 
+seed_admin_once()
+seed_user_minas_once()
 # =========================================================
 # RUN
 # =========================================================
