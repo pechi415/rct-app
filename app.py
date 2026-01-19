@@ -186,36 +186,81 @@ AREAS_OTRAS = sorted([
 
 
 # =========================================================
-# [DB] Conexión SQLite
+# [DB] Conexión (SQLite local / PostgreSQL en Render)
 # =========================================================
 from flask import g, has_app_context
 
-def _open_sqlite_conn():
-    conn = sqlite3.connect(
-        DB_PATH,
-        timeout=30,
-        check_same_thread=False
-    )
-    conn.row_factory = sqlite3.Row
-    conn.execute("PRAGMA journal_mode=WAL;")
-    conn.execute("PRAGMA synchronous=NORMAL;")
-    return conn
+class DBConnWrapper:
+    """
+    Wrapper para que el código existente pueda seguir usando:
+      conn.execute(...).fetchone()
+      with get_conn() as conn:
+    tanto en SQLite como en PostgreSQL (psycopg2).
+    """
+    def __init__(self, raw_conn, is_pg: bool):
+        self._conn = raw_conn
+        self._is_pg = is_pg
+
+    def execute(self, query: str, params=()):
+        if self._is_pg:
+            cur = self._conn.cursor()
+            cur.execute(sql_params(query), params or ())
+            return cur
+        else:
+            return self._conn.execute(query, params or ())
+
+    def commit(self):
+        return self._conn.commit()
+
+    def close(self):
+        return self._conn.close()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc, tb):
+        # En general no cerramos aquí si está en g (lo maneja teardown),
+        # pero si alguien lo usa fuera de request, sí conviene cerrarlo.
+        try:
+            self.close()
+        except Exception:
+            pass
+
+
+def _open_conn():
+    # Render / PostgreSQL
+    if is_postgres():
+        raw = get_db_connection()  # ya viene con RealDictCursor
+        return DBConnWrapper(raw, is_pg=True)
+
+    # Local / SQLite
+    raw = sqlite3.connect(DB_PATH, timeout=30, check_same_thread=False)
+    raw.row_factory = sqlite3.Row
+    raw.execute("PRAGMA journal_mode=WAL;")
+    raw.execute("PRAGMA synchronous=NORMAL;")
+    return DBConnWrapper(raw, is_pg=False)
+
 
 def get_conn():
     # Dentro de Flask (request): usar g
     if has_app_context():
         if "db" not in g:
-            g.db = _open_sqlite_conn()
+            g.db = _open_conn()
         return g.db
 
     # Fuera de Flask (inicio del programa / scripts)
-    return _open_sqlite_conn()
+    return _open_conn()
+
 
 @app.teardown_appcontext
 def close_db(exception=None):
     db = g.pop("db", None)
     if db is not None:
-        db.close()
+        try:
+            db.close()
+        except Exception:
+            pass
+
 
 
 
@@ -228,42 +273,45 @@ def close_db(exception=None):
 # ---------------------------------------------------------
 @app.before_request
 def load_logged_in_user():
-    """
-    Carga en:
-      - g.user: fila del usuario (id, username, rol, is_active)
-      - g.user_minas: set con minas autorizadas (ej: {"ED","PB"})
-    """
     user_id = session.get("user_id")
+    g.user = None
 
     if not user_id:
-        g.user = None
-        g.user_minas = set()
         return
 
-    with get_conn() as conn:
-        u = conn.execute("""
-            SELECT id, username, rol, is_active
-            FROM users
-            WHERE id = ?
-            LIMIT 1
-        """, (user_id,)).fetchone()
+    conn = get_db_connection()
+    cur = conn.cursor()
+    try:
+        cur.execute(
+            sql_params("""
+                SELECT id, username, rol, is_active
+                FROM users
+                WHERE id = ?
+                LIMIT 1
+            """),
+            (user_id,)
+        )
+        u = cur.fetchone()
+    finally:
+        try:
+            cur.close()
+        except Exception:
+            pass
+        conn.close()
 
-        # Usuario inexistente o inactivo -> cerrar sesión
-        if (not u) or (u["is_active"] != 1):
-            session.clear()
-            g.user = None
-            g.user_minas = set()
-            return
+    if u is None:
+        session.clear()
+        g.user = None
+        return
 
-        g.user = u
+    # Si está inactivo, lo sacamos
+    if u["is_active"] != 1:
+        session.clear()
+        g.user = None
+        return
 
-        rows = conn.execute("""
-            SELECT mina
-            FROM user_minas
-            WHERE user_id = ?
-        """, (user_id,)).fetchall()
+    g.user = u
 
-        g.user_minas = {r["mina"] for r in rows}
 
 
 # ---------------------------------------------------------
