@@ -89,6 +89,9 @@ BAHIAS = [
     "bahia 3 postes",
 ]
 
+ROLES = ["ADMIN", "SUPERVISOR", "DIGITADOR", "LECTOR"]
+
+
 MINAS = [
     ("ED", "El Descanso"),
     ("PB", "Pribbenow"),
@@ -4133,12 +4136,12 @@ def admin_usuarios():
 def admin_usuario_nuevo():
     if request.method == "GET":
         # ✅ Enviar catálogo de minas al template
-        return render_template("admin_usuario_nuevo.html", minas=MINAS)
+        return render_template("admin_usuario_nuevo.html", minas=MINAS, roles=ROLES)
 
     username = (request.form.get("username") or "").strip()
     nombre   = (request.form.get("nombre") or "").strip()
     email    = (request.form.get("email") or "").strip()
-    rol      = (request.form.get("rol") or "user").strip()
+    rol = (request.form.get("rol") or "LECTOR").strip().upper()
     password = request.form.get("password") or ""
     is_active = 1 if request.form.get("is_active") in ("1", "on", "true", "True") else 0
     minas = request.form.getlist("minas")
@@ -4203,16 +4206,18 @@ def admin_usuario_editar(user_id):
                 (user_id,)
             ).fetchall()
             minas_user = [r["mina"] for r in minas_user]
+            user_minas_set = set(minas_user)
 
-            # ✅ Enviar catálogo + minas seleccionadas
             return render_template(
                 "admin_usuario_editar.html",
-                user=user,
+                u=user,                      # ✅ template usa u
                 minas=MINAS,
-                minas_user=minas_user
+                roles=ROLES,                 # ✅ template usa roles
+                user_minas_set=user_minas_set
             )
 
-        rol = (request.form.get("rol") or "").strip()
+
+        rol = (request.form.get("rol") or "LECTOR").strip().upper()
         is_active = 1 if request.form.get("is_active") in ("1", "on", "true", "True") else 0
         minas = request.form.getlist("minas")
 
