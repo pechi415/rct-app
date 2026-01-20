@@ -3910,6 +3910,9 @@ def eliminar_supervisor_turno(reporte_id, item_id):
 @app.route("/reportes/<int:reporte_id>/resumen")
 @reporte_mina_required
 def resumen(reporte_id):
+    from flask import current_app
+    current_app.logger.error("MARCADOR_RESUMEN_V2: usando fetchval + total AS alias")
+
     with get_conn() as conn:
         r = fetch_reporte(conn, reporte_id)
 
