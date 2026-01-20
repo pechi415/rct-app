@@ -1964,19 +1964,23 @@ def equipos_varados(reporte_id):
             else:
                 equipo_raw = request.form.get("equipo", "").strip()
                 ubicacion = request.form.get("ubicacion", "").strip()
-                hora = request.form.get("hora", "").strip()
                 motivo = request.form.get("motivo", "").strip()
 
-                if equipo_raw == "" or ubicacion == "" or hora == "" or motivo == "":
+                if equipo_raw == "" or ubicacion == "" or motivo == "":
                     error = "Todos los campos son obligatorios."
                 elif not equipo_raw.isdigit():
                     error = "El equipo debe ser un número entero."
                 else:
                     equipo = int(equipo_raw)
+
+                    # ✅ hora ya no aplica
+                    hora = None
+
                     conn.execute("""
                         INSERT INTO equipos_varados (reporte_id, equipo, ubicacion, hora, motivo)
                         VALUES (?, ?, ?, ?, ?)
                     """, (reporte_id, equipo, ubicacion, hora, motivo))
+
                     return redirect(url_for("equipos_varados", reporte_id=reporte_id))
 
         items = conn.execute(
@@ -2011,23 +2015,28 @@ def editar_item_varados(reporte_id, item_id):
 
             equipo_raw = request.form.get("equipo", "").strip()
             ubicacion = request.form.get("ubicacion", "").strip()
-            hora = request.form.get("hora", "").strip()
             motivo = request.form.get("motivo", "").strip()
 
-            if equipo_raw == "" or ubicacion == "" or hora == "" or motivo == "":
+            if equipo_raw == "" or ubicacion == "" or motivo == "":
                 error = "Todos los campos son obligatorios."
             elif not equipo_raw.isdigit():
                 error = "El equipo debe ser un número entero."
             else:
                 equipo = int(equipo_raw)
+
+                # ✅ hora ya no aplica
+                hora = None
+
                 conn.execute("""
                     UPDATE equipos_varados
                     SET equipo = ?, ubicacion = ?, hora = ?, motivo = ?
                     WHERE id = ? AND reporte_id = ?
                 """, (equipo, ubicacion, hora, motivo, item_id, reporte_id))
+
                 return redirect(url_for("equipos_varados", reporte_id=reporte_id))
 
         return render_template("varados_editar.html", r=r, reporte=r, it=it, error=error)
+)
 
 
 @app.route("/reportes/<int:reporte_id>/varados/eliminar/<int:item_id>", methods=["POST"])
