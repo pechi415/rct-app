@@ -4150,7 +4150,8 @@ def admin_usuario_nuevo():
         flash("Faltan datos obligatorios.", "warning")
         return redirect(url_for("admin_usuario_nuevo"))
 
-    password_hash = hash_password(password)
+    password_hash = generate_password_hash(password)
+
 
     with get_conn() as conn:
         if conn._is_pg:
@@ -4245,6 +4246,18 @@ def admin_usuario_editar(user_id):
                     INSERT OR IGNORE INTO user_minas (user_id, mina)
                     VALUES (?, ?)
                 """, (user_id, m))
+
+        new_password = (request.form.get("new_password") or "").strip()
+        if new_password:
+            if len(new_password) < 6:
+                flash("La nueva contraseña debe tener al menos 6 caracteres.", "warning")
+                return redirect(url_for("admin_usuario_editar", user_id=user_id))
+            conn.execute("""
+                UPDATE users
+                SET password_hash = ?
+                WHERE id = ?
+            """, (generate_password_hash(new_password), user_id))
+
 
         conn.commit()
         flash("Usuario actualizado correctamente.", "success")
