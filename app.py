@@ -4131,133 +4131,115 @@ def admin_usuarios():
 @app.route("/admin/usuarios/nuevo", methods=["GET", "POST"])
 @admin_required
 def admin_usuario_nuevo():
-    error = None
+    if request.method == "GET":
+        return render_template("admin_usuario_nuevo.html")
 
-    if request.method == "POST":
-        username = request.form.get("username", "").strip()
-        password = request.form.get("password", "").strip()
-        rol = request.form.get("rol", "").strip().upper()
-        minas = request.form.getlist("minas")  # lista de minas marcadas
+    username = (request.form.get("username") or "").strip()
+    nombre   = (request.form.get("nombre") or "").strip()
+    email    = (request.form.get("email") or "").strip()
+    rol      = (request.form.get("rol") or "user").strip()
+    password = request.form.get("password") or ""
+    is_active = 1 if request.form.get("is_active") in ("1", "on", "true", "True") else 0
+    minas = request.form.getlist("minas")
 
-        roles_validos = {"ADMIN", "SUPERVISOR", "DIGITADOR", "LECTOR"}
-        minas_validas = {m[0] for m in MINAS}
+    if not username or not password:
+        flash("Faltan datos obligatorios.", "warning")
+        return redirect(url_for("admin_usuario_nuevo"))
 
-        if not username or not password or rol not in roles_validos:
-            error = "Usuario, contraseña y rol son obligatorios (rol válido)."
-        elif len(password) < 6:
-            error = "La contraseña debe tener al menos 6 caracteres."
-        elif any(m not in minas_validas for m in minas):
-            error = "Seleccionaste una mina inválida."
+    password_hash = hash_password(password)  # ajusta a tu función
+
+    with get_conn() as conn:
+        # Crear user
+        if conn._is_pg:
+            # PG: usa RETURNING para obtener el id sin depender de lastrowid
+            row = conn.execute("""
+                INSERT INTO users (username, nombre, email, password_hash, rol, is_active)
+                VALUES (?, ?, ?, ?, ?, ?)
+                RETURNING id
+            """, (username, nombre, email, password_hash, rol, int(is_active))).fetchone()
+            user_id = row["id"]
         else:
-            with get_conn() as conn:
-                try:
-                    cur = conn.execute("""
-                        INSERT INTO users (username, password_hash, rol, is_active)
-                        VALUES (?, ?, ?, 1)
-                    """, (username, generate_password_hash(password), rol))
-                    user_id = cur.lastrowid
-                except sqlite3.IntegrityError:
-                    error = "Ese username ya existe."
-                else:
-                    # Asignar minas (si no se marca ninguna, queda sin minas)
-                    for m in minas:
-                        conn.execute("""
-                            INSERT OR IGNORE INTO user_minas (user_id, mina)
-                            VALUES (?, ?)
-                        """, (user_id, m))
+            cur = conn.execute("""
+                INSERT INTO users (username, nombre, email, password_hash, rol, is_active)
+                VALUES (?, ?, ?, ?, ?, ?)
+            """, (username, nombre, email, password_hash, rol, int(is_active)))
+            user_id = cur.lastrowid
 
-                    return redirect(url_for("admin_usuarios"))
+        # Insert minas
+        for m in minas:
+            m = (m or "").strip()
+            if not m:
+                continue
 
-    return render_template("admin_usuario_nuevo.html", error=error, roles=["ADMIN","SUPERVISOR","DIGITADOR","LECTOR"], minas=MINAS)
+            if conn._is_pg:
+                conn.execute("""
+                    INSERT INTO user_minas (user_id, mina)
+                    VALUES (?, ?)
+                    ON CONFLICT (user_id, mina) DO NOTHING
+                """, (user_id, m))
+            else:
+                conn.execute("""
+                    INSERT OR IGNORE INTO user_minas (user_id, mina)
+                    VALUES (?, ?)
+                """, (user_id, m))
+
+        conn.commit()
+
+    flash("Usuario creado correctamente.", "success")
+    return redirect(url_for("admin_usuarios"))
 
 
 @app.route("/admin/usuarios/<int:user_id>/editar", methods=["GET", "POST"])
 @admin_required
 def admin_usuario_editar(user_id):
-    error = None
-    ok = None
-
     with get_conn() as conn:
-        u = conn.execute("""
-            SELECT id, username, rol, is_active
-            FROM users
-            WHERE id = ?
-        """, (user_id,)).fetchone()
+        user = conn.execute("SELECT * FROM users WHERE id = ?", (user_id,)).fetchone()
+        if not user:
+            flash("Usuario no encontrado.", "warning")
+            return redirect(url_for("admin_usuarios"))
 
-        if not u:
-            abort(404)
+        if request.method == "GET":
+            minas_user = conn.execute(
+                "SELECT mina FROM user_minas WHERE user_id = ? ORDER BY mina",
+                (user_id,)
+            ).fetchall()
+            minas_user = [r["mina"] for r in minas_user]
+            return render_template("admin_usuario_editar.html", user=user, minas_user=minas_user)
 
-        user_minas = conn.execute("""
-            SELECT mina FROM user_minas WHERE user_id = ?
-        """, (user_id,)).fetchall()
-        user_minas_set = {r["mina"] for r in user_minas}
-
-    if request.method == "POST":
-        rol = request.form.get("rol", "").strip().upper()
-        is_active = request.form.get("is_active", "1").strip()
+        # POST
+        rol = (request.form.get("rol") or "").strip()
+        is_active = 1 if request.form.get("is_active") in ("1", "on", "true", "True") else 0
         minas = request.form.getlist("minas")
-        new_password = request.form.get("new_password", "").strip()
 
-        roles_validos = {"ADMIN", "SUPERVISOR", "DIGITADOR", "LECTOR"}
-        minas_validas = {m[0] for m in MINAS}
+        conn.execute("""
+            UPDATE users
+            SET rol = ?, is_active = ?
+            WHERE id = ?
+        """, (rol, int(is_active), user_id))
 
-        if rol not in roles_validos:
-            error = "Rol inválido."
-        elif is_active not in ("0","1"):
-            error = "Estado inválido."
-        elif any(m not in minas_validas for m in minas):
-            error = "Seleccionaste una mina inválida."
-        elif new_password and len(new_password) < 6:
-            error = "La nueva contraseña debe tener al menos 6 caracteres."
-        else:
-            with get_conn() as conn:
-                # Actualizar rol/estado
+        # minas: borrar y reinsertar (simple y estable)
+        conn.execute("DELETE FROM user_minas WHERE user_id = ?", (user_id,))
+
+        for m in minas:
+            m = (m or "").strip()
+            if not m:
+                continue
+
+            if conn._is_pg:
                 conn.execute("""
-                    UPDATE users
-                    SET rol = ?, is_active = ?
-                    WHERE id = ?
-                """, (rol, int(is_active), user_id))
+                    INSERT INTO user_minas (user_id, mina)
+                    VALUES (?, ?)
+                    ON CONFLICT (user_id, mina) DO NOTHING
+                """, (user_id, m))
+            else:
+                conn.execute("""
+                    INSERT OR IGNORE INTO user_minas (user_id, mina)
+                    VALUES (?, ?)
+                """, (user_id, m))
 
-                # Reset password (si vino)
-                if new_password:
-                    conn.execute("""
-                        UPDATE users
-                        SET password_hash = ?
-                        WHERE id = ?
-                    """, (generate_password_hash(new_password), user_id))
-
-                # Actualizar minas: borrar y reinsertar
-                conn.execute("DELETE FROM user_minas WHERE user_id = ?", (user_id,))
-                for m in minas:
-                    conn.execute("""
-                        INSERT OR IGNORE INTO user_minas (user_id, mina)
-                        VALUES (?, ?)
-                    """, (user_id, m))
-
-            ok = "Usuario actualizado."
-
-            # Recargar datos para render
-            with get_conn() as conn:
-                u = conn.execute("""
-                    SELECT id, username, rol, is_active
-                    FROM users
-                    WHERE id = ?
-                """, (user_id,)).fetchone()
-
-                user_minas = conn.execute("""
-                    SELECT mina FROM user_minas WHERE user_id = ?
-                """, (user_id,)).fetchall()
-                user_minas_set = {r["mina"] for r in user_minas}
-
-    return render_template(
-        "admin_usuario_editar.html",
-        u=u,
-        minas=MINAS,
-        user_minas_set=user_minas_set,
-        roles=["ADMIN","SUPERVISOR","DIGITADOR","LECTOR"],
-        error=error,
-        ok=ok
-    )
+        conn.commit()
+        flash("Usuario actualizado correctamente.", "success")
+        return redirect(url_for("admin_usuarios"))
 
 
 @app.post("/admin/usuarios/<int:user_id>/eliminar")
