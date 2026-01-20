@@ -1251,7 +1251,7 @@ def build_reporte_context(conn, reporte_id: int) -> dict:
     # Distribución camiones (agrupada)
     # -------------------------
     dist_camiones = conn.execute("""
-        SELECT tipo, ROUND(SUM(cantidad), 2) AS cantidad
+        SELECT tipo, ROUND(SUM(cantidad)::numeric, 2) AS cantidad
         FROM distribucion_camiones
         WHERE reporte_id = ?
         GROUP BY tipo
