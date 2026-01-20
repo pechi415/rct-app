@@ -4191,6 +4191,10 @@ def admin_usuario_nuevo():
             if not m:
                 continue
 
+            # Regla de negocio: sin minas => inactivo
+            if not minas_sel:
+                is_active = 0
+
             if conn._is_pg:
                 conn.execute("""
                     INSERT INTO user_minas (user_id, mina)
@@ -4205,9 +4209,19 @@ def admin_usuario_nuevo():
 
         conn.commit()
 
-    estado_txt = "ACTIVO" if int(is_active) == 1 else "INACTIVO"
-    minas_txt = ", ".join(minas_sel) if minas_sel else "sin minas"
-    flash(f"Usuario creado: {username} ({rol}) — {estado_txt}. Minas: {minas_txt}", "success")
+    if not minas_sel:
+        flash(
+            f"Usuario creado como INACTIVO porque no tiene minas asignadas.",
+            "warning"
+        )
+    else:
+        estado_txt = "ACTIVO" if int(is_active) == 1 else "INACTIVO"
+        minas_txt = ", ".join(minas_sel)
+        flash(
+            f"Usuario creado: {username} ({rol}) — {estado_txt}. Minas: {minas_txt}",
+            "success"
+        )
+
 
     return redirect(url_for("admin_usuarios"))
 
