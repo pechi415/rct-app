@@ -4205,7 +4205,10 @@ def admin_usuario_nuevo():
 
         conn.commit()
 
-    flash("Usuario creado correctamente.", "success")
+    estado_txt = "ACTIVO" if int(is_active) == 1 else "INACTIVO"
+    minas_txt = ", ".join(minas_sel) if minas_sel else "sin minas"
+    flash(f"Usuario creado: {username} ({rol}) — {estado_txt}. Minas: {minas_txt}", "success")
+
     return redirect(url_for("admin_usuarios"))
 
 
