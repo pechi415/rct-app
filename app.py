@@ -1460,6 +1460,10 @@ def reporte_pdf(reporte_id: int):
     ctx.setdefault("bahias", [])
     ctx.setdefault("bahias_nota", "")
 
+    # temporal
+    ctx["__pdf_build_marker"] = "PDF_TEMPLATE_V2026_01_20_A"
+
+
     html = render_template("pdf/reporte_pdf.html", **ctx)
     pdf_bytes = HTML(string=html, base_url=request.url_root).write_pdf()
 
