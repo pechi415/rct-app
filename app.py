@@ -413,6 +413,26 @@ def fetch_reporte(conn, reporte_id: int):
 
     return r
 
+# ---------------------------------------------------------
+# [HELPER] nuevo
+# ---------------------------------------------------------
+def insert_and_get_id(conn, sql, params):
+    sql2 = sql_params(sql)  # ? -> %s si es Postgres
+
+    # Postgres
+    if is_postgres_conn(conn):
+        cur = conn.cursor()
+        cur.execute(sql2 + " RETURNING id", params)
+        new_id = cur.fetchone()[0]
+        conn.commit()
+        return new_id
+
+    # SQLite
+    cur = conn.execute(sql, params)
+    conn.commit()
+    return cur.lastrowid
+
+
 
 # ---------------------------------------------------------
 # [PERMISOS] Decorador por roles
@@ -1533,12 +1553,21 @@ def nuevo_reporte():
             mina_locked=(len(minas_permitidas) == 1)
         )
 
+    # ✅ POSTGRES: obtener id real con RETURNING (evita reporte_id=0)
     with get_conn() as conn:
         cur = conn.execute(
-            "INSERT INTO reportes (fecha, turno, estado, mina) VALUES (?, ?, 'ABIERTO', ?)",
+            "INSERT INTO reportes (fecha, turno, estado, mina) "
+            "VALUES (?, ?, 'ABIERTO', ?) RETURNING id",
             (fecha, turno, mina)
         )
-        reporte_id = cur.lastrowid
+        row = cur.fetchone()
+        reporte_id = row[0] if row else None
+
+    # Fallback seguro (por si algo raro pasa)
+    if not reporte_id or int(reporte_id) <= 0:
+        # Si tienes logger, aquí puedes loguear el caso
+        # current_app.logger.error("reporte_id invalido luego de crear: %s", reporte_id)
+        return redirect(url_for("reportes"))
 
     return redirect(url_for("reporte_inicio", reporte_id=reporte_id))
 
