@@ -4138,6 +4138,15 @@ def admin_usuario_nuevo():
     if rol not in ROLES:
         flash("Rol inválido.", "warning")
         return redirect(url_for("admin_usuario_nuevo"))
+    
+    with get_conn() as conn:
+        if conn.execute(
+            "SELECT 1 FROM users WHERE username = ?",
+            (username,)
+        ).fetchone():
+            flash("El usuario ya existe.", "warning")
+            return redirect(url_for("admin_usuario_nuevo"))
+
 
     password_hash = generate_password_hash(password)
 
