@@ -283,6 +283,7 @@ def close_db(exception=None):
 def load_logged_in_user():
     user_id = session.get("user_id")
     g.user = None
+    g.user_minas = []  # ✅ SIEMPRE definido
 
     if not user_id:
         return
@@ -300,6 +301,20 @@ def load_logged_in_user():
             (user_id,)
         )
         u = cur.fetchone()
+
+        # ✅ Cargar minas del usuario
+        cur.execute(
+            sql_params("""
+                SELECT mina
+                FROM user_minas
+                WHERE user_id = ?
+                ORDER BY mina
+            """),
+            (user_id,)
+        )
+        rows = cur.fetchall()
+        g.user_minas = [r["mina"] for r in rows]
+
     finally:
         try:
             cur.close()
@@ -310,15 +325,18 @@ def load_logged_in_user():
     if u is None:
         session.clear()
         g.user = None
+        g.user_minas = []
         return
 
     # Si está inactivo, lo sacamos
     if u["is_active"] != 1:
         session.clear()
         g.user = None
+        g.user_minas = []
         return
 
     g.user = u
+
 
 
 
