@@ -4132,7 +4132,8 @@ def admin_usuarios():
 @admin_required
 def admin_usuario_nuevo():
     if request.method == "GET":
-        return render_template("admin_usuario_nuevo.html")
+        # ✅ Enviar catálogo de minas al template
+        return render_template("admin_usuario_nuevo.html", minas=MINAS)
 
     username = (request.form.get("username") or "").strip()
     nombre   = (request.form.get("nombre") or "").strip()
@@ -4146,12 +4147,10 @@ def admin_usuario_nuevo():
         flash("Faltan datos obligatorios.", "warning")
         return redirect(url_for("admin_usuario_nuevo"))
 
-    password_hash = hash_password(password)  # ajusta a tu función
+    password_hash = hash_password(password)
 
     with get_conn() as conn:
-        # Crear user
         if conn._is_pg:
-            # PG: usa RETURNING para obtener el id sin depender de lastrowid
             row = conn.execute("""
                 INSERT INTO users (username, nombre, email, password_hash, rol, is_active)
                 VALUES (?, ?, ?, ?, ?, ?)
@@ -4165,7 +4164,6 @@ def admin_usuario_nuevo():
             """, (username, nombre, email, password_hash, rol, int(is_active)))
             user_id = cur.lastrowid
 
-        # Insert minas
         for m in minas:
             m = (m or "").strip()
             if not m:
@@ -4189,6 +4187,7 @@ def admin_usuario_nuevo():
     return redirect(url_for("admin_usuarios"))
 
 
+
 @app.route("/admin/usuarios/<int:user_id>/editar", methods=["GET", "POST"])
 @admin_required
 def admin_usuario_editar(user_id):
@@ -4204,9 +4203,15 @@ def admin_usuario_editar(user_id):
                 (user_id,)
             ).fetchall()
             minas_user = [r["mina"] for r in minas_user]
-            return render_template("admin_usuario_editar.html", user=user, minas_user=minas_user)
 
-        # POST
+            # ✅ Enviar catálogo + minas seleccionadas
+            return render_template(
+                "admin_usuario_editar.html",
+                user=user,
+                minas=MINAS,
+                minas_user=minas_user
+            )
+
         rol = (request.form.get("rol") or "").strip()
         is_active = 1 if request.form.get("is_active") in ("1", "on", "true", "True") else 0
         minas = request.form.getlist("minas")
@@ -4217,7 +4222,6 @@ def admin_usuario_editar(user_id):
             WHERE id = ?
         """, (rol, int(is_active), user_id))
 
-        # minas: borrar y reinsertar (simple y estable)
         conn.execute("DELETE FROM user_minas WHERE user_id = ?", (user_id,))
 
         for m in minas:
