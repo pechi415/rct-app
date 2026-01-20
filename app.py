@@ -2035,8 +2035,7 @@ def editar_item_varados(reporte_id, item_id):
 
                 return redirect(url_for("equipos_varados", reporte_id=reporte_id))
 
-        return render_template("varados_editar.html", r=r, reporte=r, it=it, error=error)
-)
+    return render_template("varados_editar.html", r=r, reporte=r, it=it, error=error)
 
 
 @app.route("/reportes/<int:reporte_id>/varados/eliminar/<int:item_id>", methods=["POST"])
