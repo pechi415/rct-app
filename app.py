@@ -4156,8 +4156,15 @@ def admin_usuario_nuevo():
     if rol not in ROLES:
         flash("Rol inválido.", "warning")
         return redirect(url_for("admin_usuario_nuevo"))
-    
+
+    # ✅ Regla de negocio: si no tiene minas, forzar INACTIVO (antes del INSERT)
+    if not minas_sel:
+        is_active = 0
+
+    password_hash = generate_password_hash(password)
+
     with get_conn() as conn:
+        # ✅ Check duplicado usando la misma conexión
         if conn.execute(
             "SELECT 1 FROM users WHERE username = ?",
             (username,)
@@ -4165,18 +4172,13 @@ def admin_usuario_nuevo():
             flash("El usuario ya existe.", "warning")
             return redirect(url_for("admin_usuario_nuevo"))
 
-
-    password_hash = generate_password_hash(password)
-
-    with get_conn() as conn:
+        # ✅ Crear user (solo columnas reales)
         if conn._is_pg:
             row = conn.execute("""
                 INSERT INTO users (username, password_hash, rol, is_active)
                 VALUES (?, ?, ?, ?)
                 RETURNING id
             """, (username, password_hash, rol, int(is_active))).fetchone()
-
-            # DictRow -> row["id"]
             user_id = row["id"] if row else None
         else:
             cur = conn.execute("""
@@ -4185,15 +4187,11 @@ def admin_usuario_nuevo():
             """, (username, password_hash, rol, int(is_active)))
             user_id = cur.lastrowid
 
-        # Guardar minas (si seleccionó)
+        # ✅ Guardar minas (solo si seleccionó)
         for m in minas_sel:
             m = (m or "").strip().upper()
             if not m:
                 continue
-
-            # Regla de negocio: sin minas => inactivo
-            if not minas_sel:
-                is_active = 0
 
             if conn._is_pg:
                 conn.execute("""
@@ -4207,23 +4205,26 @@ def admin_usuario_nuevo():
                     VALUES (?, ?)
                 """, (user_id, m))
 
+        # ✅ Doble seguro: si no hay minas, dejarlo INACTIVO en BD sí o sí
+        if not minas_sel:
+            conn.execute(
+                "UPDATE users SET is_active = 0 WHERE id = ?",
+                (user_id,)
+            )
+
+
         conn.commit()
 
+    # ✅ Mensaje final coherente
     if not minas_sel:
-        flash(
-            f"Usuario creado como INACTIVO porque no tiene minas asignadas.",
-            "warning"
-        )
+        flash("Usuario creado como INACTIVO porque no tiene minas asignadas.", "warning")
     else:
         estado_txt = "ACTIVO" if int(is_active) == 1 else "INACTIVO"
         minas_txt = ", ".join(minas_sel)
-        flash(
-            f"Usuario creado: {username} ({rol}) — {estado_txt}. Minas: {minas_txt}",
-            "success"
-        )
-
+        flash(f"Usuario creado: {username} ({rol}) — {estado_txt}. Minas: {minas_txt}", "success")
 
     return redirect(url_for("admin_usuarios"))
+
 
 
 @app.route("/admin/usuarios/<int:user_id>/editar", methods=["GET", "POST"])
