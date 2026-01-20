@@ -15,8 +15,9 @@ from functools import wraps
 
 from flask import (
     Flask, render_template, request, redirect,
-    url_for, abort, make_response, session, g
+    url_for, abort, make_response, session, g, flash
 )
+
 from weasyprint import HTML
 from werkzeug.security import generate_password_hash, check_password_hash
 
