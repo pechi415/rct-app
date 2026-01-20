@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8">
   <title>RCT - Reporte #{{ r.id }}</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/pdf.css') }}">
+  <link rel="stylesheet" href="static/css/pdf.css">
 
   {# Strings para @page (si las necesitas en algún momento) #}
   <style>
@@ -42,7 +42,7 @@
   <div class="page-header">
     <div class="header-inner">
       <div class="hdr-left">
-        <img class="hdr-logo" src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo">
+        <img class="hdr-logo" src="static/img/logo.png" alt="Logo">
       </div>
 
       <div class="hdr-center">

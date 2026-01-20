@@ -1465,7 +1465,9 @@ def reporte_pdf(reporte_id: int):
 
 
     html = render_template("pdf/reporte_pdf.html", **ctx)
-    pdf_bytes = HTML(string=html, base_url=request.url_root).write_pdf()
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    pdf_bytes = HTML(string=html, base_url=base_dir).write_pdf()
+
 
     resp = make_response(pdf_bytes)
     resp.headers["Content-Type"] = "application/pdf"
