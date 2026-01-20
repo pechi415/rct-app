@@ -1518,10 +1518,7 @@ def nuevo_reporte():
         return ("No tienes minas asignadas. Contacta al administrador.", 403)
 
     if request.method == "GET":
-        # ✅ Si solo tiene 1 mina, se preselecciona y no hace falta escoger
         mina_sel = minas_permitidas[0]
-
-        # En el template puedes ocultar el select si len(minas_permitidas)==1
         minas_ui = [(code, mina_label(code)) for code in minas_permitidas]
 
         return render_template(
@@ -1530,7 +1527,7 @@ def nuevo_reporte():
             error=None,
             minas=minas_ui,
             mina_sel=mina_sel,
-            mina_locked=(len(minas_permitidas) == 1)  # ✅ bandera para UI
+            mina_locked=(len(minas_permitidas) == 1)
         )
 
     # POST
@@ -1538,7 +1535,7 @@ def nuevo_reporte():
     turno = request.form.get("turno", "").strip().upper()
     mina = request.form.get("mina", "").strip().upper()
 
-    # ✅ Validar mina contra permitidas (aquí está el blindaje real)
+    # ✅ Validar mina contra permitidas
     if mina not in minas_permitidas:
         return ("No autorizado para crear reportes en esta mina.", 403)
 
@@ -1553,7 +1550,7 @@ def nuevo_reporte():
             mina_locked=(len(minas_permitidas) == 1)
         )
 
-    # ✅ POSTGRES: obtener id real con RETURNING (evita reporte_id=0)
+    # ✅ Insert + RETURNING id (Postgres) y lectura blindada del row
     with get_conn() as conn:
         cur = conn.execute(
             "INSERT INTO reportes (fecha, turno, estado, mina) "
@@ -1561,15 +1558,25 @@ def nuevo_reporte():
             (fecha, turno, mina)
         )
         row = cur.fetchone()
-        reporte_id = row[0] if row else None
 
-    # Fallback seguro (por si algo raro pasa)
+        # row puede venir como tupla (id,) o como dict-like {'id': id}
+        if row is None:
+            reporte_id = None
+        elif isinstance(row, (tuple, list)):
+            reporte_id = row[0]
+        else:
+            # dict / RowMapping
+            try:
+                reporte_id = row["id"]
+            except Exception:
+                # último fallback
+                reporte_id = getattr(row, "id", None)
+
     if not reporte_id or int(reporte_id) <= 0:
-        # Si tienes logger, aquí puedes loguear el caso
-        # current_app.logger.error("reporte_id invalido luego de crear: %s", reporte_id)
         return redirect(url_for("reportes"))
 
     return redirect(url_for("reporte_inicio", reporte_id=reporte_id))
+
 
 
 
