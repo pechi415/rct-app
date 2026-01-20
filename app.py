@@ -3918,8 +3918,11 @@ def resumen(reporte_id):
             (reporte_id,)
         ).fetchall()
 
+        # ✅ FIX POSTGRES: ROUND(double precision, int) no existe -> castear a numeric
         dist_camiones = conn.execute("""
-            SELECT tipo, ROUND(SUM(cantidad), 2) AS cantidad
+            SELECT
+                tipo,
+                ROUND(SUM(cantidad)::numeric, 2) AS cantidad
             FROM distribucion_camiones
             WHERE reporte_id = ?
             GROUP BY tipo
@@ -4052,7 +4055,6 @@ def resumen(reporte_id):
         comentarios=comentarios,
         supervisores=supervisores
     )
-
 
 # =========================================================
 # [ADMIN] Usuarios (solo ADMIN)
