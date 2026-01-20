@@ -25,7 +25,7 @@ def get_db_connection():
 
     if database_url:
         # Render / PostgreSQL
-        conn = psycopg2.connect(database_url, cursor_factory=RealDictCursor)
+        conn = psycopg2.connect(database_url, cursor_factory=DictCursor)
         conn.autocommit = True  # <-- CLAVE
         return conn
     else:
@@ -195,20 +195,41 @@ class DBConnWrapper:
     """
     Wrapper para que el código existente pueda seguir usando:
       conn.execute(...).fetchone()
+      conn.execute(...).fetchall()
       with get_conn() as conn:
     tanto en SQLite como en PostgreSQL (psycopg2).
     """
+
     def __init__(self, raw_conn, is_pg: bool):
         self._conn = raw_conn
         self._is_pg = is_pg
 
     def execute(self, query: str, params=()):
         if self._is_pg:
+            # ✅ Importante: si la conexion usa DictCursor,
+            # entonces self._conn.cursor() ya devuelve DictCursor.
             cur = self._conn.cursor()
             cur.execute(sql_params(query), params or ())
             return cur
         else:
             return self._conn.execute(query, params or ())
+
+    # ✅ Helper recomendado: devuelve el primer valor de la primera fila (SUM/COUNT/etc.)
+    def fetchval(self, query: str, params=(), default=None):
+        cur = self.execute(query, params)
+        row = cur.fetchone()
+        if row is None:
+            return default
+
+        # SQLite (sqlite3.Row) soporta index y key
+        # Postgres (DictRow) soporta index y key
+        try:
+            return row[0]
+        except Exception:
+            # fallback por si algo raro pasa
+            if hasattr(row, "keys") and row.keys():
+                return row[list(row.keys())[0]]
+            return default
 
     def commit(self):
         return self._conn.commit()
@@ -220,12 +241,11 @@ class DBConnWrapper:
         return self
 
     def __exit__(self, exc_type, exc, tb):
-        # En general no cerramos aquí si está en g (lo maneja teardown),
-        # pero si alguien lo usa fuera de request, sí conviene cerrarlo.
         try:
             self.close()
         except Exception:
             pass
+
 
 
 def _open_conn():
@@ -3944,11 +3964,18 @@ def resumen(reporte_id):
                 camiones_disponibles = int(round(d["cantidad"]))
                 break
 
-        total_camiones = conn.execute(
-            "SELECT COALESCE(SUM(cantidad), 0) FROM distribucion_camiones WHERE reporte_id = ?",
+        row_total = conn.execute(
+            "SELECT COALESCE(SUM(cantidad), 0) AS total FROM distribucion_camiones WHERE reporte_id = ?",
             (reporte_id,)
-        ).fetchone()[0]
+        ).fetchone()
+
+        total_camiones = conn.fetchval(
+            "SELECT COALESCE(SUM(cantidad), 0) FROM distribucion_camiones WHERE reporte_id = ?",
+            (reporte_id,),
+            default=0
+        )
         total_camiones = int(round(total_camiones))
+
 
         equipo_liviano_items = conn.execute(
             "SELECT camioneta, estado, comentario FROM equipo_liviano WHERE reporte_id = ? ORDER BY id DESC",
