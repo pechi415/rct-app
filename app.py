@@ -9,7 +9,7 @@ import os
 import re
 import sqlite3
 import psycopg2
-from psycopg2.extras import RealDictCursor
+from psycopg2.extras import DictCursor
 from datetime import date, datetime
 from functools import wraps
 
