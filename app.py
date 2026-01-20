@@ -195,41 +195,26 @@ AREAS_OTRAS = sorted([
 from flask import g, has_app_context
 
 class DBConnWrapper:
-    """
-    Wrapper para que el código existente pueda seguir usando:
-      conn.execute(...).fetchone()
-      conn.execute(...).fetchall()
-      with get_conn() as conn:
-    tanto en SQLite como en PostgreSQL (psycopg2).
-    """
-
     def __init__(self, raw_conn, is_pg: bool):
         self._conn = raw_conn
         self._is_pg = is_pg
 
     def execute(self, query: str, params=()):
         if self._is_pg:
-            # ✅ Importante: si la conexion usa DictCursor,
-            # entonces self._conn.cursor() ya devuelve DictCursor.
             cur = self._conn.cursor()
             cur.execute(sql_params(query), params or ())
             return cur
         else:
             return self._conn.execute(query, params or ())
 
-    # ✅ Helper recomendado: devuelve el primer valor de la primera fila (SUM/COUNT/etc.)
     def fetchval(self, query: str, params=(), default=None):
         cur = self.execute(query, params)
         row = cur.fetchone()
         if row is None:
             return default
-
-        # SQLite (sqlite3.Row) soporta index y key
-        # Postgres (DictRow) soporta index y key
         try:
             return row[0]
         except Exception:
-            # fallback por si algo raro pasa
             if hasattr(row, "keys") and row.keys():
                 return row[list(row.keys())[0]]
             return default
@@ -244,10 +229,8 @@ class DBConnWrapper:
         return self
 
     def __exit__(self, exc_type, exc, tb):
-        try:
-            self.close()
-        except Exception:
-            pass
+        # ✅ NO cerrar aquí, porque get_conn() la guarda en g y teardown la cierra.
+        return False
 
 
 
@@ -4135,41 +4118,48 @@ def admin_usuarios():
 @admin_required
 def admin_usuario_nuevo():
     if request.method == "GET":
-        # ✅ Enviar catálogo de minas al template
-        return render_template("admin_usuario_nuevo.html", minas=MINAS, roles=ROLES)
+        return render_template(
+            "admin_usuario_nuevo.html",
+            roles=ROLES,
+            minas=MINAS
+        )
 
-    username = (request.form.get("username") or "").strip()
-    nombre   = (request.form.get("nombre") or "").strip()
-    email    = (request.form.get("email") or "").strip()
-    rol = (request.form.get("rol") or "LECTOR").strip().upper()
+    username = (request.form.get("username") or "").strip().lower()
     password = request.form.get("password") or ""
+    rol = (request.form.get("rol") or "").strip().upper()
     is_active = 1 if request.form.get("is_active") in ("1", "on", "true", "True") else 0
-    minas = request.form.getlist("minas")
+    minas_sel = request.form.getlist("minas")
 
     if not username or not password:
         flash("Faltan datos obligatorios.", "warning")
         return redirect(url_for("admin_usuario_nuevo"))
 
-    password_hash = generate_password_hash(password)
+    if rol not in ROLES:
+        flash("Rol inválido.", "warning")
+        return redirect(url_for("admin_usuario_nuevo"))
 
+    password_hash = generate_password_hash(password)
 
     with get_conn() as conn:
         if conn._is_pg:
             row = conn.execute("""
-                INSERT INTO users (username, nombre, email, password_hash, rol, is_active)
-                VALUES (?, ?, ?, ?, ?, ?)
+                INSERT INTO users (username, password_hash, rol, is_active)
+                VALUES (?, ?, ?, ?)
                 RETURNING id
-            """, (username, nombre, email, password_hash, rol, int(is_active))).fetchone()
-            user_id = row["id"]
+            """, (username, password_hash, rol, int(is_active))).fetchone()
+
+            # DictRow -> row["id"]
+            user_id = row["id"] if row else None
         else:
             cur = conn.execute("""
-                INSERT INTO users (username, nombre, email, password_hash, rol, is_active)
-                VALUES (?, ?, ?, ?, ?, ?)
-            """, (username, nombre, email, password_hash, rol, int(is_active)))
+                INSERT INTO users (username, password_hash, rol, is_active)
+                VALUES (?, ?, ?, ?)
+            """, (username, password_hash, rol, int(is_active)))
             user_id = cur.lastrowid
 
-        for m in minas:
-            m = (m or "").strip()
+        # Guardar minas (si seleccionó)
+        for m in minas_sel:
+            m = (m or "").strip().upper()
             if not m:
                 continue
 
@@ -4191,36 +4181,42 @@ def admin_usuario_nuevo():
     return redirect(url_for("admin_usuarios"))
 
 
-
 @app.route("/admin/usuarios/<int:user_id>/editar", methods=["GET", "POST"])
 @admin_required
 def admin_usuario_editar(user_id):
     with get_conn() as conn:
-        user = conn.execute("SELECT * FROM users WHERE id = ?", (user_id,)).fetchone()
-        if not user:
+        u = conn.execute(
+            "SELECT id, username, rol, is_active FROM users WHERE id = ?",
+            (user_id,)
+        ).fetchone()
+
+        if not u:
             flash("Usuario no encontrado.", "warning")
             return redirect(url_for("admin_usuarios"))
 
         if request.method == "GET":
-            minas_user = conn.execute(
+            rows = conn.execute(
                 "SELECT mina FROM user_minas WHERE user_id = ? ORDER BY mina",
                 (user_id,)
             ).fetchall()
-            minas_user = [r["mina"] for r in minas_user]
-            user_minas_set = set(minas_user)
+            user_minas_set = {r["mina"] for r in rows}
 
             return render_template(
                 "admin_usuario_editar.html",
-                u=user,                      # ✅ template usa u
+                u=u,
+                roles=ROLES,
                 minas=MINAS,
-                roles=ROLES,                 # ✅ template usa roles
                 user_minas_set=user_minas_set
             )
 
-
-        rol = (request.form.get("rol") or "LECTOR").strip().upper()
+        # POST
+        rol = (request.form.get("rol") or "").strip().upper()
         is_active = 1 if request.form.get("is_active") in ("1", "on", "true", "True") else 0
-        minas = request.form.getlist("minas")
+        minas_sel = request.form.getlist("minas")
+
+        if rol not in ROLES:
+            flash("Rol inválido.", "warning")
+            return redirect(url_for("admin_usuario_editar", user_id=user_id))
 
         conn.execute("""
             UPDATE users
@@ -4228,10 +4224,11 @@ def admin_usuario_editar(user_id):
             WHERE id = ?
         """, (rol, int(is_active), user_id))
 
+        # Reset minas
         conn.execute("DELETE FROM user_minas WHERE user_id = ?", (user_id,))
 
-        for m in minas:
-            m = (m or "").strip()
+        for m in minas_sel:
+            m = (m or "").strip().upper()
             if not m:
                 continue
 
@@ -4247,21 +4244,11 @@ def admin_usuario_editar(user_id):
                     VALUES (?, ?)
                 """, (user_id, m))
 
-        new_password = (request.form.get("new_password") or "").strip()
-        if new_password:
-            if len(new_password) < 6:
-                flash("La nueva contraseña debe tener al menos 6 caracteres.", "warning")
-                return redirect(url_for("admin_usuario_editar", user_id=user_id))
-            conn.execute("""
-                UPDATE users
-                SET password_hash = ?
-                WHERE id = ?
-            """, (generate_password_hash(new_password), user_id))
-
-
         conn.commit()
-        flash("Usuario actualizado correctamente.", "success")
-        return redirect(url_for("admin_usuarios"))
+
+    flash("Usuario actualizado correctamente.", "success")
+    return redirect(url_for("admin_usuarios"))
+
 
 
 @app.post("/admin/usuarios/<int:user_id>/eliminar")
