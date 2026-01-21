@@ -430,53 +430,55 @@
             {% endfor %}
 
             <div class="mini-kpi-row">
-            <div class="mini-kpi mini-ok">
-                <div class="mini-kpi-label">Operativos</div>
-                <div class="mini-kpi-value">{{ ns.op|round(0)|int }}</div>
-            </div>
+                <div class="mini-kpi mini-ok">
+                    <div class="mini-kpi-label">Operativos</div>
+                    <div class="mini-kpi-value">{{ ns.op|round(0)|int }}</div>
+                </div>
 
-            <div class="mini-kpi mini-bad">
-                <div class="mini-kpi-label">Down</div>
-                <div class="mini-kpi-value">{{ ns.down|round(0)|int }}</div>
-            </div>
+                <div class="mini-kpi mini-bad">
+                    <div class="mini-kpi-label">Down</div>
+                    <div class="mini-kpi-value">{{ ns.down|round(0)|int }}</div>
+                </div>
 
-            <div class="mini-kpi mini-warn">
-                <div class="mini-kpi-label">Stand By c/Op</div>
-                <div class="mini-kpi-value">{{ ns.sbo|round(0)|int }}</div>
-            </div>
+                <div class="mini-kpi mini-warn">
+                    <div class="mini-kpi-label">Stand By c/Op</div>
+                    <div class="mini-kpi-value">{{ ns.sbo|round(0)|int }}</div>
+                </div>
 
-            <div class="mini-kpi mini-muted">
-                <div class="mini-kpi-label">Stand By s/Op</div>
-                <div class="mini-kpi-value">{{ ns.sbs|round(0)|int }}</div>
-            </div>
+                <div class="mini-kpi mini-muted">
+                    <div class="mini-kpi-label">Stand By s/Op</div>
+                    <div class="mini-kpi-value">{{ ns.sbs|round(0)|int }}</div>
+                </div>
+                </div>
 
-            {# ---- Tabla (solo ítems NO incluidos en mini-KPIs) ---- #}
-            {% if dist_camiones|length == 0 %}
-            <div class="empty">Sin registros.</div>
-            {% else %}
-            <table class="table table-compact">
-                <thead>
-                <tr>
-                    <th>Tipo</th>
-                    <th class="t-right" style="width:90px;">Cantidad</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for d in dist_camiones %}
-                    {% set tipo = d["tipo"] if d is mapping else d[0] %}
-                    {% set cant = d["cantidad"] if d is mapping else d[1] %}
-
-                    {% if tipo not in ["Operativos","Down","Stand By con Operador","Stand By sin Operador"] %}
+                {# ---- Tabla (solo ítems NO incluidos en mini-KPIs) ---- #}
+                {% if dist_camiones|length == 0 %}
+                <div class="empty">Sin registros.</div>
+                {% else %}
+                <table class="table table-compact">
+                    <thead>
                     <tr>
-                        <td>{{ tipo }}</td>
-                        <td class="t-right nowrap">{{ cant|round(0)|int }}</td>
+                        <th>Tipo</th>
+                        <th class="t-right" style="width:90px;">Cantidad</th>
                     </tr>
-                    {% endif %}
-                {% endfor %}
-                </tbody>
-            </table>
-            {% endif %}
-        </div>
+                    </thead>
+                    <tbody>
+                    {% for d in dist_camiones %}
+                        {% set tipo = d["tipo"] if d is mapping else d[0] %}
+                        {% set cant = d["cantidad"] if d is mapping else d[1] %}
+
+                        {% if tipo not in ["Operativos","Down","Stand By con Operador","Stand By sin Operador"] %}
+                        <tr>
+                            <td>{{ tipo }}</td>
+                            <td class="t-right nowrap">{{ cant|round(0)|int }}</td>
+                        </tr>
+                        {% endif %}
+                    {% endfor %}
+                    </tbody>
+                </table>
+                {% endif %}
+
+            </div>
 
     </div>
 
