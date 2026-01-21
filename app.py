@@ -81,7 +81,7 @@ BAHIAS = [
     "bahía Platanal",
     "bahía Conveyor",
     "bahía 1.5",
-    "bahía Banana 3 Norte",
+    "bahía Ban 3 Nor",
     "bahía 5",
     "bahía 7A",
     "bahía Retro",

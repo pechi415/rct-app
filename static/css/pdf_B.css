@@ -1230,3 +1230,14 @@ h1, h2, h3{ margin: 0; }
   white-space: nowrap; /* Hora en una sola línea */
 }
 
+/* FIX DEFINITIVO: evitar doble borde en el centro */
+#operacion table.table-split th:nth-child(2),
+#operacion table.table-split td:nth-child(2){
+  border-right: 0 !important;
+}
+
+#operacion table.table-split th:nth-child(3),
+#operacion table.table-split td:nth-child(3){
+  border-left: 1px solid var(--line) !important;
+}
+
