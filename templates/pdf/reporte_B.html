@@ -409,76 +409,82 @@
   <section class="section" id="bloque-camiones-liviano">
     <div class="two-col">
 
-      <!-- IZQUIERDA: Distribución de camiones -->
-      <div class="card" id="dist-camiones">
-        <div class="section-title">
-          <h2 class="h2">Distribución de camiones</h2>
-        </div>
+        <!-- IZQUIERDA: Distribución de camiones -->
+        <div class="card" id="dist-camiones">
+            <div class="section-title">
+            <h2 class="h2">Distribución de camiones</h2>
+            </div>
 
-        {# ---- Resumen rápido (4 principales) ---- #}
-        {% set ns = namespace(op=0, down=0, sbo=0, sbs=0) %}
+            {# ---- Resumen rápido (4 principales + Total) ---- #}
+            {% set ns = namespace(op=0, down=0, sbo=0, sbs=0) %}
 
-        {% for d in dist_camiones %}
-          {% set tipo = d["tipo"] if d is mapping else d[0] %}
-          {% set cant = d["cantidad"] if d is mapping else d[1] %}
+            {% for d in dist_camiones %}
+            {% set tipo = d["tipo"] if d is mapping else d[0] %}
+            {% set cant = d["cantidad"] if d is mapping else d[1] %}
 
-          {% if tipo == "Operativos" %}{% set ns.op = cant %}{% endif %}
-          {% if tipo == "Down" %}{% set ns.down = cant %}{% endif %}
-          {% if tipo == "Stand By con Operador" %}{% set ns.sbo = cant %}{% endif %}
-          {% if tipo == "Stand By sin Operador" %}{% set ns.sbs = cant %}{% endif %}
-        {% endfor %}
+            {% if tipo == "Operativos" %}{% set ns.op = cant %}{% endif %}
+            {% if tipo == "Down" %}{% set ns.down = cant %}{% endif %}
+            {% if tipo == "Stand By con Operador" %}{% set ns.sbo = cant %}{% endif %}
+            {% if tipo == "Stand By sin Operador" %}{% set ns.sbs = cant %}{% endif %}
+            {% endfor %}
 
-        <div class="mini-kpi-row">
-          <div class="mini-kpi mini-ok">
-            <div class="mini-kpi-label">Operativos</div>
-            <div class="mini-kpi-value">{{ ns.op|round(0)|int }}</div>
-          </div>
+            <div class="mini-kpi-row">
+            <div class="mini-kpi mini-ok">
+                <div class="mini-kpi-label">Operativos</div>
+                <div class="mini-kpi-value">{{ ns.op|round(0)|int }}</div>
+            </div>
 
-          <div class="mini-kpi mini-bad">
-            <div class="mini-kpi-label">Down</div>
-            <div class="mini-kpi-value">{{ ns.down|round(0)|int }}</div>
-          </div>
+            <div class="mini-kpi mini-bad">
+                <div class="mini-kpi-label">Down</div>
+                <div class="mini-kpi-value">{{ ns.down|round(0)|int }}</div>
+            </div>
 
-          <div class="mini-kpi mini-warn">
-            <div class="mini-kpi-label">Stand By c/Op</div>
-            <div class="mini-kpi-value">{{ ns.sbo|round(0)|int }}</div>
-          </div>
+            <div class="mini-kpi mini-warn">
+                <div class="mini-kpi-label">Stand By c/Op</div>
+                <div class="mini-kpi-value">{{ ns.sbo|round(0)|int }}</div>
+            </div>
 
-          <div class="mini-kpi mini-muted">
-            <div class="mini-kpi-label">Stand By s/Op</div>
-            <div class="mini-kpi-value">{{ ns.sbs|round(0)|int }}</div>
-          </div>
-        </div>
+            <div class="mini-kpi mini-muted">
+                <div class="mini-kpi-label">Stand By s/Op</div>
+                <div class="mini-kpi-value">{{ ns.sbs|round(0)|int }}</div>
+            </div>
 
+            <!-- TOTAL -->
+            <div class="mini-kpi mini-total" style="margin-left:auto;">
+                <div class="mini-kpi-label">Total</div>
+                <div class="mini-kpi-value">{{ total_camiones }}</div>
+            </div>
+            </div>
 
-        {# ---- Tabla completa (las 6 categorías + total) ---- #}
-        {% if dist_camiones|length == 0 %}
-          <div class="empty">Sin registros.</div>
-        {% else %}
-          <table class="table table-compact">
-            <thead>
-              <tr>
-                <th>Tipo</th>
-                <th class="t-right" style="width:90px;">Cantidad</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for d in dist_camiones %}
-                {% set tipo = d["tipo"] if d is mapping else d[0] %}
-                {% set cant = d["cantidad"] if d is mapping else d[1] %}
+            {# ---- Tabla (solo ítems NO incluidos en mini-KPIs) ---- #}
+            {% if dist_camiones|length == 0 %}
+            <div class="empty">Sin registros.</div>
+            {% else %}
+            <table class="table table-compact">
+                <thead>
                 <tr>
-                  <td>{{ tipo }}</td>
-                  <td class="t-right nowrap">{{ cant|round(0)|int }}</td>
+                    <th>Tipo</th>
+                    <th class="t-right" style="width:90px;">Cantidad</th>
                 </tr>
-              {% endfor %}
-              <tr class="row-strong">
-                <td>Total</td>
-                <td class="t-right nowrap">{{ total_camiones }}</td>
-              </tr>
-            </tbody>
-          </table>
-        {% endif %}
-      </div>
+                </thead>
+                <tbody>
+                {% for d in dist_camiones %}
+                    {% set tipo = d["tipo"] if d is mapping else d[0] %}
+                    {% set cant = d["cantidad"] if d is mapping else d[1] %}
+
+                    {% if tipo not in ["Operativos","Down","Stand By con Operador","Stand By sin Operador"] %}
+                    <tr>
+                        <td>{{ tipo }}</td>
+                        <td class="t-right nowrap">{{ cant|round(0)|int }}</td>
+                    </tr>
+                    {% endif %}
+                {% endfor %}
+                </tbody>
+            </table>
+            {% endif %}
+        </div>
+
+    </div>
 
       <!-- DERECHA: Equipo liviano -->
       <div class="card" id="equipo-liviano">
