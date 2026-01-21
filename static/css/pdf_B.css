@@ -1164,11 +1164,6 @@ h1, h2, h3{ margin: 0; }
   page-break-after: avoid;
 }
 
-/* ===== Tabla 2-bloques: divisor central más grueso ===== */
-.table-split th.split,
-.table-split td.split{
-  border-left: 2.5px solid #111;   /* línea central más gruesa */
-}
 
 /* Opcional: que el bloque derecho vacío no se vea raro */
 .table-split td.empty-right{
@@ -1180,16 +1175,6 @@ h1, h2, h3{ margin: 0; }
    Tabla 2 bloques con divisor central marcado
 ========================================================= */
 
-#operacion .table-split th.split,
-#operacion .table-split td.split{
-  border-left: 2.5px solid #111;   /* línea central más gruesa */
-}
-
-/* Operación – Llegada de buses: divisor central más grueso */
-#operacion table.table-compact thead th:nth-child(3),
-#operacion table.table-compact tbody td:nth-child(3){
-  border-left: 2.5px solid #111 !important;
-}
 
 
 /* ===== Llegada de buses a bahías (tabla 2 columnas) ===== */
@@ -1240,4 +1225,15 @@ h1, h2, h3{ margin: 0; }
 #operacion table.table-split td:nth-child(3){
   border-left: 1px solid var(--line) !important;
 }
+
+/* Divisor central = igual a las demás líneas */
+#operacion table.table-split{
+  border-collapse: collapse;
+}
+
+#operacion table.table-split th.split,
+#operacion table.table-split td.split{
+  border-left: 1px solid var(--line) !important;
+}
+
 
