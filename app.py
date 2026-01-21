@@ -1470,8 +1470,8 @@ def reporte_pdf(reporte_id: int):
 
     template_map = {
         "A": "pdf/reporte_pdf.html",
+        "B": "pdf/reporte_B.html",  
         "C": "pdf/reporte_C.html",   # NUEVO (1 hoja)
-        # "B": "pdf/reporte_B.html",
         # "D": "pdf/reporte_D.html",
     }
 
