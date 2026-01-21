@@ -1184,3 +1184,26 @@ h1, h2, h3{ margin: 0; }
 #operacion .table-split td.split{
   border-left: 2.5px solid #111;   /* línea central más gruesa */
 }
+
+/* Operación – Llegada de buses: divisor central más grueso */
+#operacion table.table-compact thead th:nth-child(3),
+#operacion table.table-compact tbody td:nth-child(3){
+  border-left: 2.5px solid #111 !important;
+}
+
+
+/* ===== Llegada de buses a bahías (tabla 2 columnas) ===== */
+#operacion table.table-split{
+  border-collapse: collapse; /* importante para que el borde se vea continuo */
+}
+
+#operacion table.table-split th,
+#operacion table.table-split td{
+  border: 1px solid var(--line);
+}
+
+/* Divisor central (antes de la 3ra columna) */
+#operacion table.table-split th.split,
+#operacion table.table-split td.split{
+  border-left: 2.5px solid #111 !important; /* más gruesa */
+}
