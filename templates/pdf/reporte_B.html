@@ -463,32 +463,17 @@
                     </tr>
                     </thead>
                     <tbody>
-                    {% set ns = namespace(hay=false) %}
+                    {% for d in dist_camiones %}
+                        {% set tipo = d["tipo"] if d is mapping else d[0] %}
+                        {% set cant = d["cantidad"] if d is mapping else d[1] %}
 
-                    {% for it in equipo_liviano %}
-                        {% set estado = (it["estado"] if it is mapping else it.estado) or "" %}
-                        {% set est = estado|lower|trim %}
-
-                        {% if 'pm' in est or 'down' in est %}
-                        {% set ns.hay = true %}
-                        {% set cam = (it["camioneta"] if it is mapping else it.camioneta) %}
-                        {% set com = (it["comentario"] if it is mapping else it.comentario) %}
-
+                        {% if tipo not in ["Operativos","Down","Stand By con Operador","Stand By sin Operador"] %}
                         <tr>
-                            <td class="nowrap el-cam">{{ cam }}</td>
-                            <td class="nowrap">
-                            <span class="chip chip-sm chip-red">{{ estado }}</span>
-                            </td>
-                            <td class="el-text">{{ com or '—' }}</td>
+                            <td>{{ tipo }}</td>
+                            <td class="t-right nowrap">{{ cant|round(0)|int }}</td>
                         </tr>
                         {% endif %}
                     {% endfor %}
-
-                    {% if not ns.hay %}
-                        <tr>
-                        <td colspan="3" class="muted">Sin camionetas en PM o DOWN.</td>
-                        </tr>
-                    {% endif %}
                     </tbody>
                 </table>
                 {% endif %}
@@ -534,35 +519,34 @@
                 </tr>
                 </thead>
                 <tbody>
-                {% set hay_registros = false %}
+                {% set ns = namespace(hay=false) %}
 
                 {% for it in equipo_liviano %}
                     {% set estado = (it["estado"] if it is mapping else it.estado) or "" %}
                     {% set est = estado|lower|trim %}
 
                     {% if 'pm' in est or 'down' in est %}
-                    {% set hay_registros = true %}
+                    {% set ns.hay = true %}
                     {% set cam = (it["camioneta"] if it is mapping else it.camioneta) %}
                     {% set com = (it["comentario"] if it is mapping else it.comentario) %}
 
                     <tr>
                         <td class="nowrap el-cam">{{ cam }}</td>
-
                         <td class="nowrap">
                         <span class="chip chip-sm chip-red">{{ estado }}</span>
                         </td>
-
                         <td class="el-text">{{ com or '—' }}</td>
                     </tr>
                     {% endif %}
                 {% endfor %}
 
-                {% if not hay_registros %}
+                {% if not ns.hay %}
                     <tr>
                     <td colspan="3" class="muted">Sin camionetas en PM o DOWN.</td>
                     </tr>
                 {% endif %}
                 </tbody>
+
 
             </table>
             {% endif %}
