@@ -1207,3 +1207,5 @@ h1, h2, h3{ margin: 0; }
 #operacion table.table-split td.split{
   border-left: 2.5px solid #111 !important; /* más gruesa */
 }
+
+body { border: 6px solid #000 !important; }
