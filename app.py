@@ -1466,7 +1466,18 @@ def reporte_pdf(reporte_id: int):
     ctx.setdefault("bahias_nota", "")
 
 
-    html = render_template("pdf/reporte_pdf.html", **ctx)
+    variant = request.args.get("v", "A").strip().upper()  # uso interno
+
+    template_map = {
+        "A": "pdf/reporte_pdf.html",
+        "C": "pdf/reporte_C.html",   # NUEVO (1 hoja)
+        # "B": "pdf/reporte_B.html",
+        # "D": "pdf/reporte_D.html",
+    }
+
+    tpl = template_map.get(variant, template_map["A"])
+    html = render_template(tpl, **ctx)
+
     base_dir = os.path.dirname(os.path.abspath(__file__))
     pdf_bytes = HTML(string=html, base_url=base_dir).write_pdf()
 
