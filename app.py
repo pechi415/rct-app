@@ -605,11 +605,9 @@ def init_auth_tables():
 # [DB] Tablas principales del RCT
 # ---------------------------------------------------------
 def init_db():
-    print("INIT_DB: corriendo init_db()")
 
     with get_conn() as conn:
         if is_postgres():
-            print("INIT_DB: creando tablas POSTGRES")
 
             # =========================================================
             # POSTGRESQL (Render)

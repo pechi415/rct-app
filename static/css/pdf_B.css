@@ -850,35 +850,6 @@ h1, h2, h3{ margin: 0; }
   padding: 0;
 }
 
-/* Mini KPIs dentro de Distribución */
-#dist-camiones .mini-kpi-row{
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
-  padding: 8px 10px 0 10px;
-  page-break-inside: avoid;
-}
-
-#dist-camiones .mini-kpi{
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  padding: 6px 8px;
-  background: #fff;
-}
-
-#dist-camiones .mini-kpi-label{
-  font-size: 9px;
-  color: var(--muted);
-  font-weight: 800;
-  line-height: 1.1;
-}
-
-#dist-camiones .mini-kpi-value{
-  font-size: 14px;
-  font-weight: 900;
-  line-height: 1.1;
-  margin-top: 2px;
-}
 
 /* Tonos suaves (coherentes con tus row-ok/warn/bad) */
 #dist-camiones .mini-ok{ background:#fbfffb; }
@@ -1237,3 +1208,25 @@ h1, h2, h3{ margin: 0; }
 }
 
 
+/* =========================
+   FIX: mini-kpis full ancho + tabla normal (solo dist-camiones)
+========================= */
+
+/* Mini KPIs: que ocupen TODO el ancho */
+#dist-camiones .mini-kpi-row{
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+
+#dist-camiones .mini-kpi{
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+/* Tabla: forzar comportamiento real de tabla (evita “tab” chico) */
+#dist-camiones table.table,
+#dist-camiones table.table-compact{
+  display: table;
+  width: 100% !important;
+}
