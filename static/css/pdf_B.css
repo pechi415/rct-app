@@ -1,0 +1,1165 @@
+/* =========================================================
+   RCT PDF - WeasyPrint
+   Diseño corporativo, moderno, consistente en A4 HORIZONTAL.
+   Header real (running element) + Footer solo paginación.
+========================================================= */
+
+:root{
+  --text:#111827;
+  --muted:#6B7280;
+  --line:#E5E7EB;
+  --soft:#F3F4F6;
+  --card:#FFFFFF;
+}
+
+/* -----------------------
+   PÁGINA + HEADER/FOOTER
+------------------------ */
+@page{
+  size: A4 landscape;
+  margin: 14mm 12mm 12mm 12mm;
+
+  /* HEADER: viene del HTML con position: running(page-header) */
+  @top-center{
+    content: element(page-header);
+  }
+
+  /* FOOTER: solo paginación */
+  @bottom-center{
+    content: "Página " counter(page) " de " counter(pages);
+    font-size: 8.5pt;
+    color: var(--muted);
+  }
+}
+
+/* -----------------------
+   HEADER (banda fina)
+   Se renderiza SOLO en el margen superior (@top-center)
+------------------------ */
+/* Header: se renderiza en el margen superior */
+.page-header{
+  position: running(page-header);
+}
+
+/* Banda fina con altura controlada */
+.header-inner{
+  height: 12mm;                 /* << controla la altura real */
+  padding: 0;                   /* ya no necesitamos padding arriba/abajo */
+  border-bottom: 1px solid var(--line);
+
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+}
+
+.hdr-left,
+.hdr-center,
+.hdr-right{
+  display: table-cell;
+  vertical-align: middle;
+}
+
+.hdr-left{ width: 14%; }
+.hdr-center{ width: 38%; text-align: center; }
+.hdr-right{ width: 48%; text-align: right; padding-top: 6mm; }
+
+.hdr-logo{
+  height: 9mm;
+  width: auto;
+  display: inline-block;
+}
+
+.hdr-title{
+  font-size: 16pt;
+  font-weight: 900;
+  color: var(--text);
+  letter-spacing: .2px;
+  white-space: nowrap;
+}
+
+/* Meta MUY pequeña (como pediste) */
+.hdr-meta{
+  font-size: 7.5pt;
+  line-height: 1.05;
+  color: #374151;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hdr-sep{
+  margin: 0 4px;
+  color: #9CA3AF;
+}
+
+.hdr-item{ font-weight: 500; }
+
+/* -----------------------
+   BASE
+------------------------ */
+html, body{
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  color: var(--text);
+  font-size: 10pt;     /* un poco más compacto */
+  line-height: 1.25;   /* compacta altura sin perder lectura */
+}
+
+/* Pequeño respiro para que el contenido no roce el header */
+body{
+  padding-top: 0mm;
+}
+
+*{ box-sizing: border-box; }
+
+.muted{ color: var(--muted); }
+.nowrap{ white-space: nowrap; }
+
+.mt-14{ margin-top: 10px; } /* compactado */
+
+.page-break{ page-break-before: always; }
+
+/* Evitar cortes feos (sin “bloquear” todo el contenido) */
+.section{
+  margin: 0 0 4mm 0;  /* antes 10mm */
+}
+
+/* -----------------------
+   TÍTULOS
+------------------------ */
+h1, h2, h3{ margin: 0; }
+
+.h2{
+  font-size: 11pt;
+  margin: 0;
+  line-height: 1.15;
+}
+
+.h3{
+  font-size: 10.5pt;
+  margin: 0;
+  color: var(--text);
+}
+
+/* Título con badge */
+.section-title{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 0.8mm;
+  margin-bottom: 1.2mm;
+  border-bottom: 1px solid var(--line);
+
+  /* evita que el título quede huérfano al final */
+  page-break-after: avoid;
+}
+
+.badge{
+  font-size: 8pt;
+  color: #111827;
+  background: var(--soft);
+  border: 1px solid var(--line);
+  padding: 0.9mm 2.2mm;
+  border-radius: 999px;
+}
+
+/* -----------------------
+   PORTADA
+------------------------ */
+.section-cover{
+  margin-top: 0;
+}
+
+.cover-top{
+  display: flex;
+  justify-content: space-between;
+  gap: 8mm;
+  margin-bottom: 3mm;
+}
+
+.cover-kicker{
+  font-size: 8.5pt;
+  font-weight: 900;
+  letter-spacing: 0.6px;
+  color: #374151;
+  text-transform: uppercase;
+}
+
+.cover-title{
+  font-size: 16pt;   /* un poco más compacto */
+  margin-top: 1.5mm;
+  margin-bottom: 0.8mm;
+  font-weight: 900;
+}
+
+.cover-meta{
+  font-size: 9pt;
+  color: #374151;
+  margin-top: 0.6mm;
+}
+
+.cover-supervisores{
+  margin-top: 1.6mm;
+  font-size: 9pt;
+  color: var(--text);
+}
+
+.dot{
+  margin: 0 4px;
+  color: #9CA3AF;
+}
+
+.cover-right{
+  text-align: right;
+  min-width: 42mm;
+}
+
+.report-id{
+  margin-top: 1.6mm;
+  font-size: 9pt;
+  color: #374151;
+}
+
+/* Chips estado (pueden quedar, aunque no vayan en header) */
+.chip{
+  display: inline-block;
+  font-size: 8pt;
+  font-weight: 900;
+  padding: 1.1mm 2.6mm;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--soft);
+  color: var(--text);
+}
+
+.chip-open{
+  background: #ECFDF5;
+  border-color: #A7F3D0;
+  color: #065F46;
+}
+
+.chip-closed{
+  background: #EFF6FF;
+  border-color: #BFDBFE;
+  color: #1D4ED8;
+}
+
+/* -----------------------
+   CARDS / KPI
+------------------------ */
+
+/* ========================
+   KPI STRIP (4 mini-cards)
+   ======================== */
+
+.kpi-strip{
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2mm;
+  margin: 1mm 0 0.5mm 0; /* pegado al header, pero con aire mínimo */
+
+  break-inside: avoid;
+  page-break-inside: avoid;
+  clear: both;
+}
+
+.kpi-mini{
+  border: 1px solid var(--line);
+  background: var(--card);
+  border-radius: 8px;
+  padding: 2mm 2.4mm;
+  page-break-inside: avoid;
+
+  display: flex;
+  flex-direction: column;      /* <-- clave */
+  justify-content: space-between;
+
+  min-height: 14mm;             /* controla la “diagonal” */
+}
+
+
+.kpi-mini-label{
+  font-size: 8.5pt;
+  font-weight: 900;
+  color: #374151;
+  line-height: 1.15;
+  margin: 0;
+
+  text-align: left;
+}
+
+
+.kpi-mini-value{
+  font-size: 16pt;
+  font-weight: 900;
+  color: var(--text);
+  line-height: 1;
+
+  text-align: right;            /* <-- valor a la derecha */
+  margin: 0;
+}
+
+
+.card{
+  border: 1px solid var(--line);
+  background: var(--card);
+  border-radius: 8px;
+  padding: 3.2mm; /* compactado */
+  page-break-inside: avoid;
+}
+
+.card-title{
+  font-size: 9.6pt;
+  font-weight: 900;
+  margin-bottom: 2.2mm;
+  color: var(--text);
+}
+
+.kpi-grid{
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 3mm;             /* compactado */
+  margin: 3mm 0 3.5mm 0;
+}
+
+.kpi{
+  border: 1px solid var(--line);
+  background: var(--card);
+  border-radius: 8px;
+  padding: 3.2mm;       /* compactado */
+  page-break-inside: avoid;
+}
+
+.kpi-label{
+  font-size: 8pt;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .35px;
+}
+
+.kpi-value{
+  font-size: 16pt;      /* compactado */
+  font-weight: 900;
+  margin-top: 1.2mm;
+}
+
+/* -----------------------
+   DOS COLUMNAS
+------------------------ */
+.two-col{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4.5mm; /* compactado */
+}
+
+/* -----------------------
+   MINI BLOQUES
+------------------------ */
+.mini-block{ margin-top: 0.8mm; }
+.mini-title{ font-size: 9pt; font-weight: 900; margin-bottom: 1.6mm; }
+.mini-row{ margin: 0.8mm 0; }
+
+/* -----------------------
+   EMPTY STATE
+------------------------ */
+.empty{
+  border: 1px dashed var(--line);
+  background: #FCFCFD;
+  padding: 3mm;
+  border-radius: 8px;
+  color: var(--muted);
+  font-style: italic;
+}
+
+/* -----------------------
+   PILLS (Sí/No)
+------------------------ */
+.pill{
+  display: inline-block;
+  padding: 0.55mm 2mm;
+  border-radius: 999px;
+  font-size: 8pt;
+  font-weight: 900;
+  border: 1px solid var(--line);
+}
+
+.pill-ok{
+  background: #ECFDF5;
+  border-color: #A7F3D0;
+  color: #065F46;
+}
+
+.pill-no{
+  background: #FEF2F2;
+  border-color: #FECACA;
+  color: #991B1B;
+}
+
+/* -----------------------
+   LISTAS / TEXTO
+------------------------ */
+.bullets{
+  margin: 0;
+  padding-left: 14px; /* compactado */
+}
+
+.text-block{
+  white-space: pre-wrap;
+}
+
+/* -----------------------
+   TABLAS (crítico para largas)
+------------------------ */
+.table{
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 9pt; /* compactado */
+}
+
+.table thead{
+  display: table-header-group; /* Repite encabezado por página */
+}
+
+.table th, .table td{
+  border: 1px solid var(--line);
+  padding: 1.7mm 1.8mm; /* compactado */
+  vertical-align: top;
+  break-inside: avoid;
+}
+
+.table th{
+  background: var(--soft);
+  font-weight: 900;
+  text-align: left;
+}
+
+.table tr{
+  page-break-inside: avoid; /* Evita partir filas */
+}
+
+.table tbody tr:nth-child(even){
+  background: #FAFAFA;
+}
+
+.table-compact th, .table-compact td{
+  padding: 1.4mm 1.6mm;
+}
+
+.t-right{ text-align: right; white-space: nowrap; }
+.t-center{ text-align: center; }
+
+.row-strong td{
+  font-weight: 900;
+  background: #F9FAFB;
+}
+
+/* =========================
+   SECCIÓN: OPERACIÓN
+========================= */
+
+.rct-section { margin: 4px 0 12px; }
+.sec-title { display: flex; align-items: center; gap: 10px; margin: 2px 0 8px; }
+.sec-title h2 { margin: 0; font-size: 14.5px; letter-spacing: .2px; }
+.sec-dot { width: 10px; height: 10px; border-radius: 50%; background: #111; display: inline-block; }
+
+/* Cards */
+.card { border: 1px solid #e7e7e7; border-radius: 10px; overflow: hidden; }
+.card-soft { background: #fff; }
+.card-header { padding: 5px 10px; border-bottom: 1px solid #ededed; display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+.card-title { font-size: 11.5px; font-weight: 700; line-height: 1.2;}
+.card-body { padding: 10px 12px; }
+
+.mb-10 { margin-bottom: 10px; }
+.mt-10 { margin-top: 10px; }
+.muted { font-size: 10.5px; color: #666; }
+
+/* KPI-like kv grid (Punto 1) */
+.kv-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px 10px;
+}
+.kv { border: 1px solid #efefef; border-radius: 10px; padding: 8px 10px; }
+.k { font-size: 10px; color: #6a6a6a; margin-bottom: 3px; }
+.v { font-size: 12px; font-weight: 700; color: #111; }
+.v-wrap { font-weight: 600; font-size: 11px; line-height: 1.25; }
+
+/* Si quieres que "Observación corta" sea más ancho en la grilla */
+.kv-grid .kv:last-child { grid-column: 1 / -1; }
+
+/* Chips */
+.chip {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 700;
+  border: 1px solid #e8e8e8;
+  background: #f7f7f7;
+  color: #111;
+  white-space: nowrap;
+}
+.chip-sm { padding: 3px 8px; font-size: 10px; }
+.chip-gray { background: #f4f4f4; border-color: #e6e6e6; color: #444; }
+.chip-green { background: #eef8f0; border-color: #cfead6; color: #0b5b1d; }
+.chip-amber { background: #fff6e6; border-color: #ffe1b3; color: #7a4a00; }
+.chip-red { background: #ffecec; border-color: #ffd0d0; color: #7a0b0b; }
+
+/* Callouts */
+.callout { border-radius: 10px; padding: 9px 10px; border: 1px solid #eee; background: #fafafa; }
+.callout-title { font-size: 11px; font-weight: 800; margin-bottom: 4px; }
+.callout-warn { border-color: #ffe1b3; background: #fff8ea; }
+.bullets { margin: 0; padding-left: 16px; }
+.bullets li { font-size: 10.5px; line-height: 1.25; margin: 2px 0; }
+
+/* Table (Punto 2) */
+.table { width: 100%; border-collapse: collapse; }
+.table thead th {
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: .25px;
+  color: #666;
+  padding: 7px 8px;
+  border-bottom: 1px solid #e9e9e9;
+}
+.table tbody td {
+  padding: 7px 8px;
+  border-bottom: 1px solid #f0f0f0;
+  vertical-align: top;
+  font-size: 11px;
+}
+.table-compact tbody td { padding: 6px 8px; }
+
+.w-20 { width: 20%; }
+.w-40 { width: 40%; }
+
+.td-main { font-weight: 700; color: #111; }
+.td-sub { font-size: 10px; color: #666; margin-top: 2px; }
+
+.mono { font-family: "Courier New", Courier, monospace; font-weight: 700; }
+
+/* Row hints (sutiles, sin color fuerte) */
+.row-ok td { background: #fbfffb; }
+.row-warn td { background: #fffdf7; }
+.row-bad td { background: #fff8f8; }
+.row-neutral td { background: #ffffff; }
+
+/* Nota */
+.note {
+  font-size: 10.5px;
+  color: #555;
+  border-left: 3px solid #111;
+  padding: 6px 10px;
+  background: #fafafa;
+  border-radius: 8px;
+}
+
+/* WeasyPrint: evita cortes feos */
+.card, .kv, .callout, table, tr, td { break-inside: avoid; }
+
+/* ===== Operación en dos columnas (50/50) ===== */
+.op-two-col{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  align-items: start;
+}
+
+.op-col{ break-inside: avoid; }
+
+/* Punto 1: kv-grid en 2 columnas cuando va en media hoja */
+.kv-grid-2{
+  display: grid;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 8px 10px;
+}
+.kv-wide{
+  grid-column: 1 / -1;
+}
+
+/* Orden interno Punto 1 */
+.kv-grid-3{
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px 10px;
+}
+
+.kv-wide{
+  grid-column: 1 / -1;
+}
+
+.kv .v{
+  white-space: normal;
+  line-height: 1.25;
+}
+
+/* ===== Tarjeta Operación (P1) estable para PDF ===== */
+.op-kv-table{
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: separate;
+  border-spacing: 10px 8px; /* espacio entre cajas */
+}
+
+.op-kv-row{
+  display: table-row;
+}
+
+.op-kv{
+  display: table-cell;
+  vertical-align: top;
+  border: 1px solid #efefef;
+  border-radius: 10px;
+  padding: 8px 10px;
+  background: #fff;
+}
+
+.op-kv .k{
+  font-size: 10px;
+  color: #6a6a6a;
+  margin-bottom: 3px;
+}
+
+.op-kv .v{
+  font-size: 12px;
+  font-weight: 800;
+  color: #111;
+  line-height: 1.2;
+  white-space: nowrap;        /* evita saltos raros */
+  overflow: hidden;
+  text-overflow: ellipsis;    /* por si se alarga */
+}
+
+/* bloque inferior (camiones x operador) */
+.op-note{
+  margin-top: 10px;
+  border: 1px solid #efefef;
+  border-radius: 10px;
+  padding: 8px 10px;
+  background: #fafafa;
+}
+
+.op-note .k{
+  font-size: 10px;
+  color: #6a6a6a;
+  margin-bottom: 3px;
+}
+
+.op-note .v{
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #111;
+  line-height: 1.25;
+  white-space: normal;
+}
+
+.op-sep{ margin: 0 6px; color: #9ca3af; }
+.op-muted{ color:#666; font-weight:700; }
+
+/* ===== Operación P1: layout fijo 2x2 (WeasyPrint-proof) ===== */
+.op-2x2{
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: separate;
+  border-spacing: 10px 8px;
+}
+
+.op-row{ display: table-row; }
+
+.op-cell{
+  display: table-cell;
+  width: 50%;
+  vertical-align: top;
+
+  border: 1px solid #efefef;
+  border-radius: 10px;
+  padding: 8px 10px;
+  background: #fff;
+}
+
+.op-cell .k{
+  font-size: 10px;
+  color: #6a6a6a;
+  margin-bottom: 3px;
+}
+
+.op-cell .v{
+  font-size: 12px;
+  font-weight: 800;
+  color: #111;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+/* bloque inferior */
+.op-note{
+  margin-top: 10px;
+  border: 1px solid #efefef;
+  border-radius: 10px;
+  padding: 8px 10px;
+  background: #fafafa;
+}
+.op-note .k{
+  font-size: 10px;
+  color: #6a6a6a;
+  margin-bottom: 3px;
+}
+.op-note .v{
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #111;
+  line-height: 1.25;
+  white-space: normal;
+}
+.op-sep{ margin: 0 6px; color: #9ca3af; }
+.op-muted{ color:#666; font-weight:700; }
+
+/* =========================
+   Gestión de Áreas (PDF)
+   ========================= */
+
+#gestion-areas .card{
+  padding: 0; /* para que la tabla aproveche el ancho */
+}
+
+#gestion-areas .table{
+  width: 100%;
+  table-layout: fixed; /* clave: controla columnas y evita desbordes */
+}
+
+#gestion-areas .table th,
+#gestion-areas .table td{
+  vertical-align: top;
+}
+
+/* Columnas fijas */
+#gestion-areas .ga-col-hora{ width: 70px; }
+#gestion-areas .ga-col-resp{ width: 150px; }
+#gestion-areas .ga-col-ok{ width: 110px; }
+
+/* Texto largo: que haga wrap bonito y no “explote” la fila */
+#gestion-areas .ga-text{
+  white-space: normal;
+  line-height: 1.2;
+  word-break: break-word;
+}
+
+/* Cabecera un poquito más compacta */
+#gestion-areas .table thead th{
+  font-size: 9.5pt;
+}
+
+/* Filas: evitar cortes feos */
+#gestion-areas tr{
+  page-break-inside: avoid;
+}
+
+/* =========================
+   Equipos Varados (PDF)
+   ========================= */
+
+#equipos-varados .card{
+  padding: 0;
+}
+
+#equipos-varados .table{
+  width: 100%;
+  table-layout: fixed;
+}
+
+#equipos-varados .table th,
+#equipos-varados .table td{
+  vertical-align: top;
+}
+
+/* Columnas controladas */
+#equipos-varados .ev-col-equipo{ width: 110px; }
+#equipos-varados .ev-col-hora{ width: 70px; }
+#equipos-varados .ev-col-ubic{ width: 180px; }
+
+/* Motivo: puede crecer sin romper */
+#equipos-varados .ev-text{
+  white-space: normal;
+  line-height: 1.2;
+  word-break: break-word;
+}
+
+/* Evitar cortes feos */
+#equipos-varados tr{
+  page-break-inside: avoid;
+}
+
+/* ===== Bloque 3 en dos columnas: varados + complementarios ===== */
+#bloque-3-dos-columnas .two-col{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  align-items: start;
+}
+
+/* Equipos varados: tabla estable en media columna */
+#equipos-varados .table{
+  width: 100%;
+  table-layout: fixed;
+}
+#equipos-varados td.ev-text{
+  white-space: normal;
+  word-break: break-word;
+  line-height: 1.2;
+}
+
+/* Complementarios compacto dentro de la card derecha */
+#complementarios-mini .subcard{
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px 10px;
+  background: #fff;
+}
+
+#complementarios-mini .subhead{
+  font-size: 10.5px;
+  font-weight: 900;
+  margin-bottom: 6px;
+  color: var(--text);
+}
+
+/* Hacer las tablas más compactas dentro del bloque derecho */
+#complementarios-mini .table th,
+#complementarios-mini .table td{
+  padding: 1.3mm 1.5mm;
+}
+#complementarios-mini .table thead th{
+  font-size: 9.5pt;
+  white-space: normal;
+}
+
+/* =========================================================
+   Distribución de camiones + Equipo liviano (50/50)
+========================================================= */
+#bloque-camiones-liviano .two-col{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  align-items: start;
+}
+
+/* Cards: que aprovechen ancho (menos padding en estas secciones) */
+#dist-camiones.card,
+#equipo-liviano.card{
+  padding: 0;
+}
+
+/* Mini KPIs dentro de Distribución */
+#dist-camiones .mini-kpi-row{
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  padding: 8px 10px 0 10px;
+  page-break-inside: avoid;
+}
+
+#dist-camiones .mini-kpi{
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 6px 8px;
+  background: #fff;
+}
+
+#dist-camiones .mini-kpi-label{
+  font-size: 9px;
+  color: var(--muted);
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+#dist-camiones .mini-kpi-value{
+  font-size: 14px;
+  font-weight: 900;
+  line-height: 1.1;
+  margin-top: 2px;
+}
+
+/* Tonos suaves (coherentes con tus row-ok/warn/bad) */
+#dist-camiones .mini-ok{ background:#fbfffb; }
+#dist-camiones .mini-warn{ background:#fffdf7; }
+#dist-camiones .mini-bad{ background:#fff8f8; }
+#dist-camiones .mini-muted{ background:#fafafa; }
+
+/* Tablas compactas dentro de estas cards */
+#dist-camiones .table,
+#equipo-liviano .table{
+  width: 100%;
+  table-layout: fixed;
+  margin-top: 8px;
+}
+
+#dist-camiones .table th,
+#dist-camiones .table td,
+#equipo-liviano .table th,
+#equipo-liviano .table td{
+  padding: 1.3mm 1.5mm;
+  vertical-align: top;
+}
+
+#equipo-liviano .el-cam{
+  font-weight: 800;
+}
+
+#equipo-liviano .el-text{
+  white-space: normal;
+  word-break: break-word;
+  line-height: 1.2;
+}
+
+/* =========================================================
+   UX FIX: Cards “respiradas” en PDF
+   (Distribución + Equipo liviano) + tabla compacta limpia
+========================================================= */
+
+/* Asegura que el layout 50/50 no se vea pegado */
+#bloque-camiones-liviano .two-col{
+  gap: 14px;                 /* más aire entre tarjetas */
+  align-items: start;
+}
+
+/* Volvemos a darle “caja” real a las cards (antes las dejábamos en padding:0) */
+#dist-camiones.card,
+#equipo-liviano.card{
+  padding: 10px 12px;        /* aire interno */
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+  overflow: hidden;          /* bordes limpios */
+}
+
+/* El título no debe estar pegado al borde */
+#dist-camiones .section-title,
+#equipo-liviano .section-title{
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+}
+
+/* Bloque interno tipo “subcard” como en Complementarios */
+#dist-camiones .subcard,
+#equipo-liviano .subcard{
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+  padding: 8px 10px;
+}
+
+/* =========================
+   Distribución: Resumen (mini KPIs) “respirado”
+========================= */
+#dist-camiones .mini-kpi-row{
+  padding: 0;               /* ya no pegado a borde */
+  margin-bottom: 10px;      /* separa del detalle */
+}
+
+#dist-camiones .mini-kpi{
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 7px 8px;
+}
+
+/* =========================
+   Tablas: que no se peguen al borde y respiren
+========================= */
+#dist-camiones .table,
+#equipo-liviano .table{
+  width: 100%;
+  table-layout: fixed;
+  margin-top: 6px;
+  border: 1px solid var(--line);    /* borde claro de tabla */
+  border-radius: 0;
+  overflow: visible;                 /* redondeo real */
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+/* Header de tabla más definido */
+#dist-camiones .table thead th,
+#equipo-liviano .table thead th{
+  background: var(--soft);
+  font-weight: 900;
+  font-size: 9.5pt;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--line);
+}
+
+/* Celdas más “aireadas” y legibles */
+#dist-camiones .table td,
+#equipo-liviano .table td{
+  padding: 6px 8px;
+  vertical-align: top;
+  border-bottom: 1px solid #F0F0F0;
+}
+
+/* Evita que la última fila quede “abierta” */
+#dist-camiones .table tbody tr:last-child td,
+#equipo-liviano .table tbody tr:last-child td{
+  border-bottom: 0;
+}
+
+/* Motivo/comentario envuelve bonito */
+#equipo-liviano .el-text{
+  white-space: normal;
+  word-break: break-word;
+  line-height: 1.2;
+}
+
+/* =========================
+   Sugerencia: separar resumen vs detalle en Distribución
+   (si quieres el mismo look de Complementarios)
+========================= */
+#dist-camiones .dist-wrap{
+  display: grid;
+  gap: 10px;
+}
+
+/* Badges por estado lógico */
+.badge-ok{
+  background: #ECFDF5;
+  border-color: #A7F3D0;
+  color: #065F46;
+}
+
+.badge-warn{
+  background: #FEFCE8;   /* amarillo suave */
+  border-color: #FDE68A; /* borde amarillo */
+  color: #854D0E;        /* texto oscuro legible */
+}
+
+
+.badge-bad{
+  background: #FEF2F2;
+  border-color: #FECACA;
+  color: #991B1B;
+}
+
+/* =========================================================
+   PERSONAL (snapshot + subcards)
+========================================================= */
+#personal .mini-kpi-row{
+  display: grid;
+  gap: 8px;
+  margin: 8px 0 10px 0;
+}
+
+#personal .mini-kpi-4{
+  grid-template-columns: repeat(4, 1fr);
+}
+
+#personal .mini-kpi{
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 7px 9px;
+  background: #fff;
+}
+
+#personal .mini-kpi-label{
+  font-size: 9px;
+  color: var(--muted);
+  font-weight: 900;
+  line-height: 1.1;
+}
+
+#personal .mini-kpi-value{
+  font-size: 14px;
+  font-weight: 900;
+  line-height: 1.1;
+  margin-top: 2px;
+}
+
+/* Subcards reutilizables (si ya existen, no pasa nada) */
+.subcard{
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 8px 10px;
+  background: #fff;
+}
+
+.subhead{
+  font-size: 10.5px;
+  font-weight: 900;
+  margin-bottom: 6px;
+  color: var(--text);
+}
+
+/* Wrap suave para textos largos */
+.wrap-soft{
+  white-space: normal;
+  word-break: break-word;
+  line-height: 1.2;
+}
+
+.divider-hr{
+  height: 1px;
+  background: var(--line);
+  margin: 10px 0 8px 0;
+}
+
+.subhead-sm{
+  margin-top: 0;
+  font-size: 10px;
+  font-weight: 900;
+}
+
+/* =========================================================
+   Seguridad + PTS/Comentarios (UX)
+========================================================= */
+#seguridad .subcard,
+#pts-comentarios .subcard{
+  page-break-inside: avoid;
+}
+
+#pts-comentarios .soft-text{
+  color: #374151;
+  font-size: 10pt;
+  line-height: 1.25;
+}
+
+/* Bullets más suaves para comentarios */
+.bullets-soft{
+  padding-left: 16px;
+}
+
+.bullets-soft li{
+  margin: 2px 0;
+}
+
+/* Texto PTS como “acta” legible */
+#pts-comentarios .text-block{
+  white-space: pre-wrap;
+}
+
+/* Evita que el texto quede pegado al borde */
+#pts-comentarios .subcard{
+  padding: 8px 10px;
+}
+
+/* =========================================================
+   FIX: evitar que el snapshot (mini KPIs) se parta en páginas
+========================================================= */
+#personal .mini-kpi-row{
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+#personal .mini-kpi{
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+/* Extra: evita que se corte justo antes del bloque */
+#personal .mini-kpi-row{
+  page-break-before: auto;
+}
+
+/* Si el problema es que el H2 + badge + snapshot se separan,
+   blindamos también el encabezado de sección + snapshot como grupo */
+#personal .section-title{
+  break-after: avoid;
+  page-break-after: avoid;
+}
