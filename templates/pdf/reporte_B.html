@@ -519,34 +519,36 @@
               </tr>
             </thead>
             <tbody>
-              {% for it in equipo_liviano %}
+            {% set hay_registros = false %}
+
+            {% for it in equipo_liviano %}
                 {% set estado = (it["estado"] if it is mapping else it.estado) or "" %}
+                {% set est = estado|lower|trim %}
+
+                {% if 'pm' in est or 'down' in est %}
+                {% set hay_registros = true %}
                 {% set cam = (it["camioneta"] if it is mapping else it.camioneta) %}
                 {% set com = (it["comentario"] if it is mapping else it.comentario) %}
+
                 <tr>
-                  <td class="nowrap el-cam">{{ cam }}</td>
+                    <td class="nowrap el-cam">{{ cam }}</td>
 
                     <td class="nowrap">
-                      {% set est = (estado|default('')|lower|trim) %}
-
-                      {% if est %}
-                        <span class="chip chip-sm
-                          {% if 'down' in est or 'taller' in est or 'pm' in est %} chip-red
-                          {% elif 'stand' in est or 'parc' in est or 'restr' in est %} chip-amber
-                          {% elif 'ok' in est or 'operat' in est %} chip-green
-                          {% else %} chip-gray
-                          {% endif %}">
-                          {{ estado }}
-                        </span>
-                      {% else %}
-                        <span class="chip chip-sm chip-gray">Sin estado</span>
-                      {% endif %}
+                    <span class="chip chip-sm chip-red">{{ estado }}</span>
                     </td>
 
-                  <td class="el-text">{{ com or '—' }}</td>
+                    <td class="el-text">{{ com or '—' }}</td>
                 </tr>
-              {% endfor %}
+                {% endif %}
+            {% endfor %}
+
+            {% if not hay_registros %}
+                <tr>
+                <td colspan="3" class="muted">Sin camionetas en PM o DOWN.</td>
+                </tr>
+            {% endif %}
             </tbody>
+
           </table>
         {% endif %}
       </div>
