@@ -1207,31 +1207,14 @@ h1, h2, h3{ margin: 0; }
   border-left: 1px solid var(--line) !important;
 }
 
-
-/* =========================
-   FIX: mini-kpis full ancho + tabla normal (solo dist-camiones)
-========================= */
-
-
-
-/* Tabla: forzar comportamiento real de tabla (evita “tab” chico) */
-#dist-camiones table.table,
-#dist-camiones table.table-compact{
-  display: table;
-  width: 100% !important;
-}
-
-/* FIX WeasyPrint: mini-kpis en “fila” sin flex (solo dist-camiones) */
+/* FIX estable (WeasyPrint): mini-kpis a 4 columnas + tabla normal (solo dist-camiones) */
 #dist-camiones .mini-kpi-row{
-  display: table;
-  width: 100%;
-  table-layout: fixed;
-  border-collapse: separate;
-  border-spacing: 8px 0;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 10px;
 }
 
 #dist-camiones .mini-kpi{
-  display: table-cell;
-  width: 25%;
-  vertical-align: top;
+  min-width: 0;
 }
