@@ -181,11 +181,11 @@ AREAS_OTRAS = sorted([
     "Despacho",
     "Dtech",
     "Dragalina",
-    "Entrenamiento",
-    "Perforación y voladura",
-    "Producción bombas",
-    "Producción palas",
-    "Seguridad Industrial",
+    "Etto",
+    "voladura",
+    "Bombas",
+    "Palas",
+    "Seg. Ind",
     "Vías",
 ], key=lambda x: x.lower())
 

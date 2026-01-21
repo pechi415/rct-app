@@ -1219,3 +1219,15 @@ h1, h2, h3{ margin: 0; }
 #dist-camiones .mini-kpi{
   min-width: 0;
 }
+
+/* PDF B: Personal (Prestados / Entrenamiento) mantener 50/50 estable */
+#personal .two-col{
+  grid-template-columns: 1fr 1fr;
+  align-items: start;
+}
+
+#personal .two-col > .card.subcard{
+  width: 100%;
+  min-width: 0;
+  overflow: visible;
+}
