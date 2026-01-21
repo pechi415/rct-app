@@ -411,9 +411,10 @@
 
         <!-- IZQUIERDA: Distribución de camiones -->
         <div class="card" id="dist-camiones">
-            <div class="section-title">
+           <div class="section-title">
             <h2 class="h2">Distribución de camiones</h2>
-            </div>
+            <span class="badge">{{ total_camiones }} camiones</span>
+        </div>
 
             {# ---- Resumen rápido (4 principales + Total) ---- #}
             {% set ns = namespace(op=0, down=0, sbo=0, sbs=0) %}
@@ -447,13 +448,6 @@
             <div class="mini-kpi mini-muted">
                 <div class="mini-kpi-label">Stand By s/Op</div>
                 <div class="mini-kpi-value">{{ ns.sbs|round(0)|int }}</div>
-            </div>
-
-            <!-- TOTAL -->
-            <div class="mini-kpi mini-total" style="margin-left:auto;">
-                <div class="mini-kpi-label">Total</div>
-                <div class="mini-kpi-value">{{ total_camiones }}</div>
-            </div>
             </div>
 
             {# ---- Tabla (solo ítems NO incluidos en mini-KPIs) ---- #}
