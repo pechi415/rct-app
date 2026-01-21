@@ -1208,3 +1208,25 @@ h1, h2, h3{ margin: 0; }
   border-left: 1px solid #E5E7EB !important;
 }
 
+/* FIX: divisor central igual a las otras líneas */
+#operacion table.table-split th.split,
+#operacion table.table-split td.split{
+  border-left: 1px solid var(--line) !important;
+}
+
+/* Anchos por columna (4 columnas): Bahía 28% / Hora 22% / Bahía 28% / Hora 22% */
+#operacion table.table-split th:nth-child(1),
+#operacion table.table-split td:nth-child(1),
+#operacion table.table-split th:nth-child(3),
+#operacion table.table-split td:nth-child(3){
+  width: 28%;
+}
+
+#operacion table.table-split th:nth-child(2),
+#operacion table.table-split td:nth-child(2),
+#operacion table.table-split th:nth-child(4),
+#operacion table.table-split td:nth-child(4){
+  width: 22%;
+  white-space: nowrap; /* Hora en una sola línea */
+}
+
