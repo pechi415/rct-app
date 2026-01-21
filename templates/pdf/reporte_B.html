@@ -463,96 +463,110 @@
                     </tr>
                     </thead>
                     <tbody>
-                    {% for d in dist_camiones %}
-                        {% set tipo = d["tipo"] if d is mapping else d[0] %}
-                        {% set cant = d["cantidad"] if d is mapping else d[1] %}
+                    {% set ns = namespace(hay=false) %}
 
-                        {% if tipo not in ["Operativos","Down","Stand By con Operador","Stand By sin Operador"] %}
+                    {% for it in equipo_liviano %}
+                        {% set estado = (it["estado"] if it is mapping else it.estado) or "" %}
+                        {% set est = estado|lower|trim %}
+
+                        {% if 'pm' in est or 'down' in est %}
+                        {% set ns.hay = true %}
+                        {% set cam = (it["camioneta"] if it is mapping else it.camioneta) %}
+                        {% set com = (it["comentario"] if it is mapping else it.comentario) %}
+
                         <tr>
-                            <td>{{ tipo }}</td>
-                            <td class="t-right nowrap">{{ cant|round(0)|int }}</td>
+                            <td class="nowrap el-cam">{{ cam }}</td>
+                            <td class="nowrap">
+                            <span class="chip chip-sm chip-red">{{ estado }}</span>
+                            </td>
+                            <td class="el-text">{{ com or '—' }}</td>
                         </tr>
                         {% endif %}
                     {% endfor %}
+
+                    {% if not ns.hay %}
+                        <tr>
+                        <td colspan="3" class="muted">Sin camionetas en PM o DOWN.</td>
+                        </tr>
+                    {% endif %}
                     </tbody>
                 </table>
                 {% endif %}
 
             </div>
 
-    </div>
+    
 
-      <!-- DERECHA: Equipo liviano -->
-      <div class="card" id="equipo-liviano">
-        <div class="section-title">
-          <h2 class="h2">Equipo liviano (Camionetas)</h2>
-          {% set ns = namespace(ok=0) %}
-          {% for it in equipo_liviano %}
-            {% set estado = (it["estado"] if it is mapping else it.estado) or "" %}
-            {% set est = estado|lower|trim %}
-
-            {% if "ok" in est or "operat" in est %}
-              {% set ns.ok = ns.ok + 1 %}
-            {% endif %}
-          {% endfor %}
-
-          <span class="badge
-            {% if ns.ok >= 7 %} badge-ok
-            {% elif ns.ok >= 5 %} badge-warn
-            {% else %} badge-bad
-            {% endif %}">
-            Disponible: {{ ns.ok }}
-          </span>
-
-
-        </div>
-
-        {% if equipo_liviano|length == 0 %}
-          <div class="empty">Sin registros.</div>
-        {% else %}
-          <table class="table table-compact">
-            <thead>
-              <tr>
-                <th style="width:110px;">Camioneta</th>
-                <th style="width:110px;">Estado</th>
-                <th>Comentario</th>
-              </tr>
-            </thead>
-            <tbody>
-            {% set hay_registros = false %}
-
+        <!-- DERECHA: Equipo liviano -->
+        <div class="card" id="equipo-liviano">
+            <div class="section-title">
+            <h2 class="h2">Equipo liviano (Camionetas)</h2>
+            {% set ns = namespace(ok=0) %}
             {% for it in equipo_liviano %}
                 {% set estado = (it["estado"] if it is mapping else it.estado) or "" %}
                 {% set est = estado|lower|trim %}
 
-                {% if 'pm' in est or 'down' in est %}
-                {% set hay_registros = true %}
-                {% set cam = (it["camioneta"] if it is mapping else it.camioneta) %}
-                {% set com = (it["comentario"] if it is mapping else it.comentario) %}
-
-                <tr>
-                    <td class="nowrap el-cam">{{ cam }}</td>
-
-                    <td class="nowrap">
-                    <span class="chip chip-sm chip-red">{{ estado }}</span>
-                    </td>
-
-                    <td class="el-text">{{ com or '—' }}</td>
-                </tr>
+                {% if "ok" in est or "operat" in est %}
+                {% set ns.ok = ns.ok + 1 %}
                 {% endif %}
             {% endfor %}
 
-            {% if not hay_registros %}
+            <span class="badge
+                {% if ns.ok >= 7 %} badge-ok
+                {% elif ns.ok >= 5 %} badge-warn
+                {% else %} badge-bad
+                {% endif %}">
+                Disponible: {{ ns.ok }}
+            </span>
+
+
+            </div>
+
+            {% if equipo_liviano|length == 0 %}
+            <div class="empty">Sin registros.</div>
+            {% else %}
+            <table class="table table-compact">
+                <thead>
                 <tr>
-                <td colspan="3" class="muted">Sin camionetas en PM o DOWN.</td>
+                    <th style="width:110px;">Camioneta</th>
+                    <th style="width:110px;">Estado</th>
+                    <th>Comentario</th>
                 </tr>
+                </thead>
+                <tbody>
+                {% set hay_registros = false %}
+
+                {% for it in equipo_liviano %}
+                    {% set estado = (it["estado"] if it is mapping else it.estado) or "" %}
+                    {% set est = estado|lower|trim %}
+
+                    {% if 'pm' in est or 'down' in est %}
+                    {% set hay_registros = true %}
+                    {% set cam = (it["camioneta"] if it is mapping else it.camioneta) %}
+                    {% set com = (it["comentario"] if it is mapping else it.comentario) %}
+
+                    <tr>
+                        <td class="nowrap el-cam">{{ cam }}</td>
+
+                        <td class="nowrap">
+                        <span class="chip chip-sm chip-red">{{ estado }}</span>
+                        </td>
+
+                        <td class="el-text">{{ com or '—' }}</td>
+                    </tr>
+                    {% endif %}
+                {% endfor %}
+
+                {% if not hay_registros %}
+                    <tr>
+                    <td colspan="3" class="muted">Sin camionetas en PM o DOWN.</td>
+                    </tr>
+                {% endif %}
+                </tbody>
+
+            </table>
             {% endif %}
-            </tbody>
-
-          </table>
-        {% endif %}
-      </div>
-
+        </div>
     </div>
   </section>
 
