@@ -349,6 +349,7 @@ h1, h2, h3{ margin: 0; }
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 4.5mm; /* compactado */
+  align-items: start;
 }
 
 /* -----------------------
