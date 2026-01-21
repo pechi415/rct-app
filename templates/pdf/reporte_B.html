@@ -642,32 +642,44 @@
             </div>
 
             <div class="card subcard">
-            <div class="subhead">Ausentismo</div>
+                <div class="subhead">Ausentismo</div>
 
-            {% if ausentismo|length == 0 %}
-                <div class="empty">Sin registros.</div>
-            {% else %}
-                <table class="table table-compact">
-                <thead>
-                    <tr>
-                    <th>Nombre</th>
-                    <th>Motivo</th>
-                    </tr>
-                </thead>
-                <tbody>
+                {% if ausentismo|length == 0 %}
+                    <div class="empty">Sin registros.</div>
+                {% else %}
+
+                    {# Agrupar por motivo #}
+                    {% set g = namespace(map={}) %}
                     {% for a in ausentismo %}
-                    {% set nom = a["nombre"] if a is mapping else a.nombre %}
-                    {% set mot = a["motivo"] if a is mapping else a.motivo %}
-                    <tr>
-                        <td class="nowrap">{{ nom }}</td>
-                        <td class="wrap-soft">{{ mot }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
+                    {% set nom = (a["nombre"] if a is mapping else a.nombre) or "" %}
+                    {% set mot = (a["motivo"] if a is mapping else a.motivo) or "Sin motivo" %}
+                    {% set key = mot|trim %}
+                    {% if key in g.map %}
+                        {% set _ = g.map.__setitem__(key, g.map[key] + [nom]) %}
+                    {% else %}
+                        {% set _ = g.map.__setitem__(key, [nom]) %}
+                    {% endif %}
+                {% endfor %}
+
+                <table class="table table-compact">
+                    <thead>
+                        <tr>
+                            <th style="width:170px;">Motivo</th>
+                            <th>Nombres</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for mot, nombres in g.map|dictsort %}
+                          <tr>
+                            <td class="nowrap">{{ mot }}</td>
+                            <td class="wrap-soft">{{ nombres|sort|join(' • ') }}</td>
+                          </tr>
+                        {% endfor %}
+                    </tbody>
                 </table>
-            {% endif %}
+             {% endif %}
             </div>
-        </div>
+
 
         {# =========================
             2 columnas: Prestados / Entrenamiento
