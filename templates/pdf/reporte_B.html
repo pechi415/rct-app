@@ -187,53 +187,55 @@
             {% if bahias|length == 0 %}
               <div class="empty">Sin registros de llegada de buses a bahías.</div>
             {% else %}
-              <table class="table table-compact">
+              <table class="table table-compact table-split">
                 <thead>
-                  <tr>
+                    <tr>
                     <th class="w-40">Bahía</th>
                     <th class="w-20">Hora arribo</th>
-                    <th class="w-40">Condición</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {% for b in bahias %}
-                    {% set nombre = b.get('nombre') if b is mapping else b.nombre %}
-                    {% set hora = b.get('hora_arribo') if b is mapping else b.hora_arribo %}
-                    {% set detalle = b.get('detalle') if b is mapping else (b.detalle if b.detalle is defined else None) %}
-                    {% set c = (b.get('condicion') if b is mapping else b.condicion) or '' %}
-
-                    <tr class="
-                      {% if 'no' in c|lower or 'fuera' in c|lower %} row-bad
-                      {% elif 'parc' in c|lower or 'restr' in c|lower %} row-warn
-                      {% elif c|length > 0 %} row-ok
-                      {% else %} row-neutral
-                      {% endif %}">
-                      <td>
-                        <div class="td-main">{{ nombre }}</div>
-                        {% if detalle %}
-                          <div class="td-sub">{{ detalle }}</div>
-                        {% endif %}
-                      </td>
-
-                      <td class="mono">{{ hora or '—' }}</td>
-
-                      <td>
-                        {% if c %}
-                          <span class="chip chip-sm
-                            {% if 'no' in c|lower or 'fuera' in c|lower %} chip-red
-                            {% elif 'parc' in c|lower or 'restr' in c|lower %} chip-amber
-                            {% else %} chip-green
-                            {% endif %}">
-                            {{ c }}
-                          </span>
-                        {% else %}
-                          <span class="chip chip-sm chip-gray">Sin registro</span>
-                        {% endif %}
-                      </td>
+                    <th class="w-40 split">Bahía</th>
+                    <th class="w-20">Hora arribo</th>
                     </tr>
-                  {% endfor %}
+                </thead>
+
+                <tbody>
+                    {# recorremos de a 2 registros por fila #}
+                    {% for i in range(0, bahias|length, 2) %}
+                    {% set b1 = bahias[i] %}
+                    {% set b2 = bahias[i+1] if i+1 < bahias|length else None %}
+
+                    {% set n1 = b1.get('nombre') if b1 is mapping else b1.nombre %}
+                    {% set h1 = b1.get('hora_arribo') if b1 is mapping else b1.hora_arribo %}
+                    {% set d1 = b1.get('detalle') if b1 is mapping else (b1.detalle if b1.detalle is defined else None) %}
+
+                    {% if b2 %}
+                        {% set n2 = b2.get('nombre') if b2 is mapping else b2.nombre %}
+                        {% set h2 = b2.get('hora_arribo') if b2 is mapping else b2.hora_arribo %}
+                        {% set d2 = b2.get('detalle') if b2 is mapping else (b2.detalle if b2.detalle is defined else None) %}
+                    {% endif %}
+
+                    <tr>
+                        <td>
+                        <div class="td-main">{{ n1 }}</div>
+                        {% if d1 %}<div class="td-sub">{{ d1 }}</div>{% endif %}
+                        </td>
+                        <td class="mono">{{ h1 or '—' }}</td>
+
+                        <td class="split">
+                        {% if b2 %}
+                            <div class="td-main">{{ n2 }}</div>
+                            {% if d2 %}<div class="td-sub">{{ d2 }}</div>{% endif %}
+                        {% else %}
+                            &nbsp;
+                        {% endif %}
+                        </td>
+                        <td class="{% if not b2 %}empty-right{% endif %} mono">
+                        {% if b2 %}{{ h2 or '—' }}{% else %}&nbsp;{% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
                 </tbody>
-              </table>
+                </table>
+
             {% endif %}
 
             {% if bahias_nota %}
