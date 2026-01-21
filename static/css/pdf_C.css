@@ -33,3 +33,22 @@ html, body {
   break-inside: avoid;
   page-break-inside: avoid;
 }
+
+.t{
+  font-weight: 700;
+  font-size: 10px;
+  margin-bottom: 6px;
+  letter-spacing: .2px;
+}
+
+.kpi{
+  display:flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 2px 0;
+  border-bottom: 1px solid #eee;
+}
+.kpi:last-child{ border-bottom: 0; }
+
+.lbl{ font-size: 9px; }
+.val{ font-size: 14px; font-weight: 700; }

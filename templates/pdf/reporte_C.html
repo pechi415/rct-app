@@ -12,9 +12,35 @@
 
     <!-- NIVEL 1 -->
     <section class="lvl lvl1">
-      <div class="card">PERSONAL</div>
-      <div class="card">CAMIONES + KPIs</div>
+
+        <!-- PERSONAL -->
+        <div class="card">
+            <div class="t">PERSONAL</div>
+            <div class="kpi">
+            <div class="lbl">Disponible</div>
+            <div class="val">{{ disponible_p }}</div>
+            </div>
+            <div class="kpi">
+            <div class="lbl">Roster</div>
+            <div class="val">{{ roster_p }}</div>
+            </div>
+        </div>
+
+        <!-- CAMIONES + KPIs -->
+        <div class="card">
+            <div class="t">CAMIONES</div>
+            <div class="kpi">
+            <div class="lbl">Total</div>
+            <div class="val">{{ total_camiones }}</div>
+            </div>
+            <div class="kpi">
+            <div class="lbl">Operativos</div>
+            <div class="val">{{ camiones_disponibles }}</div>
+            </div>
+        </div>
+
     </section>
+
 
     <!-- NIVEL 2 -->
     <section class="lvl lvl2">
