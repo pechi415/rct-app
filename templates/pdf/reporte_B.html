@@ -83,12 +83,8 @@
 
   {# ===== BLINDAJE: evita UndefinedError si no viene en ctx ===== #}
   {% set operacion = operacion|default({}) %}
-  {% set bahias = bahias|default([]) %}
-  {% set bahias_nota = bahias_nota|default('') %}
-  {% set cond = (operacion.get('condicion_general') or 'Normal') %}
-  {% set alertas = operacion.get('alertas') or [] %}
-
-  <section class="rct-section" id="operacion"></div>
+  
+  <section class="rct-section" id="operacion">
 
     <!-- DOS COLUMNAS: 50% / 50% -->
     <div class="op-two-col">
@@ -102,46 +98,27 @@
 
           </div>
 
-          <div class="card-body">
-
-            <div class="op-2x2">
-              <div class="op-row">
-                <div class="op-cell">
-                  <div class="k">Inicio Pit 2</div>
-                  <div class="v">{{ operacion.get('inicio_pit2') or '—' }}</div>
-                </div>
-                <div class="op-cell">
-                  <div class="k">Inicio Pit 5</div>
-                  <div class="v">{{ operacion.get('inicio_pit5') or '—' }}</div>
-                </div>
-              </div>
-
-              <div class="op-row">
-                <div class="op-cell">
-                  <div class="k">Final Pit 2</div>
-                  <div class="v">{{ operacion.get('final_pit2') or '—' }}</div>
-                </div>
-                <div class="op-cell">
-                  <div class="k">Final Pit 5</div>
-                  <div class="v">{{ operacion.get('final_pit5') or '—' }}</div>
-                </div>
-              </div>
+        <div class="mini-kpi-row mini-kpi-4">
+            <div class="mini-kpi">
+                <div class="mini-kpi-label">Inicio Pit 2</div>
+                <div class="mini-kpi-value">{{ operacion.get('inicio_pit2') or '—' }}</div>
             </div>
-
-            <div class="op-note">
-              <div class="k">Cam. x Operador (1ra Hr)</div>
-              <div class="v">
-                {{ operacion.get('camiones_por_operador', '—') }}
-                {% if operacion.get('razon') %}
-                  <span class="op-sep">·</span>
-                  <span class="op-muted">Razón:</span> {{ operacion.get('razon') }}
-                {% endif %}
-              </div>
+        
+            <div class="mini-kpi">
+                <div class="mini-kpi-label">Inicio Pit 5</div>
+                <div class="mini-kpi-value">{{ operacion.get('inicio_pit5') or '—' }}</div>
             </div>
-
-
-
-          </div>
+        
+            <div class="mini-kpi">
+                <div class="mini-kpi-label">Final Pit 2</div>
+                <div class="mini-kpi-value">{{ operacion.get('final_pit2') or '—' }}</div>
+            </div>
+        
+            <div class="mini-kpi">
+                <div class="mini-kpi-label">Final Pit 5</div>
+                <div class="mini-kpi-value">{{ operacion.get('final_pit5') or '—' }}</div>
+            </div>
+        </div>
 
         </div>
       </div>
