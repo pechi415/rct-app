@@ -1329,3 +1329,17 @@ h1, h2, h3{ margin: 0; }
   border-bottom: 1px solid var(--line);
   color: var(--text);
 }
+
+/* PDF B: mini-kpis tamaño intermedio y uniforme */
+.mini-kpi-label{
+  font-size: 9.5pt !important;
+  font-weight: 900 !important;
+  line-height: 1.1 !important;
+}
+
+.mini-kpi-value{
+  font-size: 13.5pt !important;
+  font-weight: 900 !important;
+  line-height: 1.05 !important;
+  margin-top: 2px !important;
+}

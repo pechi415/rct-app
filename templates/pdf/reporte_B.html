@@ -550,23 +550,27 @@
 
             {# Mini KPIs dentro de la card #}
             <div class="mini-kpi-row mini-kpi-4">
-                <div class="mini-kpi">
-                <div class="mini-kpi-label">Roster</div>
-                <div class="mini-kpi-value">{{ roster_p|default(0) }}</div>
+                <div class="mini-kpi mini-muted">
+                    <div class="mini-kpi-label">Roster</div>
+                    <div class="mini-kpi-value">{{ roster_p|default(0) }}</div>
                 </div>
-                <div class="mini-kpi">
-                <div class="mini-kpi-label">Disponible</div>
-                <div class="mini-kpi-value">{{ disponible_p|default(0) }}</div>
+            
+                <div class="mini-kpi mini-ok">
+                    <div class="mini-kpi-label">Disponible</div>
+                    <div class="mini-kpi-value">{{ disponible_p|default(0) }}</div>
                 </div>
-                <div class="mini-kpi">
-                <div class="mini-kpi-label">Ausentismo</div>
-                <div class="mini-kpi-value">{{ ausentismo|length }}</div>
+            
+                <div class="mini-kpi mini-bad">
+                    <div class="mini-kpi-label">Ausentismo</div>
+                    <div class="mini-kpi-value">{{ ausentismo|length }}</div>
                 </div>
-                <div class="mini-kpi">
-                <div class="mini-kpi-label">Vacaciones</div>
-                <div class="mini-kpi-value">{{ ns.vac_total|round(0)|int }}</div>
+            
+                <div class="mini-kpi mini-warn">
+                    <div class="mini-kpi-label">Vacaciones</div>
+                    <div class="mini-kpi-value">{{ ns.vac_total|round(0)|int }}</div>
                 </div>
             </div>
+
 
             {% if personal_items|length == 0 %}
                 <div class="empty">Sin registros.</div>
