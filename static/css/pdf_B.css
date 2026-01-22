@@ -370,3 +370,15 @@ h1,h2,h3{ margin:0; }
   break-inside: avoid;
 }
 
+/* PDF B: headers igual a Equipos varados */
+#dist-camiones.card,
+#equipo-liviano.card,
+#complementarios-mini.card{
+  padding: 0;                 /* igual que Varados */
+}
+
+#dist-camiones .section-title,
+#equipo-liviano .section-title,
+#complementarios-mini .section-title{
+  padding: 8px 10px;          /* mismo padding del header */
+}

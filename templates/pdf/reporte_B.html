@@ -321,10 +321,10 @@
                     {% endfor %}
 
                     <span class="badge
-            {% if ns.ok >= 7 %} badge-ok
-            {% elif ns.ok >= 5 %} badge-warn
-            {% else %} badge-bad
-            {% endif %}">
+                                {% if ns.ok >= 7 %} badge-ok
+                                {% elif ns.ok >= 5 %} badge-warn
+                                {% else %} badge-bad
+                                {% endif %}">
                         Disponible: {{ ns.ok }}
                     </span>
                 </div>
