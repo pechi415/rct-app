@@ -370,11 +370,3 @@ h1,h2,h3{ margin:0; }
   break-inside: avoid;
 }
 
-/* PDF B: mismo centrado visual que Varados (sin inflar header) */
-#dist-camiones .section-title,
-#complementarios-mini .section-title,
-#equipo-liviano .section-title{
-  padding: 4px 0;            /* solo vertical, no lateral */
-  align-items: center;
-  margin-bottom: 1.2mm;      /* igual a la regla base .section-title */
-}
