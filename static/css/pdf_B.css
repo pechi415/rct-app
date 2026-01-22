@@ -369,3 +369,11 @@ h1,h2,h3{ margin:0; }
   page-break-inside: avoid;
   break-inside: avoid;
 }
+
+/* PDF B: centrar verticalmente badges en headers de cards */
+#dist-camiones .section-title,
+#complementarios-mini .section-title,
+#equipo-liviano .section-title{
+  display: flex;
+  align-items: center;   /* 👈 centra badge con el título */
+}
