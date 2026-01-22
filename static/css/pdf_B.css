@@ -1316,3 +1316,16 @@ h1, h2, h3{ margin: 0; }
   font-weight: 700;
   white-space: nowrap;
 }
+
+/* PDF B: unificar títulos de subcards (Personal/Seguridad/PTS) */
+#personal .subhead,
+#seguridad .subhead,
+#pts-comentarios .subhead{
+  font-size: 11pt;
+  font-weight: 900;
+  line-height: 1.15;
+  padding-bottom: 6px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--line);
+  color: var(--text);
+}
