@@ -679,7 +679,7 @@
                 </table>
              {% endif %}
             </div>
-            
+
             </div>
 
 
@@ -717,56 +717,79 @@
             <div class="card subcard">
             <div class="subhead">Personal en entrenamiento</div>
 
-            {% if entrenamiento_items|length == 0 %}
-                <div class="empty">Sin registros.</div>
-            {% else %}
-                <table class="table table-compact">
+            {% set items = entrenamiento_items %}
+            {% set half = (items|length + 1) // 2 %}
+
+            <table class="table table-compact table-split">
                 <thead>
                     <tr>
                     <th>Entrenamiento</th>
-                    <th class="t-right" style="width:90px;">Cantidad</th>
+                    <th class="t-right" style="width:70px;">Cantidad</th>
+                    <th class="split">Entrenamiento</th>
+                    <th class="t-right" style="width:70px;">Cantidad</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for x in entrenamiento_items %}
-                    {% set ent = x["entrenamiento"] if x is mapping else x.entrenamiento %}
-                    {% set cant = x["cantidad"] if x is mapping else x.cantidad %}
-                    <tr>
-                        <td>{{ ent }}</td>
-                        <td class="t-right nowrap">{{ cant }}</td>
-                    </tr>
+                    {% for i in range(half) %}
+                        {% set left = items[i] %}
+                        {% set entL = left["entrenamiento"] if left is mapping else left.entrenamiento %}
+                        {% set cantL = left["cantidad"] if left is mapping else left.cantidad %}
+
+                        {% set j = i + half %}
+                        {% if j < items|length %}
+                            {% set right = items[j] %}
+                            {% set entR = right["entrenamiento"] if right is mapping else right.entrenamiento %}
+                            {% set cantR = right["cantidad"] if right is mapping else right.cantidad %}
+                        {% else %}
+                            {% set entR = "" %}
+                            {% set cantR = "" %}
+                        {% endif %}
+
+                        <tr>
+                            <td>{{ entL }}</td>
+                            <td class="t-right nowrap">{{ cantL }}</td>
+
+                            <td class="split">{{ entR or '—' }}</td>
+                            <td class="t-right nowrap">{{ cantR if cantR != "" else '—' }}</td>
+                        </tr>
                     {% endfor %}
                 </tbody>
-                </table>
-            {% endif %}
+            </table>
+            </div>
 
             <div class="divider-hr"></div>
 
             <div class="subhead subhead-sm">Contacto con operadores</div>
 
-            {% if contactos|length == 0 %}
-                <div class="empty">Sin registros.</div>
-            {% else %}
+                {# Agrupar por tipo #}
+                {% set g = namespace(map={}) %}
+                {% for x in contactos %}
+                    {% set tipo = (x["tipo"] if x is mapping else x.tipo) or "Sin tipo" %}
+                    {% set op = (x["operador"] if x is mapping else x.operador) or "" %}
+                    {% set key = tipo|trim %}
+                    {% if key in g.map %}
+                        {% set _ = g.map.__setitem__(key, g.map[key] + [op]) %}
+                    {% else %}
+                        {% set _ = g.map.__setitem__(key, [op]) %}
+                    {% endif %}
+                {% endfor %}
+
                 <table class="table table-compact">
-                <thead>
-                    <tr>
-                    <th style="width:140px;">Tipo</th>
-                    <th>Operador</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for x in contactos %}
-                    {% set tipo = x["tipo"] if x is mapping else x.tipo %}
-                    {% set op = x["operador"] if x is mapping else x.operador %}
-                    <tr>
-                        <td class="nowrap">{{ tipo }}</td>
-                        <td class="wrap-soft">{{ op }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
+                    <thead>
+                        <tr>
+                        <th style="width:140px;">Contacto</th>
+                        <th>Operador</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for tipo, ops in g.map|dictsort %}
+                            <tr>
+                                <td class="nowrap">{{ tipo }}</td>
+                                <td class="wrap-soft">{{ ops|sort|join(' • ') }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
                 </table>
-            {% endif %}
-            </div>
         </div>
     </section>
 
