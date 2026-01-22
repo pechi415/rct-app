@@ -1384,3 +1384,11 @@ h1, h2, h3{ margin: 0; }
 #dist-camiones .mini-warn{ background:#fffdf7; }
 #dist-camiones .mini-bad{ background:#fff8f8; }
 #dist-camiones .mini-muted{ background:#fafafa; }
+
+
+/* PDF B: reducir tamaño de números en mini-kpis */
+.mini-kpi-value{
+  font-size: 12.5px !important;
+  line-height: 1.1 !important;
+}
+
