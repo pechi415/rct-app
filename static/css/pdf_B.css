@@ -348,6 +348,9 @@ h1,h2,h3{ margin:0; }
 
 /* Equipos varados: tabla full ancho dentro de card */
 #equipos-varados.card{ padding: 0; }
+/* FIX: header de Equipos varados con aire igual a otras cards */
+#equipos-varados .section-title{ padding: 8px 10px; margin-bottom: 6px; }
+
 #equipos-varados .ev-text{ white-space: normal; line-height: 1.2; word-break: break-word; }
 
 /* Complementarios: subcards compactas */
