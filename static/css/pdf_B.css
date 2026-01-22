@@ -370,35 +370,16 @@ h1,h2,h3{ margin:0; }
   break-inside: avoid;
 }
 
-/* PDF B: copiar comportamiento de header como Equipos varados */
+/* PDF B: alinear badge al centro sin alterar altura del header */
 #dist-camiones .section-title,
 #complementarios-mini .section-title,
 #equipo-liviano .section-title{
-  padding: 8px 10px;
-  margin-bottom: 6px;
-  display: flex;
   align-items: center;
 }
 
-/* (Opcional) igualar “altura visual” del título */
-#dist-camiones .section-title .h2,
-#complementarios-mini .section-title .h2,
-#equipo-liviano .section-title .h2{
-  line-height: 1.1;
-}
-/* PDF B: copiar comportamiento de header como Equipos varados */
-#dist-camiones .section-title,
-#complementarios-mini .section-title,
-#equipo-liviano .section-title{
-  padding: 8px 10px;
-  margin-bottom: 6px;
-  display: flex;
-  align-items: center;
-}
-
-/* (Opcional) igualar “altura visual” del título */
-#dist-camiones .section-title .h2,
-#complementarios-mini .section-title .h2,
-#equipo-liviano .section-title .h2{
-  line-height: 1.1;
+#dist-camiones .section-title .badge,
+#complementarios-mini .section-title .badge,
+#equipo-liviano .section-title .badge{
+  line-height: 1;
+  margin: 0;
 }
