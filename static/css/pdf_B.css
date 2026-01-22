@@ -1281,3 +1281,38 @@ h1, h2, h3{ margin: 0; }
   padding-top: 14px;
 }
 
+/* PDF B: UX uniforme SOLO para cards de Operación (no subcards) */
+#operacion .card.card-soft{
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+  overflow: hidden;
+}
+
+#operacion .card.card-soft .card-header{
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+#operacion .card.card-soft .card-title{
+  font-size: 11pt;
+  font-weight: 900;
+  line-height: 1.15;
+  margin: 0;
+  color: var(--text);
+}
+
+#operacion .card.card-soft .card-body{
+  padding: 10px 12px;
+}
+
+#operacion .card.card-soft .muted{
+  font-size: 9pt;
+  color: var(--muted);
+  font-weight: 700;
+  white-space: nowrap;
+}
