@@ -119,23 +119,23 @@ h1,h2,h3{ margin:0; }
    GRID 2 COLUMNAS
 ======================= */
 .two-col{
-  column-count: 2;
-  column-gap: 4.5mm;
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4.5mm;
+  align-items:start;
 }
-
-.two-col > *{
-  break-inside: avoid;
-  page-break-inside: avoid;
-  margin: 0 0 4.5mm 0;   /* separación vertical entre cards */
-}
-
 
 /* =======================
    CARD / SUBCARD (únicas)
 ======================= */
 .card{
-  page-break-inside: auto;
-  break-inside: auto;
+  border: 1px solid var(--line);
+  background: var(--card);
+  border-radius: 10px;
+  padding: 3mm;              /* ✅ más compacto */
+  page-break-inside: avoid;
+  break-inside: avoid;
+  overflow: hidden;
 }
 
 .subcard{
@@ -363,21 +363,6 @@ h1,h2,h3{ margin:0; }
 
 /* Seguridad y PTS: evitar cortes feos */
 #seguridad .subcard, #pts-comentarios .subcard{
-  page-break-inside: avoid;
-  break-inside: avoid;
-}
-
-
-
-
-
-/* =======================
-   PROTEGER BLOQUES PEQUEÑOS
-======================= */
-.section-title,
-.mini-kpi-row,
-.mini-kpi,
-.table tr{
   page-break-inside: avoid;
   break-inside: avoid;
 }
