@@ -1280,3 +1280,65 @@ h1, h2, h3{ margin: 0; }
 #operacion .card-body{
   padding-top: 14px;
 }
+
+/* =========================================================
+   PDF B – UNIFICAR UX DE CARDS (títulos + body)
+   Pegar al FINAL del pdf_B.css
+========================================================= */
+
+/* Card base (todas) */
+.card{
+  border: 1px solid var(--line) !important;
+  border-radius: 10px !important;
+  background: #fff !important;
+  overflow: hidden !important;
+}
+
+/* Header uniforme */
+.card-header{
+  padding: 6px 10px !important;
+  border-bottom: 1px solid var(--line) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 8px !important;
+}
+
+/* Título uniforme */
+.card-title{
+  font-size: 11pt !important;
+  font-weight: 900 !important;
+  line-height: 1.15 !important;
+  margin: 0 !important;
+  color: var(--text) !important;
+}
+
+/* Subtítulo en header (ej: “Bahía • Hora…”) */
+.card-header .muted{
+  font-size: 9pt !important;
+  color: var(--muted) !important;
+  font-weight: 700 !important;
+  white-space: nowrap !important;
+}
+
+/* Body uniforme */
+.card-body{
+  padding: 10px 12px !important;
+}
+
+/* “Subcards” (Personal) – mismos paddings que card */
+.card.subcard{
+  padding: 0 !important; /* su contenido ya tiene head/body propios */
+}
+
+/* Títulos internos tipo subhead */
+.subhead{
+  font-size: 10.5pt !important;
+  font-weight: 900 !important;
+  margin: 0 0 6px 0 !important;
+  color: var(--text) !important;
+}
+.subhead-sm{
+  font-size: 10pt !important;
+  font-weight: 900 !important;
+}
