@@ -653,7 +653,6 @@ def init_db():
                     reporte_id BIGINT NOT NULL,
                     equipo INTEGER NOT NULL,
                     ubicacion TEXT NOT NULL,
-                    hora TEXT NOT NULL,
                     motivo TEXT NOT NULL,
                     FOREIGN KEY(reporte_id) REFERENCES reportes(id)
                 );
@@ -883,7 +882,6 @@ def init_db():
                     reporte_id INTEGER NOT NULL,
                     equipo INTEGER NOT NULL,
                     ubicacion TEXT NOT NULL,
-                    hora TEXT NOT NULL,
                     motivo TEXT NOT NULL,
                     FOREIGN KEY(reporte_id) REFERENCES reportes(id)
                 )
