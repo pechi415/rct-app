@@ -64,22 +64,9 @@
   </div>
 
  
-  <!-- =========================================================
-       PORTADA / RESUMEN EJECUTIVO (Página 1)
-  ========================================================== -->
-  <section class="section section-cover">
-    <div class="cover-top">
-    </div>
-  </section>
-
-  <!-- =========================================================
-       DETALLE POR SECCIONES (Página 2+)
-  ========================================================== -->
-  <!-- <div class="page-break"></div> -->
-
-<!-- =========================
+<!-- =========================================================
      SECCIÓN: OPERACIÓN
-========================= -->
+========================================================== -->
 
 {% set operacion = operacion|default({}) %}
 {% set bahias = bahias|default([]) %}
@@ -93,43 +80,39 @@
         <div class="op-col">
 
             <!-- Operación general del turno -->
-            <div class="card card-soft">
-                <div class="card-header">
-                    <div class="card-title">First Last</div>
-                </div>
+            <div class="card subcard">
+                <div class="subhead">First Last</div>
 
-                <div class="card-body">
-                    <div class="mini-kpi-row mini-kpi-4 op-mini">
-                        <div class="mini-kpi mini-ok">
-                            <div class="mini-kpi-label">Inicio Pit 2</div>
-                            <div class="mini-kpi-value">{{ operacion.get('inicio_pit2') or '—' }}</div>
-                        </div>
-
-                        <div class="mini-kpi mini-ok">
-                            <div class="mini-kpi-label">Inicio Pit 5</div>
-                            <div class="mini-kpi-value">{{ operacion.get('inicio_pit5') or '—' }}</div>
-                        </div>
-
-                        <div class="mini-kpi mini-muted">
-                            <div class="mini-kpi-label">Final Pit 2</div>
-                            <div class="mini-kpi-value">{{ operacion.get('final_pit2') or '—' }}</div>
-                        </div>
-
-                        <div class="mini-kpi mini-muted">
-                            <div class="mini-kpi-label">Final Pit 5</div>
-                            <div class="mini-kpi-value">{{ operacion.get('final_pit5') or '—' }}</div>
-                        </div>
+                <div class="mini-kpi-row mini-kpi-4 op-mini">
+                    <div class="mini-kpi mini-ok">
+                        <div class="mini-kpi-label">Inicio Pit 2</div>
+                        <div class="mini-kpi-value">{{ operacion.get('inicio_pit2') or '—' }}</div>
                     </div>
 
-                    <div class="op-note">
-                        <div class="k">Cam. x Operador (1ra Hr)</div>
-                        <div class="v">
-                            {{ operacion.get('camiones_por_operador', '—') }}
-                            {% if operacion.get('razon') %}
-                            <span class="op-sep">·</span>
-                            <span class="op-muted">Razón:</span> {{ operacion.get('razon') }}
-                            {% endif %}
-                        </div>
+                    <div class="mini-kpi mini-ok">
+                        <div class="mini-kpi-label">Inicio Pit 5</div>
+                        <div class="mini-kpi-value">{{ operacion.get('inicio_pit5') or '—' }}</div>
+                    </div>
+
+                    <div class="mini-kpi mini-muted">
+                        <div class="mini-kpi-label">Final Pit 2</div>
+                        <div class="mini-kpi-value">{{ operacion.get('final_pit2') or '—' }}</div>
+                    </div>
+
+                    <div class="mini-kpi mini-muted">
+                        <div class="mini-kpi-label">Final Pit 5</div>
+                        <div class="mini-kpi-value">{{ operacion.get('final_pit5') or '—' }}</div>
+                    </div>
+                </div>
+
+                <div class="op-note">
+                    <div class="k">Cam. x Operador (1ra Hr)</div>
+                    <div class="v">
+                        {{ operacion.get('camiones_por_operador', '—') }}
+                        {% if operacion.get('razon') %}
+                        <span class="op-sep">·</span>
+                        <span class="op-muted">Razón:</span> {{ operacion.get('razon') }}
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -140,62 +123,60 @@
         <div class="op-col">
 
             <!-- Llegada de buses a bahías -->
-            <div class="card card-soft">
-                <div class="card-header">
-                    <div class="card-title">Llegada de buses a bahías</div>
-                    <div class="muted">Bahía • Hora de arribo</div>
+            <div class="card subcard">
+                <div class="subhead">
+                    Llegada de buses a bahías
+                    <span class="muted">Bahía • Hora de arribo</span>
                 </div>
 
-                <div class="card-body">
-                    {% if bahias|length == 0 %}
-                    <div class="empty">Sin registros de llegada de buses a bahías.</div>
-                    {% else %}
-                    <table class="table table-compact table-split">
-                        <thead>
-                            <tr>
-                                <th class="w-40">Bahía</th>
-                                <th class="w-20">Hora arribo</th>
-                                <th class="w-40 split">Bahía</th>
-                                <th class="w-20">Hora arribo</th>
+                {% if bahias|length == 0 %}
+                <div class="empty">Sin registros de llegada de buses a bahías.</div>
+                {% else %}
+                <table class="table table-compact table-split">
+                    <thead>
+                        <tr>
+                            <th class="w-40">Bahía</th>
+                            <th class="w-20">Hora arribo</th>
+                            <th class="w-40 split">Bahía</th>
+                            <th class="w-20">Hora arribo</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for i in range(0, bahias|length, 2) %}
+                        {% set b1 = bahias[i] %}
+                        {% set b2 = bahias[i+1] if i+1 < bahias|length else None %} {% set n1=b1.get('nombre') if b1 is
+                            mapping else b1.nombre %} {% set h1=b1.get('hora_arribo') if b1 is mapping else
+                            b1.hora_arribo %} {% set d1=b1.get('detalle') if b1 is mapping else (b1.detalle if
+                            b1.detalle is defined else None) %} {% if b2 %} {% set n2=b2.get('nombre') if b2 is mapping
+                            else b2.nombre %} {% set h2=b2.get('hora_arribo') if b2 is mapping else b2.hora_arribo %} {%
+                            set d2=b2.get('detalle') if b2 is mapping else (b2.detalle if b2.detalle is defined else
+                            None) %} {% endif %} <tr>
+                            <td>
+                                <div class="td-main">{{ n1 }}</div>
+                                {% if d1 %}<div class="td-sub">{{ d1 }}</div>{% endif %}
+                            </td>
+                            <td class="mono">{{ h1 or '—' }}</td>
+
+                            <td class="split">
+                                {% if b2 %}
+                                <div class="td-main">{{ n2 }}</div>
+                                {% if d2 %}<div class="td-sub">{{ d2 }}</div>{% endif %}
+                                {% else %}
+                                &nbsp;
+                                {% endif %}
+                            </td>
+                            <td class="{% if not b2 %}empty-right{% endif %} mono">
+                                {% if b2 %}{{ h2 or '—' }}{% else %}&nbsp;{% endif %}
+                            </td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            {% for i in range(0, bahias|length, 2) %}
-                            {% set b1 = bahias[i] %}
-                            {% set b2 = bahias[i+1] if i+1 < bahias|length else None %} {% set n1=b1.get('nombre') if b1
-                                is mapping else b1.nombre %} {% set h1=b1.get('hora_arribo') if b1 is mapping else
-                                b1.hora_arribo %} {% set d1=b1.get('detalle') if b1 is mapping else (b1.detalle if
-                                b1.detalle is defined else None) %} {% if b2 %} {% set n2=b2.get('nombre') if b2 is
-                                mapping else b2.nombre %} {% set h2=b2.get('hora_arribo') if b2 is mapping else
-                                b2.hora_arribo %} {% set d2=b2.get('detalle') if b2 is mapping else (b2.detalle if
-                                b2.detalle is defined else None) %} {% endif %} <tr>
-                                <td>
-                                    <div class="td-main">{{ n1 }}</div>
-                                    {% if d1 %}<div class="td-sub">{{ d1 }}</div>{% endif %}
-                                </td>
-                                <td class="mono">{{ h1 or '—' }}</td>
+                            {% endfor %}
+                    </tbody>
+                </table>
+                {% endif %}
 
-                                <td class="split">
-                                    {% if b2 %}
-                                    <div class="td-main">{{ n2 }}</div>
-                                    {% if d2 %}<div class="td-sub">{{ d2 }}</div>{% endif %}
-                                    {% else %}
-                                    &nbsp;
-                                    {% endif %}
-                                </td>
-                                <td class="{% if not b2 %}empty-right{% endif %} mono">
-                                    {% if b2 %}{{ h2 or '—' }}{% else %}&nbsp;{% endif %}
-                                </td>
-                                </tr>
-                                {% endfor %}
-                        </tbody>
-                    </table>
-                    {% endif %}
-
-                    {% if bahias_nota %}
-                    <div class="note mt-10">{{ bahias_nota }}</div>
-                    {% endif %}
-                </div>
+                {% if bahias_nota %}
+                <div class="note mt-10">{{ bahias_nota }}</div>
+                {% endif %}
             </div>
 
         </div>
@@ -203,6 +184,7 @@
     </div>
 
 </section>
+
 
 
   <!-- =========================================================
