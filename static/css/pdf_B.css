@@ -1343,3 +1343,44 @@ h1, h2, h3{ margin: 0; }
   line-height: 1.05 !important;
   margin-top: 2px !important;
 }
+
+/* =========================================================
+   PDF B: mini-kpis GLOBAL con tamaño de Personal
+========================================================= */
+
+/* Tamaño base igual a #personal */
+.mini-kpi{
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 7px 9px;
+  background: #fff;
+}
+
+.mini-kpi-label{
+  font-size: 9px;
+  color: var(--muted);
+  font-weight: 900;
+  line-height: 1.1;
+}
+
+.mini-kpi-value{
+  font-size: 14px;
+  font-weight: 900;
+  line-height: 1.1;
+  margin-top: 2px;
+}
+
+/* Layout estándar 4 columnas */
+.mini-kpi-row{
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin: 8px 0 10px 0;
+}
+
+
+/* PDF B: colores SOLO para mini-kpis de Distribución de camiones */
+#dist-camiones .mini-ok{ background:#fbfffb; }
+#dist-camiones .mini-warn{ background:#fffdf7; }
+#dist-camiones .mini-bad{ background:#fff8f8; }
+#dist-camiones .mini-muted{ background:#fafafa; }
