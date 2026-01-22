@@ -99,8 +99,7 @@
                 </div>
 
                 <div class="card-body">
-                    <div class="mini-kpi-row mini-kpi-4">
-
+                    <div class="mini-kpi-row mini-kpi-4 op-mini">
                         <div class="mini-kpi mini-ok">
                             <div class="mini-kpi-label">Inicio Pit 2</div>
                             <div class="mini-kpi-value">{{ operacion.get('inicio_pit2') or '—' }}</div>
@@ -120,7 +119,6 @@
                             <div class="mini-kpi-label">Final Pit 5</div>
                             <div class="mini-kpi-value">{{ operacion.get('final_pit5') or '—' }}</div>
                         </div>
-
                     </div>
 
                     <div class="op-note">
@@ -161,7 +159,6 @@
                                 <th class="w-20">Hora arribo</th>
                             </tr>
                         </thead>
-
                         <tbody>
                             {% for i in range(0, bahias|length, 2) %}
                             {% set b1 = bahias[i] %}

@@ -1375,8 +1375,12 @@ h1, h2, h3{ margin: 0; }
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 8px;
-  margin: 8px 0 10px 0;
+  margin: 0; /* <- sin margen global */
 }
+
+/* margen solo donde se necesite */
+.op-mini{ margin: 6px 0 10px 0; }
+
 
 
 /* PDF B: colores SOLO para mini-kpis de Distribución de camiones */
