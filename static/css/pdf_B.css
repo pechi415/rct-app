@@ -370,10 +370,18 @@ h1,h2,h3{ margin:0; }
   break-inside: avoid;
 }
 
-/* PDF B: centrar verticalmente badges en headers de cards */
+/* PDF B: forzar badge centrado (camiones/complementarios/liviano) */
 #dist-camiones .section-title,
 #complementarios-mini .section-title,
 #equipo-liviano .section-title{
-  display: flex;
-  align-items: center;   /* 👈 centra badge con el título */
+  align-items: center !important;
+}
+
+#dist-camiones .section-title .badge,
+#complementarios-mini .section-title .badge,
+#equipo-liviano .section-title .badge{
+  align-self: center !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  line-height: 1 !important;   /* clave: evita “caída” visual */
 }
