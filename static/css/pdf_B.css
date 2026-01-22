@@ -1266,3 +1266,8 @@ h1, h2, h3{ margin: 0; }
 #operacion .mini-warn{ background:#fffdf7; }
 #operacion .mini-bad{ background:#fff8f8; }
 #operacion .mini-muted{ background:#fafafa; }
+
+/* PDF B: separar mini-kpis del header en Operación */
+#operacion .card-body .mini-kpi-row{
+  margin-top: 8px;
+}
