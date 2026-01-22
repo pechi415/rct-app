@@ -1392,3 +1392,9 @@ h1, h2, h3{ margin: 0; }
 #operacion .mini-kpi-row{
   margin: 6px 0 8px 0 !important;  /* aire controlado */
 }
+
+/* PDF B: colores mini-kpi también en Personal */
+#personal .mini-ok{ background:#fbfffb; }
+#personal .mini-warn{ background:#fffdf7; }
+#personal .mini-bad{ background:#fff8f8; }
+#personal .mini-muted{ background:#fafafa; }
