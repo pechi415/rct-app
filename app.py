@@ -1991,9 +1991,9 @@ def equipos_varados(reporte_id):
                     hora = None
 
                     conn.execute("""
-                        INSERT INTO equipos_varados (reporte_id, equipo, ubicacion, hora, motivo)
-                        VALUES (?, ?, ?, ?, ?)
-                    """, (reporte_id, equipo, ubicacion, hora, motivo))
+                        INSERT INTO equipos_varados (reporte_id, equipo, ubicacion, motivo)
+                        VALUES (?, ?, ?, ?)
+                    """, (reporte_id, equipo, ubicacion, motivo))
 
                     return redirect(url_for("equipos_varados", reporte_id=reporte_id))
 
@@ -2042,10 +2042,10 @@ def editar_item_varados(reporte_id, item_id):
                 hora = None
 
                 conn.execute("""
-                    UPDATE equipos_varados
-                    SET equipo = ?, ubicacion = ?, hora = ?, motivo = ?
-                    WHERE id = ? AND reporte_id = ?
-                """, (equipo, ubicacion, hora, motivo, item_id, reporte_id))
+                    INSERT INTO equipos_varados (reporte_id, equipo, ubicacion, motivo)
+                    VALUES (?, ?, ?, ?)
+                """, (reporte_id, equipo, ubicacion, motivo))
+
 
                 return redirect(url_for("equipos_varados", reporte_id=reporte_id))
 
