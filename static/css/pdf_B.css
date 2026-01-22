@@ -1231,3 +1231,32 @@ h1, h2, h3{ margin: 0; }
   min-width: 0;
   overflow: visible;
 }
+
+/* PDF B: reutilizar mini-kpis en Operación (igual a Personal) */
+#operacion .mini-kpi-row{
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+#operacion .mini-kpi{
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 7px 9px;
+  background: #fff;
+}
+
+#operacion .mini-kpi-label{
+  font-size: 9px;
+  color: var(--muted);
+  font-weight: 900;
+  line-height: 1.1;
+}
+
+#operacion .mini-kpi-value{
+  font-size: 14px;
+  font-weight: 900;
+  line-height: 1.1;
+  margin-top: 2px;
+}
