@@ -63,31 +63,7 @@
     </div>
   </div>
 
-  {# =========================
-    KPI STRIP (4 KPIs) - justo después del header
-    ========================= #}
-  <div class="kpi-strip">
-    <div class="kpi-mini">
-      <div class="kpi-mini-label">Personal disponible para operar</div>
-      <div class="kpi-mini-value">{{ disponible_p|default(0) }}</div>
-    </div>
-
-    <div class="kpi-mini">
-      <div class="kpi-mini-label">Ausentismo</div>
-      <div class="kpi-mini-value">{{ ausentismo|length }}</div>
-    </div>
-
-    <div class="kpi-mini">
-      <div class="kpi-mini-label">Camiones Operativos</div>
-      <div class="kpi-mini-value">{{ camiones_disponibles }}</div>
-    </div>
-
-    <div class="kpi-mini">
-      <div class="kpi-mini-label">Equipos varados</div>
-      <div class="kpi-mini-value">{{ equipos|length }}</div>
-    </div>
-  </div>
-
+ 
   <!-- =========================================================
        PORTADA / RESUMEN EJECUTIVO (Página 1)
   ========================================================== -->
@@ -112,11 +88,7 @@
   {% set cond = (operacion.get('condicion_general') or 'Normal') %}
   {% set alertas = operacion.get('alertas') or [] %}
 
-  <section class="rct-section" id="operacion">
-    <div class="section-title">
-      
-      <h2 class="h2">Operación</h2>
-    </div>
+  <section class="rct-section" id="operacion"></div>
 
     <!-- DOS COLUMNAS: 50% / 50% -->
     <div class="op-two-col">
