@@ -2417,11 +2417,8 @@ def equipo_liviano(reporte_id):
                 error = "Este reporte está cerrado. No se puede editar."
             else:
                 camioneta = request.form.get("camioneta", "").strip()
-                estado_l = request.form.get("estado", "OK").strip().upper()
+                estado_l = request.form.get("estado_liviano", "OK").strip().upper()
                 comentario = request.form.get("comentario", "").strip()
-
-                if estado_l == "":
-                    estado_l = "OK"
 
                 if (not camioneta.isdigit()) or (int(camioneta) not in [int(x) for x in camionetas]):
                     error = "Debe seleccionar una camioneta válida."
