@@ -20,7 +20,6 @@
         /* ✅ Landscape para TODO el PDF B */
         @page {
             size: A4 landscape;
-            /* margen base (ajústalo en CSS si ya lo manejas allá) */
             margin: 12mm 10mm 12mm 10mm;
         }
     </style>
@@ -143,13 +142,16 @@
                         <tbody>
                             {% for i in range(0, bahias|length, 2) %}
                             {% set b1 = bahias[i] %}
-                            {% set b2 = bahias[i+1] if i+1 < bahias|length else None %} {% set n1=b1.get('nombre') if b1
-                                is mapping else b1.nombre %} {% set h1=b1.get('hora_arribo') if b1 is mapping else
-                                b1.hora_arribo %} {% set d1=b1.get('detalle') if b1 is mapping else (b1.detalle if
-                                b1.detalle is defined else None) %} {% if b2 %} {% set n2=b2.get('nombre') if b2 is
-                                mapping else b2.nombre %} {% set h2=b2.get('hora_arribo') if b2 is mapping else
-                                b2.hora_arribo %} {% set d2=b2.get('detalle') if b2 is mapping else (b2.detalle if
-                                b2.detalle is defined else None) %} {% endif %} <tr>
+                            {% set b2 = bahias[i+1] if i+1 < bahias|length else None %}
+                            {% set n1 = b1.get('nombre') if b1 is mapping else b1.nombre %}
+                            {% set h1 = b1.get('hora_arribo') if b1 is mapping else b1.hora_arribo %}
+                            {% set d1 = b1.get('detalle') if b1 is mapping else (b1.detalle if b1.detalle is defined else None) %}
+                            {% if b2 %}
+                            {% set n2 = b2.get('nombre') if b2 is mapping else b2.nombre %}
+                            {% set h2 = b2.get('hora_arribo') if b2 is mapping else b2.hora_arribo %}
+                            {% set d2 = b2.get('detalle') if b2 is mapping else (b2.detalle if b2.detalle is defined else None) %}
+                            {% endif %}
+                            <tr>
                                 <td>
                                     <div class="td-main">{{ n1 }}</div>
                                     {% if d1 %}<div class="td-sub">{{ d1 }}</div>{% endif %}
@@ -167,8 +169,8 @@
                                 <td class="{% if not b2 %}empty-right{% endif %} mono">
                                     {% if b2 %}{{ h2 or '—' }}{% else %}&nbsp;{% endif %}
                                 </td>
-                                </tr>
-                                {% endfor %}
+                            </tr>
+                            {% endfor %}
                         </tbody>
                     </table>
                     {% endif %}
@@ -181,59 +183,6 @@
 
         </div>
     </section>
-
-
-    <!-- =========================================================
-       GESTIÓN DE ÁREAS
-  ========================================================== -->
-    <section class="section" id="gestion-areas">
-        <div class="section-title">
-            <h2 class="h2">Gestión de áreas</h2>
-            <span class="badge">{{ gestion|length }} registros</span>
-        </div>
-
-        <div class="card">
-            {% if gestion|length == 0 %}
-            <div class="empty">Sin registros.</div>
-            {% else %}
-            <table class="table table-compact">
-                <thead>
-                    <tr>
-                        <th class="ga-col-hora">Hora</th>
-                        <th>Hallazgo</th>
-                        <th>Acción</th>
-                        <th class="ga-col-resp">Responsable</th>
-                        <th class="ga-col-ok t-center">¿Corregido?</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for g in gestion %}
-                    <tr>
-                        <td class="ga-col-hora nowrap">{{ g.hora }}</td>
-                        <td class="ga-text">{{ g.hallazgo }}</td>
-                        <td class="ga-text">{{ g.accion }}</td>
-                        <td class="ga-col-resp">{{ g.responsable }}</td>
-                        <td class="ga-col-ok t-center">
-                            {% if g.corregido == 1 %}
-                            <span class="pill pill-ok">SÍ</span>
-                            {% else %}
-                            <span class="pill pill-no">NO</span>
-                            {% endif %}
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-            {% endif %}
-        </div>
-    </section>
-
-
-    <!-- =========================================================
-       CUERPO PRINCIPAL (Opción 1) — 2 columnas reales
-       IZQ: Camiones → Personal(Distribución) → Prestados
-       DER: Equipo liviano → Ausentismo → (Entrenamiento + Contacto)
-  ========================================================== -->
 
     <!-- =========================================
        1) DISTRIBUCIÓN CAMIONES + 2) EQUIPO LIVIANO (fila 1)
@@ -369,246 +318,7 @@
         </div>
     </section>
 
-
-    <!-- =========================================
-       2) PERSONAL (Distribución vs Ausentismo) — fila 2
-  ========================================== -->
-    <section class="section" id="personal">
-
-        {% set ns = namespace(ent_total=0, vac_total=0) %}
-
-        {% for x in entrenamiento_items %}
-        {% set c = x["cantidad"] if x is mapping else x.cantidad %}
-        {% set ns.ent_total = ns.ent_total + (c or 0) %}
-        {% endfor %}
-
-        {% for p in personal_items %}
-        {% set cat = (p["categoria"] if p is mapping else p.categoria) or "" %}
-        {% set cant = p["cantidad"] if p is mapping else p.cantidad %}
-        {% set cat_l = cat|lower|trim %}
-        {% if "vac" in cat_l %}
-        {% set ns.vac_total = ns.vac_total + (cant or 0) %}
-        {% endif %}
-        {% endfor %}
-
-        <div class="two-col">
-
-            <!-- IZQ: Distribución del personal (con mini-kpis dentro) -->
-            <div class="card subcard">
-                <div class="subhead">Distribución del personal</div>
-
-                <div class="mini-kpi-row mini-kpi-4">
-                    <div class="mini-kpi mini-muted">
-                        <div class="mini-kpi-label">Roster</div>
-                        <div class="mini-kpi-value">{{ roster_p|default(0) }}</div>
-                    </div>
-
-                    <div class="mini-kpi mini-ok">
-                        <div class="mini-kpi-label">Disponible</div>
-                        <div class="mini-kpi-value">{{ disponible_p|default(0) }}</div>
-                    </div>
-
-                    <div class="mini-kpi mini-bad">
-                        <div class="mini-kpi-label">Ausentismo</div>
-                        <div class="mini-kpi-value">{{ ausentismo|length }}</div>
-                    </div>
-
-                    <div class="mini-kpi mini-warn">
-                        <div class="mini-kpi-label">Vacaciones</div>
-                        <div class="mini-kpi-value">{{ ns.vac_total|round(0)|int }}</div>
-                    </div>
-                </div>
-
-                {% if personal_items|length == 0 %}
-                <div class="empty">Sin registros.</div>
-                {% else %}
-                <table class="table table-compact">
-                    <thead>
-                        <tr>
-                            <th>Categoría</th>
-                            <th class="t-right" style="width:90px;">Cantidad</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for p in personal_items %}
-                        {% set cat = (p["categoria"] if p is mapping else p.categoria) or "" %}
-                        {% set cant = p["cantidad"] if p is mapping else p.cantidad %}
-                        {% set cat_l = cat|lower|trim %}
-                        {% if ("roster" not in cat_l)
-                        and ("dispon" not in cat_l)
-                        and ("ausent" not in cat_l)
-                        and ("vac" not in cat_l)
-                        and ("para operar" not in cat_l) %}
-                        <tr>
-                            <td>{{ cat }}</td>
-                            <td class="t-right nowrap">{{ cant }}</td>
-                        </tr>
-                        {% endif %}
-                        {% endfor %}
-                    </tbody>
-                </table>
-                {% endif %}
-            </div>
-
-            <!-- DER: Ausentismo (agrupado por motivo) -->
-            <div class="card subcard">
-                <div class="subhead">Ausentismo</div>
-
-                {% if ausentismo|length == 0 %}
-                <div class="empty">Sin registros.</div>
-                {% else %}
-                {% set g = namespace(map={}) %}
-                {% for a in ausentismo %}
-                {% set nom = (a["nombre"] if a is mapping else a.nombre) or "" %}
-                {% set mot = (a["motivo"] if a is mapping else a.motivo) or "Sin motivo" %}
-                {% set key = mot|trim %}
-                {% if key in g.map %}
-                {% set _ = g.map.__setitem__(key, g.map[key] + [nom]) %}
-                {% else %}
-                {% set _ = g.map.__setitem__(key, [nom]) %}
-                {% endif %}
-                {% endfor %}
-
-                <table class="table table-compact">
-                    <thead>
-                        <tr>
-                            <th style="width:120px;">Motivo</th>
-                            <th>Nombres</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for mot, nombres in g.map|dictsort %}
-                        <tr>
-                            <td class="nowrap">{{ mot }}</td>
-                            <td class="wrap-soft">{{ nombres|sort|join(' • ') }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-                {% endif %}
-            </div>
-
-        </div>
-
-
-        <!-- =========================================
-         3) Prestados (izq) + Entrenamiento+Contacto (der) — fila 3
-    ========================================== -->
-        <div class="two-col mt-14">
-
-            <!-- IZQ: Operadores prestados -->
-            <div class="card subcard">
-                <div class="subhead">Operadores prestados a otras áreas</div>
-
-                {% if otras_areas|length == 0 %}
-                <div class="empty">Sin registros.</div>
-                {% else %}
-                <table class="table table-compact">
-                    <thead>
-                        <tr>
-                            <th>Operador</th>
-                            <th>Área</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for x in otras_areas %}
-                        {% set nom = x["nombre"] if x is mapping else x.nombre %}
-                        {% set area = x["area"] if x is mapping else x.area %}
-                        <tr>
-                            <td class="nowrap">{{ nom }}</td>
-                            <td class="wrap-soft">{{ area }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-                {% endif %}
-            </div>
-
-            <!-- DER: Card combinada (Entrenamiento + Contacto) para cerrar huecos -->
-            <div class="card subcard">
-                <div class="subhead">Personal en entrenamiento</div>
-
-                {% set items = entrenamiento_items %}
-                {% set half = (items|length + 1) // 2 %}
-
-                {% if items|length == 0 %}
-                <div class="empty">Sin registros.</div>
-                {% else %}
-                <table class="table table-compact table-split">
-                    <thead>
-                        <tr>
-                            <th>Entrenamiento</th>
-                            <th class="t-right" style="width:70px;">Cantidad</th>
-                            <th class="split">Entrenamiento</th>
-                            <th class="t-right" style="width:70px;">Cantidad</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for i in range(half) %}
-                        {% set left = items[i] %}
-                        {% set entL = left["entrenamiento"] if left is mapping else left.entrenamiento %}
-                        {% set cantL = left["cantidad"] if left is mapping else left.cantidad %}
-
-                        {% set j = i + half %}
-                        {% if j < items|length %} {% set right=items[j] %} {% set entR=right["entrenamiento"] if right
-                            is mapping else right.entrenamiento %} {% set cantR=right["cantidad"] if right is mapping
-                            else right.cantidad %} {% else %} {% set entR="" %} {% set cantR="" %} {% endif %} <tr>
-                            <td>{{ entL }}</td>
-                            <td class="t-right nowrap">{{ cantL }}</td>
-
-                            <td class="split">{{ entR or '—' }}</td>
-                            <td class="t-right nowrap">{{ cantR if cantR != "" else '—' }}</td>
-                            </tr>
-                            {% endfor %}
-                    </tbody>
-                </table>
-                {% endif %}
-
-                <div class="divider-hr"></div>
-
-                <div class="subhead subhead-sm">Contacto con operadores</div>
-
-                {% if contactos|length == 0 %}
-                <div class="empty">Sin registros.</div>
-                {% else %}
-                {% set g = namespace(map={}) %}
-                {% for x in contactos %}
-                {% set tipo = (x["tipo"] if x is mapping else x.tipo) or "Sin tipo" %}
-                {% set op = (x["operador"] if x is mapping else x.operador) or "" %}
-                {% set key = tipo|trim %}
-                {% if key in g.map %}
-                {% set _ = g.map.__setitem__(key, g.map[key] + [op]) %}
-                {% else %}
-                {% set _ = g.map.__setitem__(key, [op]) %}
-                {% endif %}
-                {% endfor %}
-
-                <table class="table table-compact">
-                    <thead>
-                        <tr>
-                            <th style="width:140px;">Contacto</th>
-                            <th>Operador</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for tipo, ops in g.map|dictsort %}
-                        <tr>
-                            <td class="nowrap">{{ tipo }}</td>
-                            <td class="wrap-soft">{{ ops|sort|join(' • ') }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-                {% endif %}
-            </div>
-
-        </div>
-    </section>
-
-
-    <!-- =========================================================
-       EQUIPOS VARADOS + COMPLEMENTARIOS (compacto, sin inflar)
-  ========================================================== -->
+    <!-- ✅ MOVIDO: VARADOS + COMPLEMENTARIOS justo debajo de camiones/liviano -->
     <section class="section" id="bloque-3-dos-columnas">
         <div class="two-col">
 
@@ -643,7 +353,7 @@
                 {% endif %}
             </div>
 
-            <!-- DER: Complementarios (solo muestra sub-bloques si hay data) -->
+            <!-- DER: Complementarios -->
             <div class="card" id="complementarios-mini">
                 <div class="section-title">
                     <h2 class="h2">Complementarios</h2>
@@ -706,6 +416,283 @@
         </div>
     </section>
 
+    <!-- =========================================
+       2) PERSONAL (Distribución vs Ausentismo) — fila 2
+  ========================================== -->
+    <section class="section" id="personal">
+
+        {% set ns = namespace(ent_total=0, vac_total=0) %}
+
+        {% for x in entrenamiento_items %}
+        {% set c = x["cantidad"] if x is mapping else x.cantidad %}
+        {% set ns.ent_total = ns.ent_total + (c or 0) %}
+        {% endfor %}
+
+        {% for p in personal_items %}
+        {% set cat = (p["categoria"] if p is mapping else p.categoria) or "" %}
+        {% set cant = p["cantidad"] if p is mapping else p.cantidad %}
+        {% set cat_l = cat|lower|trim %}
+        {% if "vac" in cat_l %}
+        {% set ns.vac_total = ns.vac_total + (cant or 0) %}
+        {% endif %}
+        {% endfor %}
+
+        <div class="two-col">
+
+            <div class="card subcard">
+                <div class="subhead">Distribución del personal</div>
+
+                <div class="mini-kpi-row mini-kpi-4">
+                    <div class="mini-kpi mini-muted">
+                        <div class="mini-kpi-label">Roster</div>
+                        <div class="mini-kpi-value">{{ roster_p|default(0) }}</div>
+                    </div>
+
+                    <div class="mini-kpi mini-ok">
+                        <div class="mini-kpi-label">Disponible</div>
+                        <div class="mini-kpi-value">{{ disponible_p|default(0) }}</div>
+                    </div>
+
+                    <div class="mini-kpi mini-bad">
+                        <div class="mini-kpi-label">Ausentismo</div>
+                        <div class="mini-kpi-value">{{ ausentismo|length }}</div>
+                    </div>
+
+                    <div class="mini-kpi mini-warn">
+                        <div class="mini-kpi-label">Vacaciones</div>
+                        <div class="mini-kpi-value">{{ ns.vac_total|round(0)|int }}</div>
+                    </div>
+                </div>
+
+                {% if personal_items|length == 0 %}
+                <div class="empty">Sin registros.</div>
+                {% else %}
+                <table class="table table-compact">
+                    <thead>
+                        <tr>
+                            <th>Categoría</th>
+                            <th class="t-right" style="width:90px;">Cantidad</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for p in personal_items %}
+                        {% set cat = (p["categoria"] if p is mapping else p.categoria) or "" %}
+                        {% set cant = p["cantidad"] if p is mapping else p.cantidad %}
+                        {% set cat_l = cat|lower|trim %}
+                        {% if ("roster" not in cat_l)
+                        and ("dispon" not in cat_l)
+                        and ("ausent" not in cat_l)
+                        and ("vac" not in cat_l)
+                        and ("para operar" not in cat_l) %}
+                        <tr>
+                            <td>{{ cat }}</td>
+                            <td class="t-right nowrap">{{ cant }}</td>
+                        </tr>
+                        {% endif %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% endif %}
+            </div>
+
+            <div class="card subcard">
+                <div class="subhead">Ausentismo</div>
+
+                {% if ausentismo|length == 0 %}
+                <div class="empty">Sin registros.</div>
+                {% else %}
+                {% set g = namespace(map={}) %}
+                {% for a in ausentismo %}
+                {% set nom = (a["nombre"] if a is mapping else a.nombre) or "" %}
+                {% set mot = (a["motivo"] if a is mapping else a.motivo) or "Sin motivo" %}
+                {% set key = mot|trim %}
+                {% if key in g.map %}
+                {% set _ = g.map.__setitem__(key, g.map[key] + [nom]) %}
+                {% else %}
+                {% set _ = g.map.__setitem__(key, [nom]) %}
+                {% endif %}
+                {% endfor %}
+
+                <table class="table table-compact">
+                    <thead>
+                        <tr>
+                            <th style="width:120px;">Motivo</th>
+                            <th>Nombres</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for mot, nombres in g.map|dictsort %}
+                        <tr>
+                            <td class="nowrap">{{ mot }}</td>
+                            <td class="wrap-soft">{{ nombres|sort|join(' • ') }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% endif %}
+            </div>
+
+        </div>
+
+        <div class="two-col mt-14">
+
+            <div class="card subcard">
+                <div class="subhead">Operadores prestados a otras áreas</div>
+
+                {% if otras_areas|length == 0 %}
+                <div class="empty">Sin registros.</div>
+                {% else %}
+                <table class="table table-compact">
+                    <thead>
+                        <tr>
+                            <th>Operador</th>
+                            <th>Área</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for x in otras_areas %}
+                        {% set nom = x["nombre"] if x is mapping else x.nombre %}
+                        {% set area = x["area"] if x is mapping else x.area %}
+                        <tr>
+                            <td class="nowrap">{{ nom }}</td>
+                            <td class="wrap-soft">{{ area }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% endif %}
+            </div>
+
+            <div class="card subcard">
+                <div class="subhead">Personal en entrenamiento</div>
+
+                {% set items = entrenamiento_items %}
+                {% set half = (items|length + 1) // 2 %}
+
+                {% if items|length == 0 %}
+                <div class="empty">Sin registros.</div>
+                {% else %}
+                <table class="table table-compact table-split">
+                    <thead>
+                        <tr>
+                            <th>Entrenamiento</th>
+                            <th class="t-right" style="width:70px;">Cantidad</th>
+                            <th class="split">Entrenamiento</th>
+                            <th class="t-right" style="width:70px;">Cantidad</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for i in range(half) %}
+                        {% set left = items[i] %}
+                        {% set entL = left["entrenamiento"] if left is mapping else left.entrenamiento %}
+                        {% set cantL = left["cantidad"] if left is mapping else left.cantidad %}
+
+                        {% set j = i + half %}
+                        {% if j < items|length %}
+                        {% set right = items[j] %}
+                        {% set entR = right["entrenamiento"] if right is mapping else right.entrenamiento %}
+                        {% set cantR = right["cantidad"] if right is mapping else right.cantidad %}
+                        {% else %}
+                        {% set entR = "" %}
+                        {% set cantR = "" %}
+                        {% endif %}
+                        <tr>
+                            <td>{{ entL }}</td>
+                            <td class="t-right nowrap">{{ cantL }}</td>
+
+                            <td class="split">{{ entR or '—' }}</td>
+                            <td class="t-right nowrap">{{ cantR if cantR != "" else '—' }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% endif %}
+
+                <div class="divider-hr"></div>
+
+                <div class="subhead subhead-sm">Contacto con operadores</div>
+
+                {% if contactos|length == 0 %}
+                <div class="empty">Sin registros.</div>
+                {% else %}
+                {% set g = namespace(map={}) %}
+                {% for x in contactos %}
+                {% set tipo = (x["tipo"] if x is mapping else x.tipo) or "Sin tipo" %}
+                {% set op = (x["operador"] if x is mapping else x.operador) or "" %}
+                {% set key = tipo|trim %}
+                {% if key in g.map %}
+                {% set _ = g.map.__setitem__(key, g.map[key] + [op]) %}
+                {% else %}
+                {% set _ = g.map.__setitem__(key, [op]) %}
+                {% endif %}
+                {% endfor %}
+
+                <table class="table table-compact">
+                    <thead>
+                        <tr>
+                            <th style="width:140px;">Contacto</th>
+                            <th>Operador</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for tipo, ops in g.map|dictsort %}
+                        <tr>
+                            <td class="nowrap">{{ tipo }}</td>
+                            <td class="wrap-soft">{{ ops|sort|join(' • ') }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% endif %}
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- ✅ MOVIDO: Gestión de áreas a la página 2 debajo de Prestados/Entrenamiento -->
+    <div class="page-break"></div>
+    <section class="section" id="gestion-areas">
+        <div class="section-title">
+            <h2 class="h2">Gestión de áreas</h2>
+            <span class="badge">{{ gestion|length }} registros</span>
+        </div>
+
+        <div class="card">
+            {% if gestion|length == 0 %}
+            <div class="empty">Sin registros.</div>
+            {% else %}
+            <table class="table table-compact">
+                <thead>
+                    <tr>
+                        <th class="ga-col-hora">Hora</th>
+                        <th>Hallazgo</th>
+                        <th>Acción</th>
+                        <th class="ga-col-resp">Responsable</th>
+                        <th class="ga-col-ok t-center">¿Corregido?</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for g in gestion %}
+                    <tr>
+                        <td class="ga-col-hora nowrap">{{ g.hora }}</td>
+                        <td class="ga-text">{{ g.hallazgo }}</td>
+                        <td class="ga-text">{{ g.accion }}</td>
+                        <td class="ga-col-resp">{{ g.responsable }}</td>
+                        <td class="ga-col-ok t-center">
+                            {% if g.corregido == 1 %}
+                            <span class="pill pill-ok">SÍ</span>
+                            {% else %}
+                            <span class="pill pill-no">NO</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% endif %}
+        </div>
+    </section>
 
     <!-- =========================================================
        SEGURIDAD
@@ -783,7 +770,6 @@
             </div>
         </div>
     </section>
-
 
     <!-- =========================================================
        PTS + COMENTARIOS (50/50)
