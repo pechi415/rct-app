@@ -175,11 +175,14 @@ h1,h2,h3{ margin:0; }
 .empty{
   border: 1px dashed var(--line);
   background: #FCFCFD;
-  padding: 2.6mm;
-  border-radius: 10px;
+  padding: 1.4mm 2mm;     /* 🔹 mucho más compacto */
+  border-radius: 8px;     /* 🔹 menos “caja” */
   color: var(--muted);
   font-style: italic;
+  font-size: 8.5pt;      /* 🔹 más pequeño que el body */
+  line-height: 1.1;      /* 🔹 menos alto */
 }
+
 
 /* =======================
    MINI KPI (GLOBAL ÚNICO)
