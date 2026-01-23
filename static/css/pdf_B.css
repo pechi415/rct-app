@@ -382,3 +382,10 @@ h1,h2,h3{ margin:0; }
 #complementarios-mini .section-title{
   padding: 8px 10px;          /* mismo padding del header */
 }
+
+/* Aire consistente debajo del header cuando una sección arranca página */
+#personal,
+#seguridad,
+#pts-comentarios{
+  padding-top: 4mm;   /* prueba 3mm–6mm */
+}
