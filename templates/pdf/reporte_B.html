@@ -540,30 +540,42 @@
 
             <div class="card subcard">
                 <div class="subhead">Operadores prestados a otras áreas</div>
-
+            
                 {% if otras_areas|length == 0 %}
                 <div class="empty">Sin registros.</div>
                 {% else %}
-                <table class="table table-compact">
+                <table class="table table-compact table-split">
                     <thead>
                         <tr>
-                            <th>Operador</th>
-                            <th>Área</th>
+                            <th class="w-30">Operador</th>
+                            <th class="w-20">Área</th>
+                            <th class="w-30 split">Operador</th>
+                            <th class="w-20">Área</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for x in otras_areas %}
-                        {% set nom = x["nombre"] if x is mapping else x.nombre %}
-                        {% set area = x["area"] if x is mapping else x.area %}
-                        <tr>
-                            <td class="nowrap">{{ nom }}</td>
-                            <td class="wrap-soft">{{ area }}</td>
-                        </tr>
-                        {% endfor %}
+                        {% for i in range(0, otras_areas|length, 2) %}
+                        {% set a1 = otras_areas[i] %}
+                        {% set a2 = otras_areas[i+1] if i+1 < otras_areas|length else None %} {% set nom1=a1.get('nombre') if a1 is
+                            mapping else a1.nombre %} {% set area1=a1.get('area') if a1 is mapping else a1.area %} {% if a2 %} {%
+                            set nom2=a2.get('nombre') if a2 is mapping else a2.nombre %} {% set area2=a2.get('area') if a2 is
+                            mapping else a2.area %} {% endif %} <tr>
+                            <td class="nowrap">{{ nom1 }}</td>
+                            <td class="wrap-soft">{{ area1 }}</td>
+            
+                            <td class="split">
+                                {% if a2 %}{{ nom2 }}{% else %}&nbsp;{% endif %}
+                            </td>
+                            <td class="{% if not a2 %}empty-right{% endif %}">
+                                {% if a2 %}{{ area2 }}{% else %}&nbsp;{% endif %}
+                            </td>
+                            </tr>
+                            {% endfor %}
                     </tbody>
                 </table>
                 {% endif %}
             </div>
+
 
             <div class="card subcard">
                 <div class="subhead">Personal en entrenamiento</div>
