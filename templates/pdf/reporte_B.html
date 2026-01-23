@@ -360,13 +360,12 @@
                     <span class="badge">Bombas: {{ bombas|length }} · Luminarias: {{ luminarias|length }}</span>
                 </div>
 
-                {% if bombas|length == 0 and luminarias|length == 0 %}
-                <div class="empty">Sin registros.</div>
-                {% else %}
-
-                {% if bombas|length > 0 %}
                 <div class="subcard">
                     <div class="subhead">Bombas</div>
+                
+                    {% if bombas|length == 0 %}
+                    <div class="empty">Sin registros.</div>
+                    {% else %}
                     <table class="table table-compact">
                         <thead>
                             <tr>
@@ -385,12 +384,16 @@
                             {% endfor %}
                         </tbody>
                     </table>
+                    {% endif %}
                 </div>
-                {% endif %}
 
-                {% if luminarias|length > 0 %}
-                <div class="subcard {% if bombas|length > 0 %}mt-10{% endif %}">
+
+                <div class="subcard mt-10">
                     <div class="subhead">Luminarias</div>
+                
+                    {% if luminarias|length == 0 %}
+                    <div class="empty">Sin registros.</div>
+                    {% else %}
                     <table class="table table-compact">
                         <thead>
                             <tr>
@@ -407,10 +410,9 @@
                             {% endfor %}
                         </tbody>
                     </table>
+                    {% endif %}
                 </div>
-                {% endif %}
 
-                {% endif %}
             </div>
 
         </div>
