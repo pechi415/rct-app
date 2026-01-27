@@ -87,29 +87,29 @@
                     <div class="mini-kpi-row mini-kpi-4 op-mini">
                         <div class="mini-kpi mini-ok">
                             <div class="mini-kpi-label">Inicio Pit 2</div>
-                            <div class="mini-kpi-value">{{ operacion.get('inicio_pit2') or '—' }}</div>
+                            <div class="mini-kpi-value">{{ operacion.get('inicio_pit2') or 'Sin registro' }}</div>
                         </div>
 
                         <div class="mini-kpi mini-ok">
                             <div class="mini-kpi-label">Inicio Pit 5</div>
-                            <div class="mini-kpi-value">{{ operacion.get('inicio_pit5') or '—' }}</div>
+                            <div class="mini-kpi-value">{{ operacion.get('inicio_pit5') or 'Sin registro' }}</div>
                         </div>
 
                         <div class="mini-kpi mini-muted">
                             <div class="mini-kpi-label">Final Pit 2</div>
-                            <div class="mini-kpi-value">{{ operacion.get('final_pit2') or '—' }}</div>
+                            <div class="mini-kpi-value">{{ operacion.get('final_pit2') or 'Sin registro' }}</div>
                         </div>
 
                         <div class="mini-kpi mini-muted">
                             <div class="mini-kpi-label">Final Pit 5</div>
-                            <div class="mini-kpi-value">{{ operacion.get('final_pit5') or '—' }}</div>
+                            <div class="mini-kpi-value">{{ operacion.get('final_pit5') or 'Sin registro' }}</div>
                         </div>
                     </div>
 
                     <div class="op-note">
                         <div class="k">Cam. x Operador (1ra Hr)</div>
                         <div class="v">
-                            {{ operacion.get('camiones_por_operador', '—') }}
+                            {{ operacion.get('camiones_por_operador', 'Sin registro') }}
                             {% if operacion.get('razon') %}
                             <span class="op-sep">·</span>
                             <span class="op-muted">Razón:</span> {{ operacion.get('razon') }}
