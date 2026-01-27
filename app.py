@@ -3511,15 +3511,18 @@ def first_last(reporte_id):
                     final_pit5  = request.form.get("final_pit5", "").strip()
 
                     camiones_raw = request.form.get("camiones_por_operador", "").strip()
-                    razon = request.form.get("razon", "").strip()  # nunca None
+                    
 
                     # camiones: si está vacío => 0
                     if camiones_raw == "":
-                        camiones = 0
+                        camiones = None
                     elif not camiones_raw.isdigit():
                         error = "La cantidad de camiones debe ser un número entero (0 o mayor)."
+                        camiones = None
                     else:
                         camiones = int(camiones_raw)
+                    
+                    razon = request.form.get("razon", "").strip() or ""
 
                     # si camiones > 0, razón obligatoria
                     if error is None and camiones > 0 and razon == "":
@@ -3576,15 +3579,18 @@ def editar_first_last(reporte_id):
             final_pit5  = request.form.get("final_pit5", "").strip()
 
             camiones_raw = request.form.get("camiones_por_operador", "").strip()
-            razon = request.form.get("razon", "").strip()  # nunca None
+            
 
             # camiones: vacío => 0
             if camiones_raw == "":
-                camiones = 0
+                camiones = None
             elif not camiones_raw.isdigit():
                 error = "La cantidad de camiones debe ser un número entero (0 o mayor)."
+                camiones = None
             else:
                 camiones = int(camiones_raw)
+
+            razon = razon or ""
 
             # si camiones > 0, razón obligatoria
             if error is None and camiones > 0 and razon == "":
