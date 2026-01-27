@@ -134,6 +134,7 @@ CATEGORIAS_PERSONAL = [
     "Personal recibido desde PB",
     "Personal prestado a Carbón",
     "Personal recibido desde Carbón",
+    "Personal solo día",
     "Vacaciones",
     "Entrenamiento",
     "Trainer",
