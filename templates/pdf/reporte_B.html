@@ -478,59 +478,82 @@
 
             <div class="card subcard">
                 <div class="subhead">Distribución del personal</div>
-
+            
                 <div class="mini-kpi-row mini-kpi-4">
                     <div class="mini-kpi mini-muted">
                         <div class="mini-kpi-label">Roster</div>
                         <div class="mini-kpi-value">{{ roster_p|default(0) }}</div>
                     </div>
-
+            
                     <div class="mini-kpi mini-ok">
                         <div class="mini-kpi-label">Disponible</div>
                         <div class="mini-kpi-value">{{ disponible_p|default(0) }}</div>
                     </div>
-
+            
                     <div class="mini-kpi mini-bad">
                         <div class="mini-kpi-label">Ausentismo</div>
                         <div class="mini-kpi-value">{{ ausentismo|length }}</div>
                     </div>
-
+            
                     <div class="mini-kpi mini-warn">
                         <div class="mini-kpi-label">Vacaciones</div>
                         <div class="mini-kpi-value">{{ ns.vac_total|round(0)|int }}</div>
                     </div>
                 </div>
-
+            
                 {% if personal_items|length == 0 %}
                 <div class="empty">Sin registros.</div>
                 {% else %}
-                <table class="table table-compact">
+            
+                {# 🔹 Filtrar SOLO las categorías “extra” que sí van a tabla #}
+                {% set rows = [] %}
+                {% for p in personal_items %}
+                {% set cat = (p["categoria"] if p is mapping else p.categoria) or "" %}
+                {% set cant = p["cantidad"] if p is mapping else p.cantidad %}
+                {% set cat_l = cat|lower|trim %}
+                {% if ("roster" not in cat_l)
+                and ("dispon" not in cat_l)
+                and ("ausent" not in cat_l)
+                and ("vac" not in cat_l)
+                and ("para operar" not in cat_l) %}
+                {% set _ = rows.append({"cat": cat, "cant": cant}) %}
+                {% endif %}
+                {% endfor %}
+            
+                {% if rows|length == 0 %}
+                <div class="empty">Sin registros.</div>
+                {% else %}
+                <table class="table table-compact table-split">
                     <thead>
                         <tr>
                             <th>Categoría</th>
-                            <th class="t-right" style="width:90px;">Cantidad</th>
+                            <th class="t-right" style="width:70px;">Cant.</th>
+                            <th class="split">Categoría</th>
+                            <th class="t-right" style="width:70px;">Cant.</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for p in personal_items %}
-                        {% set cat = (p["categoria"] if p is mapping else p.categoria) or "" %}
-                        {% set cant = p["cantidad"] if p is mapping else p.cantidad %}
-                        {% set cat_l = cat|lower|trim %}
-                        {% if ("roster" not in cat_l)
-                        and ("dispon" not in cat_l)
-                        and ("ausent" not in cat_l)
-                        and ("vac" not in cat_l)
-                        and ("para operar" not in cat_l) %}
-                        <tr>
-                            <td>{{ cat }}</td>
-                            <td class="t-right nowrap">{{ cant }}</td>
-                        </tr>
-                        {% endif %}
-                        {% endfor %}
+                        {% for i in range(0, rows|length, 2) %}
+                        {% set r1 = rows[i] %}
+                        {% set r2 = rows[i+1] if i+1 < rows|length else None %} <tr>
+                            <td class="wrap-soft">{{ r1.cat }}</td>
+                            <td class="t-right nowrap">{{ r1.cant }}</td>
+            
+                            <td class="split">
+                                {% if r2 %}{{ r2.cat }}{% else %}&nbsp;{% endif %}
+                            </td>
+                            <td class="{% if not r2 %}empty-right{% endif %} t-right nowrap">
+                                {% if r2 %}{{ r2.cant }}{% else %}&nbsp;{% endif %}
+                            </td>
+                            </tr>
+                            {% endfor %}
                     </tbody>
                 </table>
                 {% endif %}
+            
+                {% endif %}
             </div>
+
 
         <div class="card subcard">
             <div class="subhead">Ausentismo</div>
