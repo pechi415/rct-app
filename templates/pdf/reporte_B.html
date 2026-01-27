@@ -532,42 +532,44 @@
                 {% endif %}
             </div>
 
-            <div class="card subcard">
-                <div class="subhead">Ausentismo</div>
-
-                {% if ausentismo|length == 0 %}
-                <div class="empty">Sin registros.</div>
-                {% else %}
-                {% set g = namespace(map={}) %}
-                {% for a in ausentismo %}
-                {% set nom = (a["nombre"] if a is mapping else a.nombre) or "" %}
-                {% set mot = (a["motivo"] if a is mapping else a.motivo) or "Sin motivo" %}
-                {% set key = mot|trim %}
-                {% if key in g.map %}
-                {% set _ = g.map.__setitem__(key, g.map[key] + [nom]) %}
-                {% else %}
-                {% set _ = g.map.__setitem__(key, [nom]) %}
-                {% endif %}
-                {% endfor %}
-
-                <table class="table table-compact">
-                    <thead>
-                        <tr>
-                            <th style="width:120px;">Motivo</th>
-                            <th>Nombres</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for mot, nombres in g.map|dictsort %}
-                        <tr>
-                            <td class="nowrap">{{ mot }}</td>
-                            <td class="wrap-soft">{{ nombres|sort|join(' • ') }}</td>
+        <div class="card subcard">
+            <div class="subhead">Ausentismo</div>
+        
+            {% if ausentismo|length == 0 %}
+            <div class="empty">Sin registros.</div>
+            {% else %}
+            <table class="table table-compact table-split">
+                <thead>
+                    <tr>
+                        <th style="width:120px;">Motivo</th>
+                        <th>Nombre</th>
+                        <th class="split" style="width:120px;">Motivo</th>
+                        <th>Nombre</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for i in range(0, ausentismo|length, 2) %}
+                    {% set a1 = ausentismo[i] %}
+                    {% set a2 = ausentismo[i+1] if i+1 < ausentismo|length else None %} {% set nom1=(a1["nombre"] if a1 is
+                        mapping else a1.nombre) or "—" %} {% set mot1=(a1["motivo"] if a1 is mapping else a1.motivo)
+                        or "Sin motivo" %} {% if a2 %} {% set nom2=(a2["nombre"] if a2 is mapping else a2.nombre) or "—" %} {%
+                        set mot2=(a2["motivo"] if a2 is mapping else a2.motivo) or "Sin motivo" %} {% endif %} <tr>
+                        <td class="nowrap">{{ mot1 }}</td>
+                        <td class="wrap-soft">{{ nom1 }}</td>
+        
+                        <td class="split">
+                            {% if a2 %}{{ mot2 }}{% else %}&nbsp;{% endif %}
+                        </td>
+                        <td class="{% if not a2 %}empty-right{% endif %} wrap-soft">
+                            {% if a2 %}{{ nom2 }}{% else %}&nbsp;{% endif %}
+                        </td>
                         </tr>
                         {% endfor %}
-                    </tbody>
-                </table>
-                {% endif %}
-            </div>
+                </tbody>
+            </table>
+            {% endif %}
+        </div>
+
 
         </div>
 
