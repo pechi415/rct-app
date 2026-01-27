@@ -3525,8 +3525,9 @@ def first_last(reporte_id):
                     razon = request.form.get("razon", "").strip() or ""
 
                     # si camiones > 0, razón obligatoria
-                    if error is None and camiones > 0 and razon == "":
+                    if error is None and (camiones is not None) and (camiones > 0) and razon == "":
                         error = "Si camiones por operador es mayor que 0, la razón es obligatoria."
+
 
                     if error is None:
                         conn.execute("""
@@ -3579,7 +3580,7 @@ def editar_first_last(reporte_id):
             final_pit5  = request.form.get("final_pit5", "").strip()
 
             camiones_raw = request.form.get("camiones_por_operador", "").strip()
-            
+            razon = request.form.get("razon", "").strip() or ""
 
             # camiones: vacío => 0
             if camiones_raw == "":
@@ -3590,11 +3591,10 @@ def editar_first_last(reporte_id):
             else:
                 camiones = int(camiones_raw)
 
-            razon = razon or ""
-
             # si camiones > 0, razón obligatoria
-            if error is None and camiones > 0 and razon == "":
+            if error is None and (camiones is not None) and (camiones > 0) and razon == "":
                 error = "Si camiones por operador es mayor que 0, la razón es obligatoria."
+
 
             if error is None:
                 conn.execute("""
@@ -3616,7 +3616,7 @@ def editar_first_last(reporte_id):
 
                 return redirect(url_for("first_last", reporte_id=reporte_id))
             
-        return render_template("first_last_editar.html", r=r, reporte=r, it=it, error=error)
+    return render_template("first_last_editar.html", r=r, reporte=r, it=it, error=error)
 
 @app.route("/reportes/<int:reporte_id>/first_last/eliminar", methods=["POST"])
 @reporte_mina_required
