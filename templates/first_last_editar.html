@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+
 {% block title %}Editar First - Last{% endblock %}
 
 {% block content %}
@@ -21,7 +22,7 @@
      MENSAJES
 ======================= -->
 {% if error %}
-  <div class="alert alert-danger">{{ error }}</div>
+<div class="alert alert-danger">{{ error }}</div>
 {% endif %}
 
 <!-- =======================
@@ -33,14 +34,16 @@
   <div class="row g-2 mb-3">
     <div class="col-md-6">
       <label class="form-label">Pit 2 (hora)</label>
-      <input class="form-control" type="text" name="inicio_pit2" value="{{ it.inicio_pit2 }}">
-      <div class="form-text">Guía: Utilice el Formato de Hora militar (HH:MM) para registrar la Hora.</div>
+      <input class="form-control" type="text" name="inicio_pit2" placeholder="Ej: 05:42"
+        value="{{ it.inicio_pit2 or '' }}">
+      <div class="form-text">Opcional. Formato 24h (HH:MM). Si se deja vacío, en el PDF saldrá “Sin registros”.</div>
     </div>
 
     <div class="col-md-6">
       <label class="form-label">Pit 5 (hora)</label>
-      <input class="form-control" type="text" name="inicio_pit5" value="{{ it.inicio_pit5 }}">
-      <div class="form-text">Guía: Utilice el Formato de Hora militar (HH:MM) para registrar la Hora.</div>
+      <input class="form-control" type="text" name="inicio_pit5" placeholder="Ej: 18:25"
+        value="{{ it.inicio_pit5 or '' }}">
+      <div class="form-text">Opcional. Formato 24h (HH:MM). Si se deja vacío, en el PDF saldrá “Sin registros”.</div>
     </div>
   </div>
 
@@ -48,14 +51,16 @@
   <div class="row g-2 mb-3">
     <div class="col-md-6">
       <label class="form-label">Pit 2 (hora)</label>
-      <input class="form-control" type="text" name="final_pit2" value="{{ it.final_pit2 }}">
-      <div class="form-text">Guía: Utilice el Formato de Hora militar (HH:MM) para registrar la Hora.</div>
+      <input class="form-control" type="text" name="final_pit2" placeholder="Ej: 05:25"
+        value="{{ it.final_pit2 or '' }}">
+      <div class="form-text">Opcional. Formato 24h (HH:MM). Si se deja vacío, en el PDF saldrá “Sin registros”.</div>
     </div>
 
     <div class="col-md-6">
       <label class="form-label">Pit 5 (hora)</label>
-      <input class="form-control" type="text" name="final_pit5" value="{{ it.final_pit5 }}">
-      <div class="form-text">Guía: Utilice el Formato de Hora militar (HH:MM) para registrar la Hora.</div>
+      <input class="form-control" type="text" name="final_pit5" placeholder="Ej: 18:56"
+        value="{{ it.final_pit5 or '' }}">
+      <div class="form-text">Opcional. Formato 24h (HH:MM). Si se deja vacío, en el PDF saldrá “Sin registros”.</div>
     </div>
   </div>
 
@@ -63,15 +68,18 @@
   <div class="row g-2">
     <div class="col-md-4">
       <label class="form-label">Cantidad (entero)</label>
-      <input class="form-control" type="number" name="camiones_por_operador" min="0" step="1"
-             value="{{ it.camiones_por_operador }}">
-      <div class="form-text">Guía: Solo números enteros. Se permite 0.</div>
+      <input class="form-control" type="number" name="camiones_por_operador" min="0" step="1" placeholder="Ej: 2"
+        value="{{ it.camiones_por_operador if it.camiones_por_operador is not none else '' }}">
+      <div class="form-text">Opcional. Solo enteros (0 o mayor). Si se deja vacío, en el PDF saldrá “Sin registros”.
+      </div>
     </div>
 
     <div class="col-md-8">
       <label class="form-label">Razón</label>
-      <input class="form-control" type="text" name="razon" value="{{ it.razon }}">
-      <div class="form-text">Guía: Si la cantidad es mayor que 0, la razón es obligatoria.</div>
+      <input class="form-control" type="text" name="razon" placeholder="Ej: falta de operadores"
+        value="{{ it.razon or '' }}">
+      <div class="form-text">Opcional. Si quieres explicar el dato, escríbelo. Si se deja vacío, en el PDF saldrá “Sin
+        registros”.</div>
     </div>
   </div>
 
@@ -79,6 +87,7 @@
     <button class="btn btn-primary" type="submit">💾 Guardar cambios</button>
     <a class="btn btn-outline-secondary" href="/reportes/{{ r.id }}/first_last">Cancelar</a>
   </div>
+
 </form>
 
 {% endblock %}

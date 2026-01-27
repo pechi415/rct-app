@@ -3505,30 +3505,34 @@ def first_last(reporte_id):
                 if item is not None:
                     error = "Este registro ya existe. Use Editar."
                 else:
-                    inicio_pit2 = request.form.get("inicio_pit2", "").strip()
-                    inicio_pit5 = request.form.get("inicio_pit5", "").strip()
-                    final_pit2  = request.form.get("final_pit2", "").strip()
-                    final_pit5  = request.form.get("final_pit5", "").strip()
+                    inicio_pit2 = request.form.get("inicio_pit2", "").strip() or None
+                    inicio_pit5 = request.form.get("inicio_pit5", "").strip() or None
+                    final_pit2  = request.form.get("final_pit2", "").strip() or None
+                    final_pit5  = request.form.get("final_pit5", "").strip() or None
 
                     camiones_raw = request.form.get("camiones_por_operador", "").strip()
-                    razon = request.form.get("razon", "").strip()
+                    razon = request.form.get("razon", "").strip() or None
 
-                    if inicio_pit2 == "" or inicio_pit5 == "" or final_pit2 == "" or final_pit5 == "":
-                        error = "Todas las horas son obligatorias."
-                    elif camiones_raw == "" or (not camiones_raw.isdigit()):
+                    if camiones_raw == "":
+                        camiones = None
+                    elif not camiones_raw.isdigit():
                         error = "La cantidad de camiones debe ser un número entero (0 o mayor)."
                     else:
                         camiones = int(camiones_raw)
-                        if camiones > 0 and razon == "":
-                            error = "Si camiones por operador es mayor que 0, la razón es obligatoria."
-                        else:
-                            conn.execute("""
-                                INSERT INTO first_last
-                                (reporte_id, inicio_pit2, inicio_pit5, final_pit2, final_pit5,
-                                 camiones_por_operador, razon)
-                                VALUES (?, ?, ?, ?, ?, ?, ?)
-                            """, (reporte_id, inicio_pit2, inicio_pit5, final_pit2, final_pit5, camiones, razon))
-                            return redirect(url_for("first_last", reporte_id=reporte_id))
+
+                    if error is None:
+                        conn.execute("""
+                            INSERT INTO first_last
+                            (reporte_id, inicio_pit2, inicio_pit5, final_pit2, final_pit5,
+                            camiones_por_operador, razon)
+                            VALUES (?, ?, ?, ?, ?, ?, ?)
+                        """, (
+                            reporte_id,
+                            inicio_pit2, inicio_pit5,
+                            final_pit2, final_pit5,
+                            camiones, razon
+                        ))
+                        return redirect(url_for("first_last", reporte_id=reporte_id))
 
         item = conn.execute(
             "SELECT * FROM first_last WHERE reporte_id = ?",
@@ -3559,36 +3563,36 @@ def editar_first_last(reporte_id):
             if g.user["rol"] == "LECTOR":
                 return ("No autorizado", 403)
 
-            inicio_pit2 = request.form.get("inicio_pit2", "").strip()
-            inicio_pit5 = request.form.get("inicio_pit5", "").strip()
-            final_pit2  = request.form.get("final_pit2", "").strip()
-            final_pit5  = request.form.get("final_pit5", "").strip()
+            inicio_pit2 = request.form.get("inicio_pit2", "").strip() or None
+            inicio_pit5 = request.form.get("inicio_pit5", "").strip() or None
+            final_pit2  = request.form.get("final_pit2", "").strip() or None
+            final_pit5  = request.form.get("final_pit5", "").strip() or None
 
             camiones_raw = request.form.get("camiones_por_operador", "").strip()
-            razon = request.form.get("razon", "").strip()
+            razon = request.form.get("razon", "").strip() or None
 
-            if inicio_pit2 == "" or inicio_pit5 == "" or final_pit2 == "" or final_pit5 == "":
-                error = "Todas las horas son obligatorias."
+            if camiones_raw == "":
+                camiones = None
+            elif not camiones_raw.isdigit():
+                error = "La cantidad de camiones debe ser un número entero (0 o mayor)."
             else:
-                if camiones_raw == "":
-                    camiones_raw = "0"
-                if not camiones_raw.isdigit():
-                    error = "La cantidad de camiones debe ser un número entero (0 o mayor)."
-                else:
-                    camiones = int(camiones_raw)
-                    if camiones > 0 and razon == "":
-                        error = "Si camiones por operador es mayor que 0, la razón es obligatoria."
-                    else:
-                        conn.execute("""
-                            UPDATE first_last
-                            SET inicio_pit2 = ?, inicio_pit5 = ?, final_pit2 = ?, final_pit5 = ?,
-                                camiones_por_operador = ?, razon = ?,
-                                updated_at = CURRENT_TIMESTAMP
-                            WHERE reporte_id = ?
-                        """, (inicio_pit2, inicio_pit5, final_pit2, final_pit5, camiones, razon, reporte_id))
-                        return redirect(url_for("first_last", reporte_id=reporte_id))
+                camiones = int(camiones_raw)
 
-    return render_template("first_last_editar.html", r=r, reporte=r, it=it, error=error)
+            if error is None:
+                conn.execute("""
+                    UPDATE first_last
+                    SET inicio_pit2 = ?, inicio_pit5 = ?, final_pit2 = ?, final_pit5 = ?,
+                        camiones_por_operador = ?, razon = ?,
+                        updated_at = CURRENT_TIMESTAMP
+                    WHERE reporte_id = ?
+                """, (
+                    inicio_pit2, inicio_pit5,
+                    final_pit2, final_pit5,
+                    camiones, razon,
+                    reporte_id
+                ))
+                return redirect(url_for("first_last", reporte_id=reporte_id))
+
 
 
 @app.route("/reportes/<int:reporte_id>/first_last/eliminar", methods=["POST"])
