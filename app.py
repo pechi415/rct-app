@@ -3609,6 +3609,8 @@ def editar_first_last(reporte_id):
                 ))
 
                 return redirect(url_for("first_last", reporte_id=reporte_id))
+            
+            return render_template("first_last_editar.html", r=r, reporte=r, it=it, error=error)
 
 @app.route("/reportes/<int:reporte_id>/first_last/eliminar", methods=["POST"])
 @reporte_mina_required
