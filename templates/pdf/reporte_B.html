@@ -538,6 +538,12 @@
             {% if ausentismo|length == 0 %}
             <div class="empty">Sin registros.</div>
             {% else %}
+        
+            {# 🔹 Ordenar por motivo alfabéticamente #}
+            {% set aus = ausentismo
+            | sort(attribute='motivo')
+            %}
+        
             <table class="table table-compact table-split">
                 <thead>
                     <tr>
@@ -548,12 +554,12 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for i in range(0, ausentismo|length, 2) %}
-                    {% set a1 = ausentismo[i] %}
-                    {% set a2 = ausentismo[i+1] if i+1 < ausentismo|length else None %} {% set nom1=(a1["nombre"] if a1 is
-                        mapping else a1.nombre) or "—" %} {% set mot1=(a1["motivo"] if a1 is mapping else a1.motivo)
-                        or "Sin motivo" %} {% if a2 %} {% set nom2=(a2["nombre"] if a2 is mapping else a2.nombre) or "—" %} {%
-                        set mot2=(a2["motivo"] if a2 is mapping else a2.motivo) or "Sin motivo" %} {% endif %} <tr>
+                    {% for i in range(0, aus|length, 2) %}
+                    {% set a1 = aus[i] %}
+                    {% set a2 = aus[i+1] if i+1 < aus|length else None %} {% set nom1=(a1["nombre"] if a1 is mapping else
+                        a1.nombre) or "—" %} {% set mot1=(a1["motivo"] if a1 is mapping else a1.motivo) or "Sin motivo" %} {% if
+                        a2 %} {% set nom2=(a2["nombre"] if a2 is mapping else a2.nombre) or "—" %} {% set mot2=(a2["motivo"] if
+                        a2 is mapping else a2.motivo) or "Sin motivo" %} {% endif %} <tr>
                         <td class="nowrap">{{ mot1 }}</td>
                         <td class="wrap-soft">{{ nom1 }}</td>
         
