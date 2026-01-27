@@ -148,6 +148,7 @@ IMPACTO_PERSONAL = {
     "Personal recibido desde PB": +1,
     "Personal prestado a Carbón": -1,
     "Personal recibido desde Carbón": +1,
+    "Personal solo día": +1,
     "Trainer": +1,
     "Vacaciones": -1,
     "Entrenamiento": -1,
@@ -159,9 +160,16 @@ def calc_disponible_personal(items):
     """
     Calcula personal disponible.
     Retorna: (roster, disponible)
+
+    REGLA:
+      - roster = ROSTER + "Personal solo día"
     """
     data = {row["categoria"]: int(row["cantidad"]) for row in items}
-    roster = data.get("ROSTER", 0)
+
+    roster_base = data.get("ROSTER", 0)
+    solo_dia = data.get("Personal solo día", 0)
+
+    roster = roster_base + solo_dia
 
     disponible = roster
     for cat, sign in IMPACTO_PERSONAL.items():
@@ -169,6 +177,7 @@ def calc_disponible_personal(items):
             disponible += sign * data.get(cat, 0)
 
     return roster, disponible
+
 
 
 # =========================================================
@@ -2588,9 +2597,14 @@ def distribucion_personal(reporte_id):
             FROM distribucion_personal
             WHERE reporte_id = ?
             ORDER BY
-                CASE categoria WHEN 'ROSTER' THEN 0 ELSE 1 END,
+                CASE
+                    WHEN categoria = 'ROSTER' THEN 0
+                    WHEN categoria = 'Personal solo día' THEN 1
+                    ELSE 2
+                END,
                 id DESC
         """, (reporte_id,)).fetchall()
+
 
         usadas = {it["categoria"] for it in items}
         categorias_disponibles = [c for c in CATEGORIAS_PERSONAL if c not in usadas]
@@ -2628,9 +2642,14 @@ def distribucion_personal(reporte_id):
             FROM distribucion_personal
             WHERE reporte_id = ?
             ORDER BY
-                CASE categoria WHEN 'ROSTER' THEN 0 ELSE 1 END,
+                CASE
+                    WHEN categoria = 'ROSTER' THEN 0
+                    WHEN categoria = 'Personal solo día' THEN 1
+                    ELSE 2
+                END,
                 id DESC
         """, (reporte_id,)).fetchall()
+
 
         roster, disponible = calc_disponible_personal(items)
         usadas = {it["categoria"] for it in items}
