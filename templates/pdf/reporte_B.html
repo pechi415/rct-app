@@ -359,64 +359,98 @@
                     <h2 class="h2">Complementarios</h2>
                     <span class="badge">Bombas: {{ bombas|length }} · Luminarias: {{ luminarias|length }}</span>
                 </div>
-
+            
+                <!-- =======================
+                     Bombas (doble columna)
+                ======================= -->
                 <div class="subcard">
                     <div class="subhead">Bombas</div>
-                
+            
                     {% if bombas|length == 0 %}
                     <div class="empty">Sin registros.</div>
                     {% else %}
-                    <table class="table table-compact">
+                    <table class="table table-compact table-split">
                         <thead>
                             <tr>
                                 <th style="width:55px;">No.</th>
-                                <th style="width:90px;">Estado</th>
+                                <th style="width:80px;">Estado</th>
+                                <th>Ubicación</th>
+            
+                                <th class="split" style="width:55px;">No.</th>
+                                <th style="width:80px;">Estado</th>
                                 <th>Ubicación</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {% for b in bombas %}
-                            <tr>
-                                <td class="nowrap">{{ b.numero }}</td>
-                                <td class="nowrap">{{ b.estado }}</td>
-                                <td>{{ b.ubicacion }}</td>
-                            </tr>
-                            {% endfor %}
+                            {% for i in range(0, bombas|length, 2) %}
+                            {% set b1 = bombas[i] %}
+                            {% set b2 = bombas[i+1] if i+1 < bombas|length else None %} {% set n1=b1.get('numero') if b1 is mapping
+                                else b1.numero %} {% set e1=b1.get('estado') if b1 is mapping else b1.estado %} {% set
+                                u1=b1.get('ubicacion') if b1 is mapping else b1.ubicacion %} {% if b2 %} {% set n2=b2.get('numero')
+                                if b2 is mapping else b2.numero %} {% set e2=b2.get('estado') if b2 is mapping else b2.estado %} {%
+                                set u2=b2.get('ubicacion') if b2 is mapping else b2.ubicacion %} {% endif %} <tr>
+                                <td class="nowrap">{{ n1 }}</td>
+                                <td class="nowrap">{{ e1 }}</td>
+                                <td class="wrap-soft">{{ u1 }}</td>
+            
+                                <td class="split">
+                                    {% if b2 %}{{ n2 }}{% else %}&nbsp;{% endif %}
+                                </td>
+                                <td class="nowrap">
+                                    {% if b2 %}{{ e2 }}{% else %}&nbsp;{% endif %}
+                                </td>
+                                <td class="{% if not b2 %}empty-right{% endif %} wrap-soft">
+                                    {% if b2 %}{{ u2 }}{% else %}&nbsp;{% endif %}
+                                </td>
+                                </tr>
+                                {% endfor %}
                         </tbody>
                     </table>
                     {% endif %}
                 </div>
-
-
+            
+                <!-- =======================
+                     Luminarias (doble columna)
+                ======================= -->
                 <div class="subcard mt-10">
                     <div class="subhead">Luminarias</div>
-                
+            
                     {% if luminarias|length == 0 %}
                     <div class="empty">Sin registros.</div>
                     {% else %}
-                    <table class="table table-compact">
+                    <table class="table table-compact table-split">
                         <thead>
                             <tr>
                                 <th style="width:70px;">No.</th>
                                 <th>Ubicación</th>
+                                <th class="split" style="width:70px;">No.</th>
+                                <th>Ubicación</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {% for x in luminarias %}
-                            <tr>
-                                <td class="nowrap">{{ x.numero }}</td>
-                                <td>{{ x.ubicacion }}</td>
-                            </tr>
-                            {% endfor %}
+                            {% for i in range(0, luminarias|length, 2) %}
+                            {% set x1 = luminarias[i] %}
+                            {% set x2 = luminarias[i+1] if i+1 < luminarias|length else None %} {% set n1=x1.get('numero') if x1 is
+                                mapping else x1.numero %} {% set u1=x1.get('ubicacion') if x1 is mapping else x1.ubicacion %} {% if
+                                x2 %} {% set n2=x2.get('numero') if x2 is mapping else x2.numero %} {% set u2=x2.get('ubicacion') if
+                                x2 is mapping else x2.ubicacion %} {% endif %} <tr>
+                                <td class="nowrap">{{ n1 }}</td>
+                                <td class="wrap-soft">{{ u1 }}</td>
+            
+                                <td class="split">
+                                    {% if x2 %}{{ n2 }}{% else %}&nbsp;{% endif %}
+                                </td>
+                                <td class="{% if not x2 %}empty-right{% endif %} wrap-soft">
+                                    {% if x2 %}{{ u2 }}{% else %}&nbsp;{% endif %}
+                                </td>
+                                </tr>
+                                {% endfor %}
                         </tbody>
                     </table>
                     {% endif %}
                 </div>
-
+            
             </div>
-
-        </div>
-    </section>
 
     <!-- =========================================
        2) PERSONAL (Distribución vs Ausentismo) — fila 2
