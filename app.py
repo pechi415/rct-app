@@ -3580,7 +3580,7 @@ def editar_first_last(reporte_id):
 
             # camiones: vacío => 0
             if camiones_raw == "":
-                camiones = ""
+                camiones = 0
             elif not camiones_raw.isdigit():
                 error = "La cantidad de camiones debe ser un número entero (0 o mayor)."
             else:
