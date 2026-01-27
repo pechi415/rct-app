@@ -109,11 +109,22 @@
                     <div class="op-note">
                         <div class="k">Cam. x Operador (1ra Hr)</div>
                         <div class="v">
-                            {{ operacion.get('camiones_por_operador', 'Sin registro') }}
-                            {% if operacion.get('razon') %}
-                            <span class="op-sep">·</span>
-                            <span class="op-muted">Razón:</span> {{ operacion.get('razon') }}
+                            {% set cam = operacion.get('camiones_por_operador') %}
+                            {% set rz = operacion.get('razon') %}
+                            
+                            {% if cam is none %}
+                                Sin registro
+                            {% elif cam|int == 0 and (rz is none or rz|string|trim == '') %}
+                                Sin registro
+                            {% else %}
+                                {{ cam }}
                             {% endif %}
+                            
+                            {% if rz %}
+                                <span class="op-sep">·</span>
+                                <span class="op-muted">Razón:</span> {{ rz }}
+                            {% endif %}
+
                         </div>
                     </div>
                 </div>
@@ -124,7 +135,6 @@
                 <div class="card subcard">
                     <div class="subhead">
                         Llegada de buses a bahías
-                        <span class="muted">Bahía • Hora de arribo</span>
                     </div>
 
                     {% if bahias|length == 0 %}
