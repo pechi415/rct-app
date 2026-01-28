@@ -74,21 +74,33 @@ os.makedirs(INSTANCE_DIR, exist_ok=True)
 DB_PATH = os.path.join(INSTANCE_DIR, "rct.db")
 
 # =========================================================
-# [CATÁLOGOS] Listas fijas
+# [CATÁLOGOS] Bahías por mina
 # =========================================================
-BAHIAS = [
-    "bahía Draga",
-    "bahía Platanal",
-    "bahía Conveyor",
-    "bahía 1.5",
-    "bahía Ban 3 Nor",
-    "bahía 5",
-    "bahía 7A",
-    "bahía Retro",
-    "bahía 14",
-    "bahía 15",
-    "bahia 3 postes",
-]
+BAHIAS_POR_MINA = {
+    "ED": [
+        "bahía Draga",
+        "bahía Platanal",
+        "bahía Conveyor",
+        "bahía 1.5",
+        "bahía Ban 3 Nor",
+        "bahía 5",
+        "bahía 7A",
+        "bahía Retro",
+        "bahía 14",
+        "bahía 15",
+        "bahia 3 postes",
+    ],
+    "PB": [
+        "Bahía Michoacán",
+        "Bahía R39",
+        "Bahía W3",
+        "Bahía R24",
+        "Bahía Cerrejones",
+        "Bahía San Antonio",
+        "Bahía Los Tupes",
+    ],
+}
+
 
 ROLES = ["ADMIN", "SUPERVISOR", "DIGITADOR", "LECTOR"]
 
@@ -1848,13 +1860,16 @@ def buses_bahias(reporte_id):
         reporte = fetch_reporte(conn, reporte_id)
         error = None
 
+        # ✅ Bahías según mina del reporte
+        bahias_base = BAHIAS_POR_MINA.get(reporte["mina"], [])
+
         items = conn.execute(
             "SELECT * FROM buses_bahias WHERE reporte_id = ? ORDER BY id DESC",
             (reporte_id,)
         ).fetchall()
 
         usadas = {it["bahia"] for it in items}
-        bahias_disponibles = [b for b in BAHIAS if b not in usadas]
+        bahias_disponibles = [b for b in bahias_base if b not in usadas]
 
         if request.method == "POST":
             if g.user["rol"] == "LECTOR":
@@ -1864,14 +1879,14 @@ def buses_bahias(reporte_id):
             else:
                 bahia = request.form.get("bahia", "").strip()
                 hora = request.form.get("hora", "").strip()
-               
+
                 # 🔒 Observación deshabilitada: ignorar cualquier valor enviado
                 observacion = ""
 
                 if bahia == "" or hora == "":
                     error = "Bahía y Hora son obligatorios."
-                elif bahia not in BAHIAS:
-                    error = "Debes seleccionar una bahía válida."
+                elif bahia not in bahias_base:
+                    error = "Debes seleccionar una bahía válida para esta mina."
                 elif bahia in usadas:
                     error = f"La bahía {bahia} ya fue registrada en este reporte."
                 else:
@@ -1887,7 +1902,7 @@ def buses_bahias(reporte_id):
             (reporte_id,)
         ).fetchall()
         usadas = {it["bahia"] for it in items}
-        bahias_disponibles = [b for b in BAHIAS if b not in usadas]
+        bahias_disponibles = [b for b in bahias_base if b not in usadas]
 
     return render_template(
         "buses.html",
