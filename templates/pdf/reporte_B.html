@@ -82,26 +82,29 @@
             <!-- IZQ: Operación general -->
             <div class="op-col">
                 <div class="card subcard">
+                    {% set label_pit2 = "Pit 2" if r.mina == "ED" else "Pribbenow" %}
+                    {% set label_pit5 = "Pit 5" if r.mina == "ED" else "El Corozo" %}
+
                     <div class="subhead">First - Last</div>
 
                     <div class="mini-kpi-row mini-kpi-4 op-mini">
                         <div class="mini-kpi mini-ok">
-                            <div class="mini-kpi-label">Inicio Pit 2</div>
+                            <div class="mini-kpi-label">Inicio {{ label_pit2 }}</div>
                             <div class="mini-kpi-value">{{ operacion.get('inicio_pit2') or 'Sin registro' }}</div>
                         </div>
 
                         <div class="mini-kpi mini-ok">
-                            <div class="mini-kpi-label">Inicio Pit 5</div>
+                            <div class="mini-kpi-label">Inicio {{ label_pit5 }}</div>
                             <div class="mini-kpi-value">{{ operacion.get('inicio_pit5') or 'Sin registro' }}</div>
                         </div>
 
                         <div class="mini-kpi mini-muted">
-                            <div class="mini-kpi-label">Final Pit 2</div>
+                            <div class="mini-kpi-label">Final {{ label_pit2 }}</div>
                             <div class="mini-kpi-value">{{ operacion.get('final_pit2') or 'Sin registro' }}</div>
                         </div>
 
                         <div class="mini-kpi mini-muted">
-                            <div class="mini-kpi-label">Final Pit 5</div>
+                            <div class="mini-kpi-label">Final {{ label_pit5 }}</div>
                             <div class="mini-kpi-value">{{ operacion.get('final_pit5') or 'Sin registro' }}</div>
                         </div>
                     </div>
