@@ -2636,7 +2636,7 @@ def distribucion_personal(reporte_id):
                 CASE
                     WHEN categoria = 'ROSTER' THEN 0
                     WHEN categoria = 'Personal solo día' THEN 1
-                    ELSE 1
+                    ELSE 2
                 END,
                 id DESC
         """, (reporte_id,)).fetchall()
