@@ -176,6 +176,7 @@ def calc_disponible_personal(items):
 
     REGLA:
       - roster = ROSTER + "Personal solo día"
+      - "Personal solo día" NO se vuelve a aplicar en impactos (para no duplicar)
     """
     data = {row["categoria"]: int(row["cantidad"]) for row in items}
 
@@ -186,10 +187,11 @@ def calc_disponible_personal(items):
 
     disponible = roster
     for cat, sign in IMPACTO_PERSONAL.items():
-        if cat != "ROSTER":
+        if cat not in ("ROSTER", "Personal solo día"):
             disponible += sign * data.get(cat, 0)
 
     return roster, disponible
+
 
 
 
