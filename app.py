@@ -549,12 +549,24 @@ TIPOS_CONTACTO = [
     "Contacto en Oficina",
 ]
 
-SUPERVISORES_POR_GRUPO = {
-    "G1": ["A. Ramirez", "G. Hidalgo", "J. Diaz", "O. Araujo"],
-    "G2": ["A. Morales", "S. Rodríguez", "L. Jiménez"],
-    "G3": ["D. Tapias", "J. Hernández", "C. Daza", "E. Duran"],
+# =========================================================
+# [CATÁLOGOS] Supervisores por mina y por grupo
+# =========================================================
+SUPERVISORES_POR_MINA = {
+    "ED": {
+        "G1": ["A. Ramirez", "G. Hidalgo", "J. Diaz", "O. Araujo"],
+        "G2": ["A. Morales", "S. Rodríguez", "L. Jiménez"],
+        "G3": ["D. Tapias", "J. Hernández", "C. Daza", "E. Duran"],
+    },
+    "PB": {
+        "G1": ["J. Ballesteros", "J. Reyes", "J. Vargas"],
+        "G2": ["J. Hernández", "M. Maestre"],
+        "G3": ["J. Daza", "Q. Muñoz"],
+    },
 }
+
 GRUPOS_SUP = ["G1", "G2", "G3"]
+
 
 
 # =========================================================
@@ -3852,6 +3864,9 @@ def supervisores_turno(reporte_id):
         r = fetch_reporte(conn, reporte_id)
         error = None
 
+        # ✅ Supervisores según mina del reporte
+        sup_mina = SUPERVISORES_POR_MINA.get(r["mina"], {})
+
         if request.method == "POST":
             if g.user["rol"] == "LECTOR":
                 error = "No tienes permisos para registrar información."
@@ -3865,7 +3880,8 @@ def supervisores_turno(reporte_id):
                 if grupo not in GRUPOS_SUP:
                     error = "Debes seleccionar un grupo válido (G1, G2 o G3)."
                 else:
-                    validos = set(SUPERVISORES_POR_GRUPO.get(grupo, []))
+                    # ✅ válidos solo de ESTA mina y ESTE grupo
+                    validos = set(sup_mina.get(grupo, []))
 
                     if accion == "todos":
                         a_insertar = list(validos)
@@ -3901,8 +3917,9 @@ def supervisores_turno(reporte_id):
         items=items,
         error=error,
         grupos=GRUPOS_SUP,
-        sup_por_grupo=SUPERVISORES_POR_GRUPO
+        sup_por_grupo=sup_mina
     )
+
 
 
 @app.route("/reportes/<int:reporte_id>/supervisores/<int:item_id>/editar", methods=["GET", "POST"])
@@ -3910,6 +3927,10 @@ def supervisores_turno(reporte_id):
 def editar_supervisor_turno(reporte_id, item_id):
     with get_conn() as conn:
         r = fetch_reporte(conn, reporte_id)
+
+        # ✅ Supervisores según mina del reporte
+        sup_mina = SUPERVISORES_POR_MINA.get(r["mina"], {})
+
         if r["estado"] == "CERRADO":
             return redirect(url_for("supervisores_turno", reporte_id=reporte_id))
 
@@ -3933,9 +3954,9 @@ def editar_supervisor_turno(reporte_id, item_id):
             if grupo not in GRUPOS_SUP:
                 error = "Grupo inválido."
             else:
-                validos = set(SUPERVISORES_POR_GRUPO.get(grupo, []))
+                validos = set(sup_mina.get(grupo, []))
                 if supervisor not in validos:
-                    error = "Supervisor inválido para el grupo seleccionado."
+                    error = "Supervisor inválido para el grupo seleccionado en esta mina."
                 else:
                     dup = conn.execute("""
                         SELECT 1
@@ -3961,8 +3982,9 @@ def editar_supervisor_turno(reporte_id, item_id):
         it=it,
         error=error,
         grupos=GRUPOS_SUP,
-        sup_por_grupo=SUPERVISORES_POR_GRUPO
+        sup_por_grupo=sup_mina
     )
+
 
 
 @app.route("/reportes/<int:reporte_id>/supervisores/eliminar/<int:item_id>", methods=["POST"])
