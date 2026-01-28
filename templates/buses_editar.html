@@ -62,16 +62,6 @@
             <div class="form-text">Guía: Utilice el Formato de Hora militar (HH:MM) para registrar la Hora.</div>
           </div>
 
-          <div class="col-md-5">
-            <label class="form-label">Observación (opcional)</label>
-            <input type="text"
-                   name="observacion"
-                   class="form-control"
-                   value="{{ item.observacion }}"
-                   placeholder="Ej: sin novedad / retraso / etc."
-                   {% if r.estado == "CERRADO" %}disabled{% endif %}>
-          </div>
-
         </div>
 
         <div class="d-flex gap-2 mt-3">
