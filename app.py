@@ -1919,6 +1919,9 @@ def editar_item_buses(reporte_id, item_id):
     with get_conn() as conn:
         r = fetch_reporte(conn, reporte_id)
 
+        # ✅ Bahías según mina del reporte
+        bahias_base = BAHIAS_POR_MINA.get(r["mina"], [])
+
         if r["estado"] == "CERRADO":
             return redirect(url_for("buses_bahias", reporte_id=reporte_id))
 
@@ -1937,14 +1940,14 @@ def editar_item_buses(reporte_id, item_id):
 
             bahia = request.form.get("bahia", "").strip()
             hora = request.form.get("hora", "").strip()
-            
-            # 🔒 Observación deshabilitada: no se edita ni se guarda
+
+            # 🔒 Observación deshabilitada: no se edita ni se guarda (se conserva)
             observacion = item["observacion"] or ""
 
-            if bahia not in BAHIAS:
-                error = "Debes seleccionar una bahía válida."
-            elif bahia == "" or hora == "":
+            if bahia == "" or hora == "":
                 error = "Bahía y Hora llegada son obligatorios."
+            elif bahia not in bahias_base:
+                error = "Debes seleccionar una bahía válida para esta mina."
             else:
                 conn.execute("""
                     UPDATE buses_bahias
@@ -1957,9 +1960,10 @@ def editar_item_buses(reporte_id, item_id):
             "buses_editar.html",
             r=r, reporte=r,
             item=item,
-            bahias=BAHIAS,
+            bahias=bahias_base,
             error=error
         )
+
 
 
 @app.route("/reportes/<int:reporte_id>/buses/eliminar/<int:item_id>", methods=["POST"])
