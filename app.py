@@ -1864,7 +1864,9 @@ def buses_bahias(reporte_id):
             else:
                 bahia = request.form.get("bahia", "").strip()
                 hora = request.form.get("hora", "").strip()
-                observacion = request.form.get("observacion", "").strip()
+               
+                # 🔒 Observación deshabilitada: ignorar cualquier valor enviado
+                observacion = ""
 
                 if bahia == "" or hora == "":
                     error = "Bahía y Hora son obligatorios."
@@ -1920,7 +1922,9 @@ def editar_item_buses(reporte_id, item_id):
 
             bahia = request.form.get("bahia", "").strip()
             hora = request.form.get("hora", "").strip()
-            observacion = request.form.get("observacion", "").strip()
+            
+            # 🔒 Observación deshabilitada: no se edita ni se guarda
+            observacion = item["observacion"] or ""
 
             if bahia not in BAHIAS:
                 error = "Debes seleccionar una bahía válida."
