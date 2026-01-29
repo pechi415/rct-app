@@ -265,7 +265,7 @@
             <div class="card" id="equipo-liviano">
                 <div class="section-title">
                     <h2 class="h2">Equipo liviano (Camionetas)</h2>
-
+            
                     {% set ns = namespace(ok=0) %}
                     {% for it in equipo_liviano %}
                     {% set estado = (it["estado"] if it is mapping else it.estado) or "" %}
@@ -274,7 +274,7 @@
                     {% set ns.ok = ns.ok + 1 %}
                     {% endif %}
                     {% endfor %}
-
+            
                     <span class="badge
                                 {% if ns.ok >= 7 %} badge-ok
                                 {% elif ns.ok >= 5 %} badge-warn
@@ -283,14 +283,14 @@
                         Disponible: {{ ns.ok }}
                     </span>
                 </div>
-
+            
                 {% if equipo_liviano|length == 0 %}
                 <div class="empty">Sin registros.</div>
                 {% else %}
                 <table class="table table-compact">
                     <thead>
                         <tr>
-                            <th style="width:110px;">Camioneta</th>
+                            <th style="width:140px;">Camioneta</th>
                             <th style="width:110px;">Estado</th>
                             <th>Comentario</th>
                         </tr>
@@ -300,17 +300,34 @@
                         {% for it in equipo_liviano %}
                         {% set estado = (it["estado"] if it is mapping else it.estado) or "" %}
                         {% set est = estado|lower|trim %}
-                        {% if 'pm' in est or 'down' in est %}
-                        {% set ns.hay = true %}
                         {% set cam = (it["camioneta"] if it is mapping else it.camioneta) %}
+                        {% set cam_str = cam|string %}
                         {% set com = (it["comentario"] if it is mapping else it.comentario) %}
+            
+                        {# Manual si NO está en la lista base de la mina #}
+                        {% set es_manual = (camionetas_base is defined) and (cam_str not in camionetas_base) %}
+            
+                        {# Regla: mostrar si PM/DOWN o si es MANUAL #}
+                        {% if ('pm' in est) or ('down' in est) or es_manual %}
+                        {% set ns.hay = true %}
                         <tr>
-                            <td class="nowrap el-cam">{{ cam }}</td>
-                            <td class="nowrap"><span class="chip chip-sm chip-red">{{ estado }}</span></td>
+                            <td class="nowrap el-cam">
+                                {{ cam }}
+                                {% if es_manual %}
+                                <span class="chip chip-sm chip-gray" style="margin-left:6px;">MANUAL</span>
+                                {% endif %}
+                            </td>
+                            <td class="nowrap">
+                                <span
+                                    class="chip chip-sm {% if 'down' in est or 'pm' in est %}chip-red{% else %}chip-ok{% endif %}">
+                                    {{ estado }}
+                                </span>
+                            </td>
                             <td class="el-text">{{ com or '—' }}</td>
                         </tr>
                         {% endif %}
                         {% endfor %}
+            
                         {% if not ns.hay %}
                         <tr>
                             <td colspan="3" class="muted">Sin camionetas en PM o DOWN.</td>
@@ -320,6 +337,7 @@
                 </table>
                 {% endif %}
             </div>
+
 
         </div>
     </section>
