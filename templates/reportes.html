@@ -89,9 +89,9 @@
                   {% if g.user and g.user.rol == "ADMIN" %}
                   <form method="POST" action="/reportes/{{ r.id }}/eliminar" class="m-0" onsubmit="
                           const txt = prompt('Escriba: ELIMINAR {{ r.id }} para confirmar');
-                          if (txt !== 'ELIMINAR {{ r.id }}') return false;
+                          if (txt === null) return false; // canceló
                           this.querySelector('input[name=confirmar]').value = txt;
-                          return true;
+                          return true; // siempre envía, backend decide si es válido
                         ">
                     <input type="hidden" name="confirmar" value="">
                     <button class="btn btn-sm btn-outline-danger" type="submit">
@@ -99,6 +99,7 @@
                     </button>
                   </form>
                   {% endif %}
+
 
                   <a class="btn btn-sm btn-outline-primary"
                     href="{{ url_for('reporte_pdf', reporte_id=r.id, v='B') }}"
