@@ -142,7 +142,7 @@
     <tr>
       <td>
         {{ it.camioneta }}
-        {% if it.camioneta|string not in (CAMIONETAS_POR_MINA.get(r.mina, []) | map('string') | list) %}
+        {% if (it.camioneta|string) not in camionetas_base %}
         <span class="badge bg-secondary ms-1">MANUAL</span>
         {% endif %}
       </td>

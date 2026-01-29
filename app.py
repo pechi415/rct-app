@@ -2563,10 +2563,13 @@ def equipo_liviano(reporte_id):
         ya_set = {row["camioneta"] for row in ya}
         camionetas_disponibles = [str(c) for c in camionetas if int(c) not in ya_set]
 
+    camionetas_base = [str(x) for x in CAMIONETAS_POR_MINA.get(mina, [])]
+
     return render_template(
         "equipo_liviano.html",
         r=r, reporte=r,
         camionetas=camionetas_disponibles,
+        camionetas_base=camionetas_base,
         estados=ESTADOS_LIVIANO,
         items=items,
         error=error
@@ -2644,13 +2647,17 @@ def editar_equipo_liviano(reporte_id, item_id):
                     """, (camioneta_num, estado, comentario, item_id, reporte_id))
                     return redirect(url_for("equipo_liviano", reporte_id=reporte_id))
 
+    camionetas_base = [str(x) for x in CAMIONETAS_POR_MINA.get(r["mina"], [])]
+
     return render_template(
         "equipo_liviano_editar.html",
         r=r, reporte=r,
         it=it,
         camionetas=camionetas,
+        camionetas_base=camionetas_base,
         error=error
     )
+
 
 
 @app.route("/reportes/<int:reporte_id>/equipo_liviano/eliminar/<int:item_id>", methods=["POST"])
