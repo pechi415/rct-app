@@ -86,6 +86,19 @@
                     {% endif %}
                   {% endif %}
 
+                  {% if g.user and g.user.rol == "ADMIN" %}
+                  <form method="POST" action="/reportes/{{ r.id }}/eliminar" class="m-0" onsubmit="
+                          const txt = prompt('Escriba: ELIMINAR {{ r.id }} para confirmar');
+                          if (txt !== 'ELIMINAR {{ r.id }}') return false;
+                          this.querySelector('input[name=confirmar]').value = txt;
+                          return true;
+                        ">
+                    <input type="hidden" name="confirmar" value="">
+                    <button class="btn btn-sm btn-outline-danger" type="submit">
+                      🗑 Eliminar
+                    </button>
+                  </form>
+                  {% endif %}
 
                   <a class="btn btn-sm btn-outline-primary"
                     href="{{ url_for('reporte_pdf', reporte_id=r.id, v='B') }}"
