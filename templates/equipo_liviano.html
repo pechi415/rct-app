@@ -71,7 +71,13 @@
           {% for c in camionetas %}
             <option value="{{ c }}">{{ c }}</option>
           {% endfor %}
+          <option value="__OTRA__">Otra (manual)</option>
         </select>
+        <div class="mt-2 d-none" id="wrapCamionetaManual">
+          <label class="form-label">Camioneta (manual - número)</label>
+          <input class="form-control" type="number" name="camioneta_manual" min="0" step="1" placeholder="Ej: 2059">
+          <div class="form-text">Solo aplica para este reporte (no se guarda en la lista).</div>
+        </div>
       </div>
 
       <div class="col-md-3">
@@ -95,6 +101,22 @@
       <button class="btn btn-primary">✅ Agregar</button>
     </div>
     {% endif %}
+
+    <script>
+      (function () {
+        const sel = document.querySelector('select[name="camioneta"]');
+        const wrap = document.getElementById('wrapCamionetaManual');
+        if (!sel || !wrap) return;
+
+        function toggle() {
+          const isOtra = sel.value === "__OTRA__";
+          wrap.classList.toggle("d-none", !isOtra);
+        }
+        sel.addEventListener("change", toggle);
+        toggle();
+      })();
+    </script>
+
   </form>
 
 </div>
@@ -118,7 +140,12 @@
   <tbody>
     {% for it in items %}
     <tr>
-      <td>{{ it.camioneta }}</td>
+      <td>
+        {{ it.camioneta }}
+        {% if it.camioneta|string not in (CAMIONETAS_POR_MINA.get(r.mina, []) | map('string') | list) %}
+        <span class="badge bg-secondary ms-1">MANUAL</span>
+        {% endif %}
+      </td>
       <td>{{ it.estado }}</td>
       <td>{{ it.comentario }}</td>
 

@@ -25,17 +25,35 @@
 
       <div class="col-md-4">
         <label class="form-label">Camioneta</label>
+      
+        {# Detectar si el registro actual es manual (no está en lista) #}
+        {% set it_cam = it.camioneta|string %}
+        {% set es_manual_it = (it_cam not in (camionetas | map('string') | list)) %}
+      
+        {# Valor seleccionado: si hay POST, respetarlo; si no, usar fijo o __OTRA__ #}
+        {% set sel_camioneta = request.form.get('camioneta', '__OTRA__' if es_manual_it else it_cam) %}
+      
         <select class="form-select" name="camioneta" required>
           <option value="">Seleccione...</option>
-          {% set sel_camioneta = request.form.get('camioneta', it.camioneta|string) %}
           {% for c in camionetas %}
-            <option value="{{ c }}"
-              {% if (c|string) == (sel_camioneta|string) %}selected{% endif %}>
-              {{ c }}
-            </option>
+          {% set c_str = c|string %}
+          <option value="{{ c_str }}" {% if c_str==(sel_camioneta|string) %}selected{% endif %}>
+            {{ c_str }}
+          </option>
           {% endfor %}
+          <option value="__OTRA__" {% if sel_camioneta=="__OTRA__" %}selected{% endif %}>
+            Otra (manual)
+          </option>
         </select>
+      
+        <div class="mt-2 d-none" id="wrapCamionetaManual">
+          <label class="form-label">Camioneta (manual - número)</label>
+          <input class="form-control" type="number" name="camioneta_manual" min="0" step="1" placeholder="Ej: 2059"
+            value="{{ request.form.get('camioneta_manual', it_cam if es_manual_it else '') }}">
+          <div class="form-text">Solo aplica para este reporte (no se guarda en la lista).</div>
+        </div>
       </div>
+
 
       <div class="col-md-3">
         <label class="form-label">Estado</label>
@@ -59,6 +77,21 @@
         <button class="btn btn-primary">💾 Guardar</button>
         <a class="btn btn-outline-secondary" href="/reportes/{{ r.id }}/equipo_liviano">❌ Cancelar</a>
       </div>
+
+      <script>
+        (function () {
+          const sel = document.querySelector('select[name="camioneta"]');
+          const wrap = document.getElementById('wrapCamionetaManual');
+          if (!sel || !wrap) return;
+
+          function toggle() {
+            const isOtra = sel.value === "__OTRA__";
+            wrap.classList.toggle("d-none", !isOtra);
+          }
+          sel.addEventListener("change", toggle);
+          toggle();
+        })();
+      </script>
 
     </form>
   </div>

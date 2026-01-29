@@ -2503,30 +2503,50 @@ def equipo_liviano(reporte_id):
             elif r["estado"] == "CERRADO":
                 error = "Este reporte está cerrado. No se puede editar."
             else:
-                camioneta = request.form.get("camioneta", "").strip()
+                camioneta_sel = request.form.get("camioneta", "").strip()
+                camioneta_manual = request.form.get("camioneta_manual", "").strip()
+
                 estado_l = request.form.get("estado_liviano", "OK").strip().upper()
                 comentario = request.form.get("comentario", "").strip()
 
-                if (not camioneta.isdigit()) or (int(camioneta) not in [int(x) for x in camionetas]):
-                    error = "Debe seleccionar una camioneta válida."
-                elif estado_l not in ESTADOS_LIVIANO:
-                    error = "Estado inválido."
+                # 1) Resolver número de camioneta (fija o manual)
+                if camioneta_sel == "__OTRA__":
+                    if camioneta_manual == "":
+                        error = "Debes ingresar el número de la camioneta manual."
+                    elif not camioneta_manual.isdigit():
+                        error = "La camioneta manual debe ser un número válido."
+                    else:
+                        camioneta_num = int(camioneta_manual)
                 else:
+                    if camioneta_sel == "":
+                        error = "Debe seleccionar una camioneta."
+                    elif (not camioneta_sel.isdigit()) or (int(camioneta_sel) not in [int(x) for x in camionetas]):
+                        error = "Debe seleccionar una camioneta válida."
+                    else:
+                        camioneta_num = int(camioneta_sel)
+
+                # 2) Validar estado
+                if error is None and estado_l not in ESTADOS_LIVIANO:
+                    error = "Estado inválido."
+
+                # 3) No duplicar dentro del reporte
+                if error is None:
                     existe = conn.execute("""
                         SELECT 1
                         FROM equipo_liviano
                         WHERE reporte_id = ? AND camioneta = ?
                         LIMIT 1
-                    """, (reporte_id, int(camioneta))).fetchone()
+                    """, (reporte_id, camioneta_num)).fetchone()
 
                     if existe:
-                        error = f"La camioneta {camioneta} ya fue registrada en este reporte."
+                        error = f"La camioneta {camioneta_num} ya fue registrada en este reporte."
                     else:
                         conn.execute("""
                             INSERT INTO equipo_liviano (reporte_id, camioneta, estado, comentario)
                             VALUES (?, ?, ?, ?)
-                        """, (reporte_id, int(camioneta), estado_l, comentario))
+                        """, (reporte_id, camioneta_num, estado_l, comentario))
                         return redirect(url_for("equipo_liviano", reporte_id=reporte_id))
+
 
         items = conn.execute("""
             SELECT *
@@ -2541,7 +2561,7 @@ def equipo_liviano(reporte_id):
             WHERE reporte_id = ?
         """, (reporte_id,)).fetchall()
         ya_set = {row["camioneta"] for row in ya}
-        camionetas_disponibles = [c for c in camionetas if int(c) not in ya_set]
+        camionetas_disponibles = [str(c) for c in camionetas if int(c) not in ya_set]
 
     return render_template(
         "equipo_liviano.html",
@@ -2575,29 +2595,53 @@ def editar_equipo_liviano(reporte_id, item_id):
             if g.user["rol"] == "LECTOR":
                 return ("No autorizado", 403)
 
-            camioneta = request.form.get("camioneta", "").strip()
+            camioneta_sel = request.form.get("camioneta", "").strip()
+            camioneta_manual = request.form.get("camioneta_manual", "").strip()
             estado = request.form.get("estado", "OK").strip().upper()
             comentario = request.form.get("comentario", "").strip()
 
-            if camioneta == "" or camioneta not in camionetas:
-                error = "Debes seleccionar una camioneta válida para esta mina."
-            elif estado not in ESTADOS_LIVIANO:
-                error = "Estado inválido."
+            # -------------------------
+            # Resolver camioneta (fija o manual)
+            # -------------------------
+            if camioneta_sel == "__OTRA__":
+                if camioneta_manual == "":
+                    error = "Debes ingresar el número de la camioneta manual."
+                elif not camioneta_manual.isdigit():
+                    error = "La camioneta manual debe ser un número válido."
+                else:
+                    camioneta_num = int(camioneta_manual)
             else:
+                if camioneta_sel == "":
+                    error = "Debes seleccionar una camioneta."
+                elif camioneta_sel not in camionetas:
+                    error = "Debes seleccionar una camioneta válida para esta mina."
+                else:
+                    camioneta_num = int(camioneta_sel)
+
+            # -------------------------
+            # Validar estado
+            # -------------------------
+            if error is None and estado not in ESTADOS_LIVIANO:
+                error = "Estado inválido."
+
+            # -------------------------
+            # Evitar duplicados en el reporte
+            # -------------------------
+            if error is None:
                 dup = conn.execute("""
                     SELECT 1
                     FROM equipo_liviano
                     WHERE reporte_id = ? AND camioneta = ? AND id <> ?
-                """, (reporte_id, camioneta, item_id)).fetchone()
+                """, (reporte_id, camioneta_num, item_id)).fetchone()
 
                 if dup:
-                    error = f"La camioneta {camioneta} ya está registrada en este reporte."
+                    error = f"La camioneta {camioneta_num} ya está registrada en este reporte."
                 else:
                     conn.execute("""
                         UPDATE equipo_liviano
                         SET camioneta = ?, estado = ?, comentario = ?
                         WHERE id = ? AND reporte_id = ?
-                    """, (camioneta, estado, comentario, item_id, reporte_id))
+                    """, (camioneta_num, estado, comentario, item_id, reporte_id))
                     return redirect(url_for("equipo_liviano", reporte_id=reporte_id))
 
     return render_template(
