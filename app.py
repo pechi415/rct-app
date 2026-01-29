@@ -4482,7 +4482,7 @@ def eliminar_reporte(reporte_id):
             flash("Confirmación inválida. No se eliminó el reporte.", "danger")
         except Exception:
             pass
-        return redirect(url_for("reportes"))
+        return redirect(url_for("ver_reportes"))
 
     with get_conn() as conn:
         # (opcional) verifica que exista
@@ -4534,7 +4534,7 @@ def eliminar_reporte(reporte_id):
     except Exception:
         pass
 
-    return redirect(url_for("reportes"))
+    return redirect(url_for("ver_reportes"))
 
 
 
