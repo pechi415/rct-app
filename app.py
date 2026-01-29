@@ -2128,43 +2128,16 @@ def editar_item_varados(reporte_id, item_id):
             else:
                 equipo = int(equipo_raw)
 
-                # ✅ hora ya no aplica
-                hora = None
-
                 conn.execute("""
-                    INSERT INTO equipos_varados (reporte_id, equipo, ubicacion, motivo)
-                    VALUES (?, ?, ?, ?)
-                """, (reporte_id, equipo, ubicacion, motivo))
-
+                    UPDATE equipos_varados
+                    SET equipo = ?, ubicacion = ?, motivo = ?
+                    WHERE id = ? AND reporte_id = ?
+                """, (equipo, ubicacion, motivo, item_id, reporte_id))
 
                 return redirect(url_for("equipos_varados", reporte_id=reporte_id))
 
     return render_template("varados_editar.html", r=r, reporte=r, it=it, error=error)
 
-
-@app.route("/reportes/<int:reporte_id>/varados/eliminar/<int:item_id>", methods=["POST"])
-@reporte_mina_required
-def eliminar_item_varados(reporte_id, item_id):
-    with get_conn() as conn:
-        rep = conn.execute(
-            "SELECT estado FROM reportes WHERE id = ?",
-            (reporte_id,)
-        ).fetchone()
-        if rep is None:
-            abort(404)
-
-        if rep["estado"] == "CERRADO":
-            return redirect(url_for("equipos_varados", reporte_id=reporte_id))
-
-        if g.user["rol"] == "LECTOR":
-            return ("No autorizado", 403)
-
-        conn.execute(
-            "DELETE FROM equipos_varados WHERE id = ? AND reporte_id = ?",
-            (item_id, reporte_id)
-        )
-
-    return redirect(url_for("equipos_varados", reporte_id=reporte_id))
 
 
 # =========================================================
