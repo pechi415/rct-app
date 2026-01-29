@@ -10,6 +10,12 @@
   <h2 class="m-0">Reportes</h2>
 
   <div class="acciones-header">
+
+    <button class="btn btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#filtrosReportes"
+      aria-expanded="false" aria-controls="filtrosReportes">
+      🔎 Buscar
+    </button>
+
     {% if g.user.rol in ["ADMIN", "SUPERVISOR"] %}
       <a class="btn btn-primary" href="/reportes/nuevo">📝 Nuevo reporte</a>
     {% endif %}
@@ -18,58 +24,66 @@
 </div>
 
 <!-- =====================================================
-  [REPORTES] BUSCAR / FILTRAR (GET)
+  [REPORTES] BUSCAR / FILTRAR (COLLAPSE)
 ===================================================== -->
-<form method="GET" action="/reportes" class="card card-body mb-3">
-  <div class="row g-2 align-items-end">
+{% set hay_filtros = request.args.get('mina') or request.args.get('estado') or request.args.get('turno') or request.args.get('desde') or request.args.get('hasta') %}
+<div class="collapse mb-3 {% if hay_filtros %}show{% endif %}" id="filtrosReportes">
 
-    <div class="col-6 col-md-2">
-      <label class="form-label">Mina</label>
-      {% set mina_sel = request.args.get('mina','') %}
-      <select class="form-select" name="mina">
-        <option value="" {% if mina_sel == "" %}selected{% endif %}>Todas</option>
-        <option value="ED" {% if mina_sel == "ED" %}selected{% endif %}>ED</option>
-        <option value="PB" {% if mina_sel == "PB" %}selected{% endif %}>PB</option>
-      </select>
-    </div>
+  <div class="card card-body">
 
-    <div class="col-6 col-md-2">
-      <label class="form-label">Estado</label>
-      {% set estado_sel = request.args.get('estado','') %}
-      <select class="form-select" name="estado">
-        <option value="" {% if estado_sel == "" %}selected{% endif %}>Todos</option>
-        <option value="ABIERTO" {% if estado_sel == "ABIERTO" %}selected{% endif %}>ABIERTO</option>
-        <option value="CERRADO" {% if estado_sel == "CERRADO" %}selected{% endif %}>CERRADO</option>
-      </select>
-    </div>
+    <form method="GET" action="/reportes">
+      <div class="row g-2 align-items-end">
 
-    <div class="col-6 col-md-2">
-      <label class="form-label">Turno</label>
-      {% set turno_sel = request.args.get('turno','') %}
-      <select class="form-select" name="turno">
-        <option value="" {% if turno_sel == "" %}selected{% endif %}>Todos</option>
-        <option value="DIA" {% if turno_sel == "DIA" %}selected{% endif %}>DÍA</option>
-        <option value="NOCHE" {% if turno_sel == "NOCHE" %}selected{% endif %}>NOCHE</option>
-      </select>
-    </div>
+        <div class="col-6 col-md-2">
+          <label class="form-label">Mina</label>
+          {% set mina_sel = request.args.get('mina','') %}
+          <select class="form-select" name="mina">
+            <option value="" {% if mina_sel == "" %}selected{% endif %}>Todas</option>
+            <option value="ED" {% if mina_sel == "ED" %}selected{% endif %}>ED</option>
+            <option value="PB" {% if mina_sel == "PB" %}selected{% endif %}>PB</option>
+          </select>
+        </div>
 
-    <div class="col-6 col-md-2">
-      <label class="form-label">Desde</label>
-      <input class="form-control" type="date" name="desde" value="{{ request.args.get('desde','') }}">
-    </div>
+        <div class="col-6 col-md-2">
+          <label class="form-label">Estado</label>
+          {% set estado_sel = request.args.get('estado','') %}
+          <select class="form-select" name="estado">
+            <option value="" {% if estado_sel == "" %}selected{% endif %}>Todos</option>
+            <option value="ABIERTO" {% if estado_sel == "ABIERTO" %}selected{% endif %}>ABIERTO</option>
+            <option value="CERRADO" {% if estado_sel == "CERRADO" %}selected{% endif %}>CERRADO</option>
+          </select>
+        </div>
 
-    <div class="col-6 col-md-2">
-      <label class="form-label">Hasta</label>
-      <input class="form-control" type="date" name="hasta" value="{{ request.args.get('hasta','') }}">
-    </div>
+        <div class="col-6 col-md-2">
+          <label class="form-label">Turno</label>
+          {% set turno_sel = request.args.get('turno','') %}
+          <select class="form-select" name="turno">
+            <option value="" {% if turno_sel == "" %}selected{% endif %}>Todos</option>
+            <option value="DIA" {% if turno_sel == "DIA" %}selected{% endif %}>DÍA</option>
+            <option value="NOCHE" {% if turno_sel == "NOCHE" %}selected{% endif %}>NOCHE</option>
+          </select>
+        </div>
 
-    <div class="col-12 col-md-4 d-flex gap-2">
-      <button class="btn btn-primary" type="submit">🔍 Buscar</button>
-      <a class="btn btn-outline-secondary" href="/reportes">🧹 Limpiar</a>
-    </div>
+        <div class="col-6 col-md-2">
+          <label class="form-label">Desde</label>
+          <input class="form-control" type="date" name="desde" value="{{ request.args.get('desde','') }}">
+        </div>
+
+        <div class="col-6 col-md-2">
+          <label class="form-label">Hasta</label>
+          <input class="form-control" type="date" name="hasta" value="{{ request.args.get('hasta','') }}">
+        </div>
+
+        <div class="col-12 col-md-4 d-flex gap-2">
+          <button class="btn btn-primary" type="submit">Aplicar</button>
+          <a class="btn btn-outline-secondary" href="/reportes">Limpiar</a>
+        </div>
+
+      </div>
+    </form>
 
   </div>
-</form>
+</div>
 
 
 {% if reportes|length == 0 %}
