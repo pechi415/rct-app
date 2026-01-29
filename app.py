@@ -4467,6 +4467,76 @@ def logout():
     return redirect(url_for("login"))
 
 
+# ---------------------------------------------------------
+# [RUTA] Eliminar reporte (solo ADMIN)
+# ---------------------------------------------------------
+@app.route("/reportes/<int:reporte_id>/eliminar", methods=["POST"])
+@roles_required("ADMIN")
+def eliminar_reporte(reporte_id):
+    confirmar = (request.form.get("confirmar") or "").strip()
+    esperado = f"ELIMINAR {reporte_id}"
+
+    if confirmar != esperado:
+        # si usas flash en el proyecto, esto es ideal
+        try:
+            flash("Confirmación inválida. No se eliminó el reporte.", "danger")
+        except Exception:
+            pass
+        return redirect(url_for("reportes"))
+
+    with get_conn() as conn:
+        # (opcional) verifica que exista
+        r = fetch_reporte(conn, reporte_id)
+        if not r:
+            abort(404)
+
+        # 1) borrar tablas hijas (ignorar si alguna no existe)
+        tablas_hijas = [
+            "buses_bahias",
+            "supervisores_turno",
+            "first_last",
+            "gestion_areas",
+            "equipos_varados",
+
+            # Personal
+            "distribucion_personal",
+            "ausentismo",
+            "operadores_otras_areas",
+            "personal_entrenamiento",
+            "contacto_operadores",
+
+            # Operación / complementarios
+            "distribucion_camiones",
+            "equipo_liviano",
+            "bombas",
+            "luminarias",
+
+            # Seguridad / socialización
+            "seguridad",
+            "socializacion_pts",
+            "comentarios",
+        ]
+
+
+        for t in tablas_hijas:
+            try:
+                conn.execute(f"DELETE FROM {t} WHERE reporte_id = ?", (reporte_id,))
+            except Exception:
+                # tabla no existe en tu esquema o nombre distinto
+                pass
+
+        # 2) borrar el reporte padre
+        conn.execute("DELETE FROM reportes WHERE id = ?", (reporte_id,))
+
+    try:
+        flash(f"Reporte #{reporte_id} eliminado correctamente.", "success")
+    except Exception:
+        pass
+
+    return redirect(url_for("reportes"))
+
+
+
 
 # ---------------------------------------------------------
 # [INIT] Ejecutar inicialización (ORDEN CORRECTO)
