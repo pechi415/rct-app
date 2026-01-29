@@ -170,11 +170,12 @@
                   {% endif %}
 
 
-                  <a class="btn btn-sm btn-outline-primary"
-                    href="{{ url_for('reporte_pdf', reporte_id=r.id, v='B') }}"
-                    target="_blank">
+                  {% if r.estado == "CERRADO" %}
+                  <a class="btn btn-sm btn-outline-primary" href="{{ url_for('reporte_pdf', reporte_id=r.id, v='B') }}" target="_blank">
                     📄 PDF
                   </a>
+                  {% endif %}
+
 
                 </div>
               </div>
