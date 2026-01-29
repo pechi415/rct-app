@@ -37,16 +37,14 @@
   <div class="row g-2 mb-3">
     <div class="col-md-6">
       <label class="form-label">{{ label_pit2 }} (hora)</label>
-      <input class="form-control" type="text" name="inicio_pit2" placeholder="Ej: 05:42"
-        value="{{ it.inicio_pit2 or '' }}">
-      <div class="form-text">Opcional. Formato 24h (HH:MM). Si se deja vacío, en el PDF saldrá “Sin registros”.</div>
+      <input class="form-control" type="time" name="inicio_pit2">
+      <div class="form-text">Formato HH:MM.</div>
     </div>
 
     <div class="col-md-6">
       <label class="form-label">{{ label_pit5 }} (hora)</label>
-      <input class="form-control" type="text" name="inicio_pit5" placeholder="Ej: 18:25"
-        value="{{ it.inicio_pit5 or '' }}">
-      <div class="form-text">Opcional. Formato 24h (HH:MM). Si se deja vacío, en el PDF saldrá “Sin registros”.</div>
+      <input class="form-control" type="time" name="inicio_pit5">
+      <div class="form-text">Formato HH:MM.</div>
     </div>
   </div>
 
@@ -54,16 +52,14 @@
   <div class="row g-2 mb-3">
     <div class="col-md-6">
       <label class="form-label">{{ label_pit2 }} (hora)</label>
-      <input class="form-control" type="text" name="final_pit2" placeholder="Ej: 05:25"
-        value="{{ it.final_pit2 or '' }}">
-      <div class="form-text">Opcional. Formato 24h (HH:MM). Si se deja vacío, en el PDF saldrá “Sin registros”.</div>
+      <input class="form-control" type="time" name="final_pit2">
+      <div class="form-text">Formato HH:MM.</div>
     </div>
 
     <div class="col-md-6">
       <label class="form-label">{{ label_pit5 }} (hora)</label>
-      <input class="form-control" type="text" name="final_pit5" placeholder="Ej: 18:56"
-        value="{{ it.final_pit5 or '' }}">
-      <div class="form-text">Opcional. Formato 24h (HH:MM). Si se deja vacío, en el PDF saldrá “Sin registros”.</div>
+      <input class="form-control" type="time" name="final_pit5">
+      <div class="form-text">Formato HH:MM.</div>
     </div>
   </div>
 

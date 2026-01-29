@@ -3621,6 +3621,19 @@ def first_last(reporte_id):
                     final_pit2 = request.form.get("final_pit2", "").strip()
                     final_pit5 = request.form.get("final_pit5", "").strip()
 
+                    # ✅ validar hora militar HH:MM (solo si viene algo)
+                    pat_hora = r'^([01]\d|2[0-3]):[0-5]\d$'
+
+                    for label, val in [
+                        ("Inicio " + ("Pit 2" if r["mina"] == "ED" else "Pribbenow"), inicio_pit2),
+                        ("Inicio " + ("Pit 5" if r["mina"] == "ED" else "El Corozo"), inicio_pit5),
+                        ("Final " + ("Pit 2" if r["mina"] == "ED" else "Pribbenow"), final_pit2),
+                        ("Final " + ("Pit 5" if r["mina"] == "ED" else "El Corozo"), final_pit5),
+                    ]:
+                        if val != "" and not re.match(pat_hora, val):
+                            error = f"{label}: hora inválida. Use formato militar HH:MM (00:00 a 23:59)."
+                            break
+
                     camiones_raw = request.form.get("camiones_por_operador", "").strip()
                     razon = request.form.get("razon", "").strip() or ""  # ✅ NOT NULL safe
 
@@ -3685,6 +3698,19 @@ def editar_first_last(reporte_id):
             inicio_pit5 = request.form.get("inicio_pit5", "").strip()
             final_pit2 = request.form.get("final_pit2", "").strip()
             final_pit5 = request.form.get("final_pit5", "").strip()
+
+            # ✅ validar hora militar HH:MM (solo si viene algo)
+            pat_hora = r'^([01]\d|2[0-3]):[0-5]\d$'
+
+            for label, val in [
+                ("Inicio " + ("Pit 2" if r["mina"] == "ED" else "Pribbenow"), inicio_pit2),
+                ("Inicio " + ("Pit 5" if r["mina"] == "ED" else "El Corozo"), inicio_pit5),
+                ("Final " + ("Pit 2" if r["mina"] == "ED" else "Pribbenow"), final_pit2),
+                ("Final " + ("Pit 5" if r["mina"] == "ED" else "El Corozo"), final_pit5),
+            ]:
+                if val != "" and not re.match(pat_hora, val):
+                    error = f"{label}: hora inválida. Use formato militar HH:MM (00:00 a 23:59)."
+                    break
 
             camiones_raw = request.form.get("camiones_por_operador", "").strip()
             razon = request.form.get("razon", "").strip() or ""  # ✅ NOT NULL safe
