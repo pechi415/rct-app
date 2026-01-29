@@ -1944,6 +1944,8 @@ def buses_bahias(reporte_id):
 
                 if bahia == "" or hora == "":
                     error = "Bahía y Hora son obligatorios."
+                elif not re.match(r'^([01]\d|2[0-3]):[0-5]\d$', hora):
+                    error = "La hora debe estar en formato militar HH:MM (00:00 a 23:59)."
                 elif bahia not in bahias_base:
                     error = "Debes seleccionar una bahía válida para esta mina."
                 elif bahia in usadas:
@@ -2005,6 +2007,8 @@ def editar_item_buses(reporte_id, item_id):
 
             if bahia == "" or hora == "":
                 error = "Bahía y Hora llegada son obligatorios."
+            elif not re.match(r'^([01]\d|2[0-3]):[0-5]\d$', hora):
+                    error = "La hora debe estar en formato militar HH:MM (00:00 a 23:59)."
             elif bahia not in bahias_base:
                 error = "Debes seleccionar una bahía válida para esta mina."
             else:

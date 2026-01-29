@@ -52,11 +52,9 @@
           <div class="col-md-3">
             <label class="form-label">Hora llegada</label>
             <!-- Hora libre: texto -->
-            <input class="form-control"
-                   type="text"
+            <input type="time" class="form-control"
                    name="hora"
-                   value="{{ item.hora }}"
-                   placeholder="Ej: 05:52"
+                   value="{{ request.form.get('hora','') }}"
                    required
                    {% if r.estado == "CERRADO" %}disabled{% endif %}>
             <div class="form-text">Guía: Utilice el Formato de Hora militar (HH:MM) para registrar la Hora.</div>
