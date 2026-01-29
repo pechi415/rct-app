@@ -1540,26 +1540,66 @@ def ver_reportes():
     if g.user is None:
         return redirect(url_for("login"))
 
+    # -------------------------
+    # Filtros (GET)
+    # -------------------------
+    mina = (request.args.get("mina") or "").strip()
+    estado = (request.args.get("estado") or "").strip()
+    turno = (request.args.get("turno") or "").strip()
+    desde = (request.args.get("desde") or "").strip()
+    hasta = (request.args.get("hasta") or "").strip()
+
     with get_conn() as conn:
-        if g.user["rol"] == "ADMIN":
-            reportes = conn.execute("""
-                SELECT id, fecha, turno, estado, mina
-                FROM reportes
-                ORDER BY id DESC
-            """).fetchall()
-        else:
+        sql = """
+            SELECT id, fecha, turno, estado, mina
+            FROM reportes
+            WHERE 1=1
+        """
+        params = []
+
+        # -------------------------
+        # Restricción por minas (no ADMIN)
+        # -------------------------
+        if g.user["rol"] != "ADMIN":
             if not g.user_minas:
-                reportes = []
-            else:
-                placeholders = ",".join(["?"] * len(g.user_minas))
-                reportes = conn.execute(f"""
-                    SELECT id, fecha, turno, estado, mina
-                    FROM reportes
-                    WHERE mina IN ({placeholders})
-                    ORDER BY id DESC
-                """, list(g.user_minas)).fetchall()
+                return render_template("reportes.html", reportes=[])
+            placeholders = ",".join(["?"] * len(g.user_minas))
+            sql += f" AND mina IN ({placeholders})"
+            params.extend(list(g.user_minas))
+
+        # -------------------------
+        # Filtros exactos
+        # -------------------------
+        if mina in ("ED", "PB"):
+            sql += " AND mina = ?"
+            params.append(mina)
+
+        if estado in ("ABIERTO", "CERRADO"):
+            sql += " AND estado = ?"
+            params.append(estado)
+
+        if turno in ("DIA", "NOCHE"):
+            sql += " AND turno = ?"
+            params.append(turno)
+
+        # -------------------------
+        # Rango de fechas
+        # -------------------------
+        if desde:
+            sql += " AND fecha >= ?"
+            params.append(desde)
+
+        if hasta:
+            sql += " AND fecha <= ?"
+            params.append(hasta)
+
+        # Orden final
+        sql += " ORDER BY fecha DESC, id DESC"
+
+        reportes = conn.execute(sql, params).fetchall()
 
     return render_template("reportes.html", reportes=reportes)
+
 
 
 # ---------------------------------------------------------
