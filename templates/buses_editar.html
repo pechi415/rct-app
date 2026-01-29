@@ -54,7 +54,6 @@
             <!-- Hora libre: texto -->
             <input type="time" class="form-control"
                    name="hora"
-                   value="{{ request.form.get('hora') if request.form.get('hora','')|length == 5 else '' }}"
                    required
                    {% if r.estado == "CERRADO" %}disabled{% endif %}>
             <div class="form-text">Guía: Utilice el Formato de Hora militar (HH:MM) para registrar la Hora.</div>
