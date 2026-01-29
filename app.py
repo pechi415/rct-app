@@ -4502,8 +4502,8 @@ def eliminar_reporte(reporte_id):
             "distribucion_personal",
             "ausentismo",
             "operadores_otras_areas",
-            "personal_entrenamiento",
-            "contacto_operadores",
+            "entrenamiento_personal",
+            "contactos_operadores",
 
             # Operación / complementarios
             "distribucion_camiones",
@@ -4512,9 +4512,10 @@ def eliminar_reporte(reporte_id):
             "luminarias",
 
             # Seguridad / socialización
-            "seguridad",
-            "socializacion_pts",
-            "comentarios",
+            "seguridad_observaciones",
+            "seguridad_charlas",
+            "pts_divulgacion",
+            "comentarios_turno",
         ]
 
 
