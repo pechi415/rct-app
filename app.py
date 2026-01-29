@@ -1253,6 +1253,9 @@ def build_reporte_context(conn, reporte_id: int) -> dict:
     """
     r = fetch_reporte(conn, reporte_id)
 
+    camionetas_base = [str(x) for x in CAMIONETAS_POR_MINA.get(r["mina"], [])]
+
+
     # -------------------------
     # Gestión / Buses / Varados
     # -------------------------
@@ -1472,6 +1475,8 @@ def build_reporte_context(conn, reporte_id: int) -> dict:
         pts=pts,
         comentarios=comentarios,
         supervisores=supervisores,
+        camionetas_base=camionetas_base,
+
     )
 
 
