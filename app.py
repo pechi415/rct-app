@@ -1802,6 +1802,9 @@ def gestion_areas(reporte_id):
                 responsable = request.form.get("responsable", "").strip()
                 corregido = request.form.get("corregido", "0").strip()
 
+                if hora == "" or not re.match(r'^([01]\d|2[0-3]):[0-5]\d$', hora):
+                    error = "La hora debe estar en formato militar HH:MM (00:00 a 23:59)."
+
                 if hora == "" or hallazgo == "" or accion == "" or responsable == "":
                     error = "Todos los campos son obligatorios."
                 else:
@@ -1854,6 +1857,9 @@ def editar_item_gestion(reporte_id, item_id):
             responsable = request.form.get("responsable", "").strip()
             corregido = request.form.get("corregido", "0").strip()
             corregido_val = 1 if corregido == "1" else 0
+
+            if hora == "" or not re.match(r'^([01]\d|2[0-3]):[0-5]\d$', hora):
+                error = "La hora debe estar en formato militar HH:MM (00:00 a 23:59)."
 
             if not hora or not hallazgo or not accion or not responsable:
                 item_dict = dict(item)
