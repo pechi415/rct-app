@@ -393,24 +393,32 @@ h1,h2,h3{ margin:0; }
   padding-top: 2mm;   /* prueba 3mm–6mm */
 }
 
+/* ===============================
+   PDF B – Equipos varados
+   =============================== */
 
-/* Equipos varados: Ubicación = Motivo */
-.table-varados{
-  width: 100%;
-  table-layout: fixed;
+.table-varados {
+    width: 100%;
+    table-layout: fixed;
 }
 
+/* Equipo → fijo y pequeño */
 .table-varados th:nth-child(1),
-.table-varados td:nth-child(1){
-  width: 95px;           /* Equipo fijo (como lo tenías) */
+.table-varados td:nth-child(1) {
+    width: 80px !important;
+    max-width: 80px;
+    white-space: nowrap;
 }
 
+/* Ubicación → mitad del espacio restante */
 .table-varados th:nth-child(2),
-.table-varados td:nth-child(2){
-  width: calc((100% - 95px) / 2);  /* Ubicación = Motivo */
+.table-varados td:nth-child(2) {
+    width: calc((100% - 80px) / 2) !important;
 }
 
+/* Motivo → mitad del espacio restante */
 .table-varados th:nth-child(3),
-.table-varados td:nth-child(3){
-  width: calc((100% - 95px) / 2);  /* Ubicación = Motivo */
+.table-varados td:nth-child(3) {
+    width: calc((100% - 80px) / 2) !important;
 }
+v
