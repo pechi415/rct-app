@@ -2148,6 +2148,36 @@ def editar_item_varados(reporte_id, item_id):
 
     return render_template("varados_editar.html", r=r, reporte=r, it=it, error=error)
 
+@app.route("/reportes/<int:reporte_id>/varados/<int:item_id>/eliminar", methods=["POST"])
+@reporte_mina_required
+def eliminar_item_varados(reporte_id, item_id):
+    with get_conn() as conn:
+        r = fetch_reporte(conn, reporte_id)
+
+        # Permisos
+        if g.user["rol"] == "LECTOR":
+            return ("No autorizado", 403)
+
+        # No permitir eliminar si está cerrado
+        if r["estado"] == "CERRADO":
+            return redirect(url_for("equipos_varados", reporte_id=reporte_id))
+
+        # Validar que exista el item dentro del reporte
+        it = conn.execute(
+            "SELECT id FROM equipos_varados WHERE id = ? AND reporte_id = ?",
+            (item_id, reporte_id)
+        ).fetchone()
+
+        if it is None:
+            abort(404)
+
+        # Eliminar
+        conn.execute(
+            "DELETE FROM equipos_varados WHERE id = ? AND reporte_id = ?",
+            (item_id, reporte_id)
+        )
+
+    return redirect(url_for("equipos_varados", reporte_id=reporte_id))
 
 
 # =========================================================
