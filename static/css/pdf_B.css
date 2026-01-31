@@ -394,34 +394,23 @@ h1,h2,h3{ margin:0; }
 }
 
 
-/* -------------------------
-   Equipos / Camiones varados
--------------------------- */
-.table-varados {
-    width: 100%;
-    table-layout: fixed;
+/* Equipos varados: Ubicación = Motivo */
+.table-varados{
+  width: 100%;
+  table-layout: fixed;
 }
 
-/* Equipo */
 .table-varados th:nth-child(1),
-.table-varados td:nth-child(1) {
-    width: 15%;
+.table-varados td:nth-child(1){
+  width: 95px;           /* Equipo fijo (como lo tenías) */
 }
 
-/* Ubicación */
 .table-varados th:nth-child(2),
-.table-varados td:nth-child(2) {
-    width: 32.5%;
+.table-varados td:nth-child(2){
+  width: calc((100% - 95px) / 2);  /* Ubicación = Motivo */
 }
 
-/* Motivo */
 .table-varados th:nth-child(3),
-.table-varados td:nth-child(3) {
-    width: 32.5%;
-}
-
-/* Acciones */
-.table-varados th:nth-child(4),
-.table-varados td:nth-child(4) {
-    width: 220px;
+.table-varados td:nth-child(3){
+  width: calc((100% - 95px) / 2);  /* Ubicación = Motivo */
 }
