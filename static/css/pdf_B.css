@@ -421,3 +421,8 @@ h1,h2,h3{ margin:0; }
 .table-varados td:nth-child(3) {
     width: calc((100% - 80px) / 2) !important;
 }
+
+.table-varados{
+  width: 100%;
+  table-layout: fixed;
+}
