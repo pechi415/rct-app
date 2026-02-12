@@ -1738,6 +1738,43 @@ def reabrir_reporte(reporte_id):
     return redirect(url_for("ver_reportes"))
 
 
+# ---------------------------------------------------------
+# [RUTA] Editar fecha del reporte (ADMIN y SUPERVISOR)
+# ---------------------------------------------------------
+@app.route("/reportes/<int:reporte_id>/editar-fecha", methods=["GET", "POST"])
+@reporte_mina_required
+@roles_required("ADMIN", "SUPERVISOR")
+def editar_fecha_reporte(reporte_id):
+    with get_conn() as conn:
+        r = fetch_reporte(conn, reporte_id)
+    
+    if request.method == "GET":
+        return render_template(
+            "reporte_editar_fecha.html",
+            r=r,
+            error=None
+        )
+    
+    # POST
+    nueva_fecha = request.form.get("fecha", "").strip()
+    
+    if nueva_fecha == "":
+        return render_template(
+            "reporte_editar_fecha.html",
+            r=r,
+            error="Debes ingresar una fecha válida."
+        )
+    
+    # Actualizar la fecha en la base de datos
+    with get_conn() as conn:
+        conn.execute(
+            "UPDATE reportes SET fecha = ? WHERE id = ?",
+            (nueva_fecha, reporte_id)
+        )
+    
+    return redirect(url_for("reporte_inicio", reporte_id=reporte_id))
+
+
 # =========================================================
 # Bloque 6: Gestión + Buses + Varados (CRUD)
 # =========================================================

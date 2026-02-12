@@ -12,6 +12,9 @@
   </div>
 
   <div class="d-flex gap-2">
+    {% if g.user and g.user.rol in ('ADMIN', 'SUPERVISOR') %}
+      <a class="btn btn-primary btn-sm" href="/reportes/{{ r.id }}/editar-fecha">📝 Editar Fecha</a>
+    {% endif %}
     <a class="btn btn-secondary btn-sm" href="/reportes">🏠 Inicio</a>
   </div>
 </div>
