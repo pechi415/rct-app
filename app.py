@@ -424,6 +424,9 @@ def cambiar_password():
                 if not check_password_hash(u["password_hash"], actual):
                     error = "La contraseña actual no es correcta."
                 else:
+                    # ✅ Recordar si venía de un cambio obligatorio ANTES de limpiarlo
+                    era_obligatorio = (g.user.get("debe_cambiar_pass") == 1)
+
                     # ✅ Actualizar contraseña y quitar la obligación de cambiarla
                     conn.execute("""
                         UPDATE users
@@ -439,7 +442,7 @@ def cambiar_password():
                     
                     # ✅ Si el usuario estaba obligado a cambiarla, lo mandamos al index directo.
                     # (Porque si no, se queda atrapado en la pantalla de contraseña sin botón de volver).
-                    if request.endpoint == "cambiar_password" and g.user.get("debe_cambiar_pass") == 1:
+                    if request.endpoint == "cambiar_password" and era_obligatorio:
                         return redirect(url_for("ver_reportes"))
 
                     # ✅ Si era un cambio normal voluntario, recargar la página
