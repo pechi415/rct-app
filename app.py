@@ -605,6 +605,9 @@ def init_auth_tables():
                 );
             """)
 
+            # ✅ Auto-migración si la tabla ya existía antes de este update
+            cur.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS debe_cambiar_pass SMALLINT NOT NULL DEFAULT 0;")
+
             cur.execute("""
                 CREATE TABLE IF NOT EXISTS user_minas (
                   user_id BIGINT NOT NULL,
@@ -627,6 +630,10 @@ def init_auth_tables():
                   created_at TEXT NOT NULL DEFAULT (datetime('now'))
                 )
             """)
+            try:
+                cur.execute("ALTER TABLE users ADD COLUMN debe_cambiar_pass INTEGER NOT NULL DEFAULT 0;")
+            except Exception:
+                pass
 
             cur.execute("""
                 CREATE TABLE IF NOT EXISTS user_minas (
