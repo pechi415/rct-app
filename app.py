@@ -434,8 +434,15 @@ def cambiar_password():
                     # ✅ Actualizamos g.user temporalmente para evitar redirección en cadena antes del redirect
                     g.user["debe_cambiar_pass"] = 0
 
-                    # ✅ Guardar mensaje y redirigir (POST-Redirect-GET)
+                    # ✅ Guardar mensaje
                     session["flash_ok"] = "Contraseña actualizada correctamente."
+                    
+                    # ✅ Si el usuario estaba obligado a cambiarla, lo mandamos al index directo.
+                    # (Porque si no, se queda atrapado en la pantalla de contraseña sin botón de volver).
+                    if request.endpoint == "cambiar_password" and g.user.get("debe_cambiar_pass") == 1:
+                        return redirect(url_for("ver_reportes"))
+
+                    # ✅ Si era un cambio normal voluntario, recargar la página
                     return redirect(url_for("cambiar_password"))
 
     return render_template("cambiar_password.html", error=error, ok=ok)
