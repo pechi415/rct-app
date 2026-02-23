@@ -352,21 +352,21 @@ def load_logged_in_user():
         g.user_minas = []
         return
 
-        if u["is_active"] != 1:
-            session.clear()
-            g.user = None
-            g.user_minas = []
-            return
+    if u["is_active"] != 1:
+        session.clear()
+        g.user = None
+        g.user_minas = []
+        return
 
-        g.user = u
+    g.user = u
 
-        # ✅ Bloqueo para Cambio de Contraseña Obligatorio
-        # Si el usuario DEBE cambiarla, redirigir a /mi-cuenta/password
-        if g.user.get("debe_cambiar_pass") == 1:
-            # Puntos a donde SÍ le dejamos ir: estáticos, logout, o cambiar clave.
-            if request.endpoint not in ["cambiar_password", "logout", "static"]:
-                flash("Por seguridad, debes cambiar la contraseña temporal asignada.", "warning")
-                return redirect(url_for("cambiar_password"))
+    # ✅ Bloqueo para Cambio de Contraseña Obligatorio
+    # Si el usuario DEBE cambiarla, redirigir a /mi-cuenta/password
+    if g.user["debe_cambiar_pass"] == 1:
+        # Puntos a donde SÍ le dejamos ir: estáticos, logout, o cambiar clave.
+        if request.endpoint not in ["cambiar_password", "logout", "static"]:
+            flash("Por seguridad, debes cambiar la contraseña temporal asignada.", "warning")
+            return redirect(url_for("cambiar_password"))
 
 
 # ---------------------------------------------------------
