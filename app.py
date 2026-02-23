@@ -317,7 +317,7 @@ def load_logged_in_user():
     try:
         cur.execute(
             sql_params("""
-                SELECT id, username, rol, is_active
+                SELECT id, username, rol, is_active, debe_cambiar_pass
                 FROM users
                 WHERE id = ?
                 LIMIT 1
@@ -352,16 +352,21 @@ def load_logged_in_user():
         g.user_minas = []
         return
 
-    # Si está inactivo, lo sacamos
-    if u["is_active"] != 1:
-        session.clear()
-        g.user = None
-        g.user_minas = []
-        return
+        if u["is_active"] != 1:
+            session.clear()
+            g.user = None
+            g.user_minas = []
+            return
 
-    g.user = u
+        g.user = u
 
-
+        # ✅ Bloqueo para Cambio de Contraseña Obligatorio
+        # Si el usuario DEBE cambiarla, redirigir a /mi-cuenta/password
+        if g.user.get("debe_cambiar_pass") == 1:
+            # Puntos a donde SÍ le dejamos ir: estáticos, logout, o cambiar clave.
+            if request.endpoint not in ["cambiar_password", "logout", "static"]:
+                flash("Por seguridad, debes cambiar la contraseña temporal asignada.", "warning")
+                return redirect(url_for("cambiar_password"))
 
 
 # ---------------------------------------------------------
@@ -419,12 +424,15 @@ def cambiar_password():
                 if not check_password_hash(u["password_hash"], actual):
                     error = "La contraseña actual no es correcta."
                 else:
-                    # ✅ Actualizar contraseña
+                    # ✅ Actualizar contraseña y quitar la obligación de cambiarla
                     conn.execute("""
                         UPDATE users
-                        SET password_hash = ?
+                        SET password_hash = ?, debe_cambiar_pass = 0
                         WHERE id = ?
                     """, (generate_password_hash(nueva), g.user["id"]))
+
+                    # ✅ Actualizamos g.user temporalmente para evitar redirección en cadena antes del redirect
+                    g.user["debe_cambiar_pass"] = 0
 
                     # ✅ Guardar mensaje y redirigir (POST-Redirect-GET)
                     session["flash_ok"] = "Contraseña actualizada correctamente."
@@ -592,6 +600,7 @@ def init_auth_tables():
                   password_hash TEXT NOT NULL,
                   rol TEXT NOT NULL CHECK (rol IN ('ADMIN','SUPERVISOR','DIGITADOR','LECTOR')),
                   is_active SMALLINT NOT NULL DEFAULT 1,
+                  debe_cambiar_pass SMALLINT NOT NULL DEFAULT 0,
                   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
                 );
             """)
@@ -614,6 +623,7 @@ def init_auth_tables():
                   password_hash TEXT NOT NULL,
                   rol TEXT NOT NULL CHECK (rol IN ('ADMIN','SUPERVISOR','DIGITADOR','LECTOR')),
                   is_active INTEGER NOT NULL DEFAULT 1,
+                  debe_cambiar_pass INTEGER NOT NULL DEFAULT 0,
                   created_at TEXT NOT NULL DEFAULT (datetime('now'))
                 )
             """)
@@ -4442,15 +4452,15 @@ def admin_usuario_nuevo():
         # ✅ Crear user (solo columnas reales)
         if conn._is_pg:
             row = conn.execute("""
-                INSERT INTO users (username, password_hash, rol, is_active)
-                VALUES (?, ?, ?, ?)
+                INSERT INTO users (username, password_hash, rol, is_active, debe_cambiar_pass)
+                VALUES (?, ?, ?, ?, 1)
                 RETURNING id
             """, (username, password_hash, rol, int(is_active))).fetchone()
             user_id = row["id"] if row else None
         else:
             cur = conn.execute("""
-                INSERT INTO users (username, password_hash, rol, is_active)
-                VALUES (?, ?, ?, ?)
+                INSERT INTO users (username, password_hash, rol, is_active, debe_cambiar_pass)
+                VALUES (?, ?, ?, ?, 1)
             """, (username, password_hash, rol, int(is_active)))
             user_id = cur.lastrowid
 
@@ -4605,7 +4615,7 @@ def login():
 
         cur.execute(
             sql_params("""
-                SELECT id, username, password_hash, rol, is_active
+                SELECT id, username, password_hash, rol, is_active, debe_cambiar_pass
                 FROM users
                 WHERE LOWER(username) = ?
                 LIMIT 1
