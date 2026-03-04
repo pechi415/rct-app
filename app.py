@@ -4553,16 +4553,31 @@ def admin_usuario_editar(user_id):
         rol = (request.form.get("rol") or "").strip().upper()
         is_active = 1 if request.form.get("is_active") in ("1", "on", "true", "True") else 0
         minas_sel = request.form.getlist("minas")
+        new_password = request.form.get("new_password", "").strip()
 
         if rol not in ROLES:
             flash("Rol inválido.", "warning")
             return redirect(url_for("admin_usuario_editar", user_id=user_id))
 
-        conn.execute("""
-            UPDATE users
-            SET rol = ?, is_active = ?
-            WHERE id = ?
-        """, (rol, int(is_active), user_id))
+        # Validar nueva contraseña si se proporciona
+        if new_password and len(new_password) < 6:
+            flash("La contraseña debe tener al menos 6 caracteres.", "warning")
+            return redirect(url_for("admin_usuario_editar", user_id=user_id))
+
+        # Preparar valores a actualizar
+        if new_password:
+            password_hash = generate_password_hash(new_password)
+            conn.execute("""
+                UPDATE users
+                SET rol = ?, is_active = ?, password_hash = ?
+                WHERE id = ?
+            """, (rol, int(is_active), password_hash, user_id))
+        else:
+            conn.execute("""
+                UPDATE users
+                SET rol = ?, is_active = ?
+                WHERE id = ?
+            """, (rol, int(is_active), user_id))
 
         # Reset minas
         conn.execute("DELETE FROM user_minas WHERE user_id = ?", (user_id,))
