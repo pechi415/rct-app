@@ -4569,7 +4569,7 @@ def admin_usuario_editar(user_id):
             password_hash = generate_password_hash(new_password)
             conn.execute("""
                 UPDATE users
-                SET rol = ?, is_active = ?, password_hash = ?
+                SET rol = ?, is_active = ?, password_hash = ?, debe_cambiar_pass = 1
                 WHERE id = ?
             """, (rol, int(is_active), password_hash, user_id))
         else:
