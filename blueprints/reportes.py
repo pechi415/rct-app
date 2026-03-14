@@ -1,9 +1,10 @@
 
 import os
 import gc
+import multiprocessing
 from datetime import date, datetime
 from flask import Blueprint, render_template, request, redirect, url_for, g, flash, abort, make_response
-from weasyprint import HTML
+
 from database import get_conn, get_db_connection
 from config import MINAS, CAMIONETAS_POR_MINA
 from utils import mina_label, calc_disponible_personal
@@ -279,6 +280,15 @@ def build_reporte_context(conn, reporte_id: int) -> dict:
 
 
 # ---------------------------------------------------------
+# [HELPER] Proceso Aislado PDF
+# ---------------------------------------------------------
+def _generate_pdf_worker(html_str, base_dir):
+    """ Función atómica que corre en un sub-proceso para generar el PDF y liberar memoria. """
+    from weasyprint import HTML
+    return HTML(string=html_str, base_url=base_dir).write_pdf()
+
+
+# ---------------------------------------------------------
 # [RUTA] Reporte PDF
 # ---------------------------------------------------------
 @reportes_bp.route("/reportes/<int:reporte_id>/pdf")
@@ -315,10 +325,11 @@ def reporte_pdf(reporte_id: int):
 
     from flask import current_app
     base_dir = current_app.root_path
-    pdf_bytes = HTML(string=html, base_url=base_dir).write_pdf()
-
-    # Limpiar inmediatamente a Weasyprint de memoria para no saturar los 512MB de Render
-    gc.collect()
+    
+    # Aislar WeasyPrint en un proceso que muere tras generar el PDF
+    # Esto salva de fugas de memoria (OOM) en Render (512MB RAM)
+    with multiprocessing.Pool(processes=1, maxtasksperchild=1) as pool:
+        pdf_bytes = pool.apply(_generate_pdf_worker, (html, base_dir))
 
     resp = make_response(pdf_bytes)
     resp.headers["Content-Type"] = "application/pdf"
