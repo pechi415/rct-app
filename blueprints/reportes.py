@@ -246,36 +246,47 @@ def build_reporte_context(conn, reporte_id: int) -> dict:
             supervisor ASC
     """, (reporte_id,)).fetchall()
 
+    # -------------------------
+    # Fatiga y Pausas Activas
+    # -------------------------
+    fatiga_items = conn.execute(
+        "SELECT reportes_sueno, pausas_activas FROM fatiga_pausas WHERE reporte_id = ?",
+        (reporte_id,)
+    ).fetchall()
+    
+    total_sueno = sum(it["reportes_sueno"] for it in fatiga_items)
+    total_pausas = sum(it["pausas_activas"] for it in fatiga_items)
+
     return dict(
         r=r,
         gestion=gestion,
         buses=buses,
         equipos=equipos,
-        ausentismo=ausentismo_items,
-        bombas=bombas_items,
         dist_camiones=dist_camiones,
         total_camiones=total_camiones,
         camiones_disponibles=camiones_disponibles,
+        ausentismo=ausentismo_items,
+        bombas=bombas_items,
         equipo_liviano=equipo_liviano_items,
-        personal_items=personal_items,
+        personal=personal_items,
         roster_p=roster_p,
         disponible_p=disponible_p,
         otras_areas=otras_areas_items,
-        entrenamiento_items=entrenamiento_items,
+        entrenamiento=entrenamiento_items,
         luminarias=luminarias,
         contactos=contactos,
         seguridad_obs=seguridad_obs,
         seguridad_charlas=seguridad_charlas,
-        first_last=first_last,
         operacion=operacion,
+        pts=pts,
         bahias=bahias,
         bahias_nota=bahias_nota,
-        pts=pts,
         comentarios=comentarios,
         supervisores=supervisores,
-        camionetas_base=camionetas_base,
-
+        fatiga_total_sueno=total_sueno,
+        fatiga_total_pausas=total_pausas,
     )
+
 
 
 # ---------------------------------------------------------

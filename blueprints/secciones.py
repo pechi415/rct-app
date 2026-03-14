@@ -2379,13 +2379,100 @@ def eliminar_supervisor_turno(reporte_id, item_id):
     return redirect(url_for("supervisores_turno", reporte_id=reporte_id))
 
 
-# =========================================================
-# Bloque 11: Resumen + PDF + Login/Logout + Init/Seeds + RUN
-# =========================================================
-
 # ---------------------------------------------------------
-# [RUTA] Resumen
-# =========================================================
-# [ADMIN] Usuarios (solo ADMIN)
-# =========================================================
+# [RUTA] Fatiga y Pausas
+# ---------------------------------------------------------
+@secciones_bp.route("/reportes/<int:reporte_id>/fatiga", methods=["GET", "POST"])
+@reporte_mina_required
+def fatiga(reporte_id):
+    with get_conn() as conn:
+        r = fetch_reporte(conn, reporte_id)
+        error = None
+
+        if request.method == "POST":
+            if g.user["rol"] == "LECTOR":
+                error = "No tienes permisos para registrar información."
+            elif r["estado"] == "CERRADO":
+                error = "El reporte está cerrado."
+            else:
+                try:
+                    reportes_sueno = int(request.form.get("reportes_sueno", 0))
+                    pausas_activas = int(request.form.get("pausas_activas", 0))
+
+                    if reportes_sueno < 0 or pausas_activas < 0:
+                        error = "Los valores no pueden ser negativos."
+                    else:
+                        conn.execute("""
+                            INSERT INTO fatiga_pausas (reporte_id, reportes_sueno, pausas_activas)
+                            VALUES (?, ?, ?)
+                        """, (reporte_id, reportes_sueno, pausas_activas))
+                        return redirect(url_for("secciones.fatiga", reporte_id=reporte_id))
+                except ValueError:
+                    error = "Los valores deben ser enteros válidos."
+
+        items = conn.execute(
+            "SELECT * FROM fatiga_pausas WHERE reporte_id = ? ORDER BY id DESC",
+            (reporte_id,)
+        ).fetchall()
+
+    return render_template("fatiga.html", r=r, items=items, error=error)
+
+
+@secciones_bp.route("/reportes/<int:reporte_id>/fatiga/<int:item_id>/editar", methods=["GET", "POST"])
+@reporte_mina_required
+def editar_item_fatiga(reporte_id, item_id):
+    with get_conn() as conn:
+        r = fetch_reporte(conn, reporte_id)
+        if r["estado"] == "CERRADO":
+            return redirect(url_for("secciones.fatiga", reporte_id=reporte_id))
+
+        it = conn.execute(
+            "SELECT * FROM fatiga_pausas WHERE id = ? AND reporte_id = ?",
+            (item_id, reporte_id)
+        ).fetchone()
+        if it is None:
+            abort(404)
+
+        error = None
+
+        if request.method == "POST":
+            if g.user["rol"] == "LECTOR":
+                return ("No autorizado", 403)
+
+            try:
+                reportes_sueno = int(request.form.get("reportes_sueno", 0))
+                pausas_activas = int(request.form.get("pausas_activas", 0))
+
+                if reportes_sueno < 0 or pausas_activas < 0:
+                    error = "Los valores no pueden ser negativos."
+                else:
+                    conn.execute("""
+                        UPDATE fatiga_pausas
+                        SET reportes_sueno = ?, pausas_activas = ?
+                        WHERE id = ? AND reporte_id = ?
+                    """, (reportes_sueno, pausas_activas, item_id, reporte_id))
+                    return redirect(url_for("secciones.fatiga", reporte_id=reporte_id))
+            except ValueError:
+                error = "Los valores deben ser enteros válidos."
+
+    return render_template("fatiga_editar.html", r=r, item=it, error=error)
+
+
+@secciones_bp.route("/reportes/<int:reporte_id>/fatiga/eliminar/<int:item_id>", methods=["POST"])
+@reporte_mina_required
+def eliminar_item_fatiga(reporte_id, item_id):
+    with get_conn() as conn:
+        r = fetch_reporte(conn, reporte_id)
+        if r["estado"] == "CERRADO":
+            return redirect(url_for("secciones.fatiga", reporte_id=reporte_id))
+
+        if g.user["rol"] == "LECTOR":
+            return ("No autorizado", 403)
+
+        conn.execute(
+            "DELETE FROM fatiga_pausas WHERE id = ? AND reporte_id = ?",
+            (item_id, reporte_id)
+        )
+
+    return redirect(url_for("secciones.fatiga", reporte_id=reporte_id))
 

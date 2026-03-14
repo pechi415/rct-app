@@ -41,6 +41,8 @@ from blueprints.reportes import reportes_bp
 app.register_blueprint(reportes_bp)
 from blueprints.secciones import secciones_bp
 app.register_blueprint(secciones_bp)
+from blueprints.gerencia import gerencia_bp
+app.register_blueprint(gerencia_bp)
 from blueprints.reportes import fetch_reporte, reporte_mina_required
 
 

@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+{% block title %}Gerencial {{ fecha }} T{{ turno }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="mb-1 text-primary">Reporte Gerencial Consolidado</h2>
+        <div class="text-muted h5 mb-0">
+            📅 {{ fecha }} &nbsp;|&nbsp; 🕒 Turno {{ turno }} &nbsp;|&nbsp; 📍 El Descanso + Pribbenow
+        </div>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{{ url_for('gerencia.index') }}" class="btn btn-outline-secondary">🔙 Volver</a>
+        <a href="?pdf=1" class="btn btn-success fw-bold" target="_blank">📄 Imprimir PDF</a>
+    </div>
+</div>
+
+<hr class="mb-4">
+
+<div class="row g-4">
+
+    <!-- 1. FATIGA Y SALUD -->
+    <div class="col-md-6 col-lg-3">
+        <div class="card h-100 border-info">
+            <div class="card-header bg-info text-white fw-bold">Salud y Fatiga</div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Reportes de Sueño
+                        <span class="badge bg-warning text-dark rounded-pill">{{ fatiga_sueno_total }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Pausas Activas
+                        <span class="badge bg-success rounded-pill">{{ fatiga_pausas_total }}</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. CONTACTOS -->
+    <div class="col-md-6 col-lg-4">
+        <div class="card h-100 border-primary">
+            <div class="card-header bg-primary text-white fw-bold d-flex justify-content-between">
+                <span>Contactos Operativos</span>
+                <span class="badge bg-light text-primary">{{ total_contactos }} Totales</span>
+            </div>
+            <div class="card-body p-0">
+                {% if contactos %}
+                <div style="max-height: 250px; overflow-y: auto;">
+                    <table class="table table-sm table-striped mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Mina</th>
+                                <th>Tipo</th>
+                                <th>Operador</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for c in contactos %}
+                            <tr>
+                                <td>{{ c.mina }}</td>
+                                <td>{{ c.tipo_contacto }}</td>
+                                <td>{{ c.operador }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="p-3 text-muted">No hay contactos registrados.</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. DISTRIBUCION CAMIONES -->
+    <div class="col-md-12 col-lg-5">
+        <div class="card h-100 border-secondary">
+            <div class="card-header bg-secondary text-white fw-bold d-flex justify-content-between">
+                <span>Distribución de Camiones</span>
+                <span class="badge bg-light text-dark">Operativos: {{ camiones_disponibles }} / {{ total_camiones
+                    }}</span>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-sm table-striped mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Estado</th>
+                            <th class="text-end">Cantidad</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for d in distribucion_camiones %}
+                        <tr>
+                            <td>{{ d.tipo }}</td>
+                            <td class="text-end fw-bold">{{ d.cantidad }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. PERSONAL -->
+    <div class="col-md-12">
+        <div class="card border-dark">
+            <div class="card-header bg-dark text-white fw-bold d-flex justify-content-between">
+                <span>Distribución de Personal</span>
+                <span>Roster: {{ roster_p }} &nbsp;|&nbsp; Presentes: {{ disponible_p }}</span>
+            </div>
+            <div class="card-body">
+                <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-3">
+                    {% for p in personal %}
+                    <div class="col">
+                        <div class="d-flex justify-content-between border-bottom pb-1">
+                            <span class="text-muted">{{ p.categoria }}</span>
+                            <span class="fw-bold">{{ p.cantidad }}</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. FIRST LAST (PARALELO) -->
+    <div class="col-md-12">
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="card border-primary h-100">
+                    <div class="card-header bg-primary text-white fw-bold">First - Last (El Descanso)</div>
+                    <div class="card-body p-0">
+                        <table class="table table-sm table-bordered mb-0">
+                            <tr>
+                                <th class="bg-light w-50">Arribo inicio P2 / P5</th>
+                                <td>{{ fl_ed.inicio_pit2 or '-' }} / {{ fl_ed.inicio_pit5 or '-' }}</td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light">Llegada final P2 / P5</th>
+                                <td>{{ fl_ed.final_pit2 or '-' }} / {{ fl_ed.final_pit5 or '-' }}</td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light">Camiones / Primera Hora</th>
+                                <td>{{ fl_ed.camiones_por_operador or '0' }}</td>
+                            </tr>
+                            {% if fl_ed.razon %}
+                            <tr>
+                                <th class="bg-light">Tardanza / Comentario</th>
+                                <td class="text-danger small">{{ fl_ed.razon }}</td>
+                            </tr>
+                            {% endif %}
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card border-success h-100">
+                    <div class="card-header bg-success text-white fw-bold">First - Last (Pribbenow)</div>
+                    <div class="card-body p-0">
+                        <table class="table table-sm table-bordered mb-0">
+                            <tr>
+                                <th class="bg-light w-50">Arribo inicio P2 / P5</th>
+                                <td>{{ fl_prb.inicio_pit2 or '-' }} / {{ fl_prb.inicio_pit5 or '-' }}</td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light">Llegada final P2 / P5</th>
+                                <td>{{ fl_prb.final_pit2 or '-' }} / {{ fl_prb.final_pit5 or '-' }}</td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light">Camiones / Primera Hora</th>
+                                <td>{{ fl_prb.camiones_por_operador or '0' }}</td>
+                            </tr>
+                            {% if fl_prb.razon %}
+                            <tr>
+                                <th class="bg-light">Tardanza / Comentario</th>
+                                <td class="text-danger small">{{ fl_prb.razon }}</td>
+                            </tr>
+                            {% endif %}
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

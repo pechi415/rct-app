@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8">
+    <title>Reporte Gerencial Consolidado</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles_pdf.css') }}">
+    <style>
+        /* Ajustes específicos para Gerencia */
+        h1 {
+            margin-top: 0;
+            color: #1a5276;
+            font-size: 20px;
+        }
+
+        .header-gerencia {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #1a5276;
+            padding-bottom: 5px;
+            margin-bottom: 15px;
+        }
+
+        .badge {
+            padding: 3px 6px;
+            background-color: #f2f2f2;
+            border: 1px solid #ccc;
+            font-weight: bold;
+            border-radius: 4px;
+            font-size: 11px;
+        }
+
+        .bg-info {
+            background-color: #d1ecf1;
+        }
+
+        .bg-warning {
+            background-color: #fff3cd;
+        }
+
+        .bg-success {
+            background-color: #d4edda;
+        }
+
+        .sec-title {
+            background-color: #1a5276;
+            color: white;
+            padding: 4px 8px;
+            font-weight: bold;
+            font-size: 13px;
+            margin-bottom: 0;
+        }
+
+        .grid-2 {
+            display: table;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .col-50 {
+            display: table-cell;
+            width: 48%;
+            vertical-align: top;
+        }
+
+        .col-space {
+            display: table-cell;
+            width: 4%;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Logo Banner -->
+    <div style="text-align: right; margin-bottom: 10px;">
+        <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo" style="height: 40px;">
+    </div>
+
+    <div class="header-gerencia">
+        <div>
+            <h1>Reporte Gerencial Consolidado</h1>
+            <div style="color: #666; font-size:12px;">El Descanso & Pribbenow</div>
+        </div>
+        <div style="text-align:right; font-size: 14px;">
+            <strong>Fecha:</strong> {{ fecha }} <br>
+            <strong>Turno:</strong> {{ turno }}
+        </div>
+    </div>
+
+    <div class="grid-2">
+        <!-- FATIGA -->
+        <div class="col-50">
+            <div class="sec-title">Salud y Fatiga</div>
+            <table class="table-border mt-0">
+                <tr>
+                    <th>Reportes de Sueño</th>
+                    <td style="text-align:center; font-weight:bold;">{{ fatiga_sueno_total }}</td>
+                </tr>
+                <tr>
+                    <th>Pausas Activas</th>
+                    <td style="text-align:center; font-weight:bold;">{{ fatiga_pausas_total }}</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="col-space"></div>
+
+        <!-- CAMIONES -->
+        <div class="col-50">
+            <div class="sec-title">Distribución de Camiones (Op: {{ camiones_disponibles }}/{{ total_camiones }})</div>
+            <table class="table-border mt-0">
+                <tr>
+                    <th>Estado</th>
+                    <th>Cant</th>
+                </tr>
+                {% for d in distribucion_camiones %}
+                <tr>
+                    <td>{{ d.tipo }}</td>
+                    <td style="text-align:center;">{{ d.cantidad }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+
+
+    <!-- CONTACTOS -->
+    <div style="margin-bottom:10px;">
+        <div class="sec-title">Contactos Operativos (Total: {{ total_contactos }})</div>
+        <table class="table-border mt-0">
+            <tr>
+                <th style="width:25%;">Mina</th>
+                <th style="width:35%;">Tipo de Contacto</th>
+                <th style="width:40%;">Operador</th>
+            </tr>
+            {% if contactos %}
+            {% for c in contactos %}
+            <tr>
+                <td>{{ c.mina }}</td>
+                <td>{{ c.tipo_contacto }}</td>
+                <td>{{ c.operador }}</td>
+            </tr>
+            {% endfor %}
+            {% else %}
+            <tr>
+                <td colspan="3" style="text-align:center; color:#777;">Sin contactos</td>
+            </tr>
+            {% endif %}
+        </table>
+    </div>
+
+
+    <!-- PERSONAL -->
+    <div style="margin-bottom:10px;">
+        <div class="sec-title">Distribución de Personal (Roster: {{ roster_p }} | Disp: {{ disponible_p }})</div>
+        <table class="table-border mt-0">
+            <tr>
+                {% for p in personal %}
+                <th style="font-size:10px;">{{ p.categoria }}</th>
+                {% endfor %}
+            </tr>
+            <tr>
+                {% for p in personal %}
+                <td style="text-align:center; font-weight:bold;">{{ p.cantidad }}</td>
+                {% endfor %}
+            </tr>
+        </table>
+    </div>
+
+    <!-- FIRST LAST -->
+    <div class="grid-2">
+        <div class="col-50">
+            <div class="sec-title" style="background-color:#0b5345;">First / Last (El Descanso)</div>
+            <table class="table-border mt-0">
+                <tr>
+                    <th style="width:60%">Arribo inicio P2 / P5</th>
+                    <td>{{ fl_ed.inicio_pit2 or '-' }} / {{ fl_ed.inicio_pit5 or '-' }}</td>
+                </tr>
+                <tr>
+                    <th>Llegada final P2 / P5</th>
+                    <td>{{ fl_ed.final_pit2 or '-' }} / {{ fl_ed.final_pit5 or '-' }}</td>
+                </tr>
+                <tr>
+                    <th>Camiones 1ra Hora</th>
+                    <td>{{ fl_ed.camiones_por_operador or '0' }}</td>
+                </tr>
+                {% if fl_ed.razon %}<tr>
+                    <td colspan="2" style="color:red; font-size:10px;">{{ fl_ed.razon }}</td>
+                </tr>{% endif %}
+            </table>
+        </div>
+
+        <div class="col-space"></div>
+
+        <div class="col-50">
+            <div class="sec-title" style="background-color:#1e8449;">First / Last (Pribbenow)</div>
+            <table class="table-border mt-0">
+                <tr>
+                    <th style="width:60%">Arribo inicio P2 / P5</th>
+                    <td>{{ fl_prb.inicio_pit2 or '-' }} / {{ fl_prb.inicio_pit5 or '-' }}</td>
+                </tr>
+                <tr>
+                    <th>Llegada final P2 / P5</th>
+                    <td>{{ fl_prb.final_pit2 or '-' }} / {{ fl_prb.final_pit5 or '-' }}</td>
+                </tr>
+                <tr>
+                    <th>Camiones 1ra Hora</th>
+                    <td>{{ fl_prb.camiones_por_operador or '0' }}</td>
+                </tr>
+                {% if fl_prb.razon %}<tr>
+                    <td colspan="2" style="color:red; font-size:10px;">{{ fl_prb.razon }}</td>
+                </tr>{% endif %}
+            </table>
+        </div>
+    </div>
+
+</body>
+
+</html>

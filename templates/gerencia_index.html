@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Resumen Gerencial{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">Resumen Gerencial (Consolidado)</h4>
+            </div>
+            <div class="card-body">
+                <p class="text-muted mb-4">Seleccione la fecha y turno para generar el reporte unificado de las minas
+                    <strong>El Descanso</strong> y <strong>Pribbenow</strong>. Ambos reportes fuente deben encontrarse
+                    "CERRADOS" para proceder.</p>
+
+                <form method="POST">
+                    <div class="mb-3">
+                        <label class="form-label" for="fecha">Fecha de Operación</label>
+                        <input type="date" class="form-control form-control-lg" name="fecha" id="fecha"
+                            value="{{ request.form.get('fecha', '') }}" required>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label" for="turno">Turno</label>
+                        <select class="form-select form-select-lg" name="turno" id="turno" required>
+                            <option value="">-- Seleccionar --</option>
+                            <option value="1">Turno 1: 06:00 - 18:00</option>
+                            <option value="2">Turno 2: 18:00 - 06:00</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-lg w-100 fw-bold">Buscar y Consolidar 📊</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

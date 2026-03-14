@@ -13,7 +13,7 @@
 
   <div class="d-flex gap-2">
     {% if g.user and g.user.rol in ('ADMIN', 'SUPERVISOR') %}
-      <a class="btn btn-primary btn-sm" href="/reportes/{{ r.id }}/editar-fecha">📝 Editar Fecha</a>
+    <a class="btn btn-primary btn-sm" href="/reportes/{{ r.id }}/editar-fecha">📝 Editar Fecha</a>
     {% endif %}
     <a class="btn btn-secondary btn-sm" href="/reportes">🏠 Inicio</a>
   </div>
@@ -119,7 +119,7 @@
         <div class="text-muted">Numero · Ubicación </div>
       </div>
     </a>
-  </div>  
+  </div>
 
   <div class="col-12 col-md-6 col-lg-4">
     <a class="card card-seccion h-100 text-decoration-none" href="/reportes/{{ r.id }}/contactos">
@@ -171,6 +171,15 @@
       <div class="card-body">
         <div class="card-title h5 mb-1">Supervisores de turno</div>
         <div class="text-muted">G1 · G2 · G3</div>
+      </div>
+    </a>
+  </div>
+
+  <div class="col-12 col-md-6 col-lg-4">
+    <a class="card card-seccion h-100 text-decoration-none" href="/reportes/{{ r.id }}/fatiga">
+      <div class="card-body">
+        <div class="card-title h5 mb-1">Fatiga y Pausas Activas</div>
+        <div class="text-muted">Reportes de Sueño · Pausas Activas</div>
       </div>
     </a>
   </div>
