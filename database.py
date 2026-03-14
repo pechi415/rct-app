@@ -29,6 +29,32 @@ def insert_and_get_id(conn, sql, params):
     return cur.lastrowid
 
 
+def ensure_fatiga_table(conn):
+    """Asegura que la tabla fatiga_pausas exista tanto en PG como SQLite."""
+    is_pg = is_postgres()
+    if is_pg:
+        cur = conn.cursor()
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS fatiga_pausas (
+                id SERIAL PRIMARY KEY,
+                reporte_id INTEGER REFERENCES reportes(id) ON DELETE CASCADE,
+                reportes_sueno INTEGER DEFAULT 0,
+                pausas_activas INTEGER DEFAULT 0
+            )
+        """)
+    else:
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS fatiga_pausas (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                reporte_id INTEGER NOT NULL,
+                reportes_sueno INTEGER DEFAULT 0,
+                pausas_activas INTEGER DEFAULT 0,
+                FOREIGN KEY(reporte_id) REFERENCES reportes(id) ON DELETE CASCADE
+            )
+        """)
+    conn.commit()
+
+
 def get_db_connection():
     database_url = os.environ.get("DATABASE_URL")
 
@@ -47,6 +73,7 @@ def get_db_connection():
             try:
                 conn = psycopg2.connect(database_url, cursor_factory=DictCursor, connect_timeout=15)
                 conn.autocommit = True  # <-- CLAVE
+                ensure_fatiga_table(conn)
                 return conn
             except psycopg2.OperationalError as e:
                 # Si falla intentamos reconectar tras una brevísima pausa, en caso el pooler esté frío
@@ -58,6 +85,7 @@ def get_db_connection():
         # Local / SQLite
         conn = sqlite3.connect(DB_PATH)
         conn.row_factory = sqlite3.Row
+        ensure_fatiga_table(conn)
         return conn
 
 
