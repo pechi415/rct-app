@@ -33,6 +33,10 @@ app = Flask(__name__)
 from database import init_app as init_db_app, get_conn, is_postgres, sql_params, get_db_connection
 init_db_app(app)
 
+from blueprints.auth import auth_bp, login_required, admin_required, roles_required
+app.register_blueprint(auth_bp)
+
+
 # En local: clave fija para que la sesión no se invalide al cambiar cómo ejecutas la app
 app.secret_key = os.environ.get("FLASK_SECRET_KEY")
 if not app.secret_key:
@@ -73,165 +77,6 @@ def inject_helpers():
 # Bloque 2: Auth, carga de usuario (g.user / g.user_minas) y permisos
 # =========================================================
 
-# ---------------------------------------------------------
-# [AUTH] Cargar usuario logueado en cada request
-# ---------------------------------------------------------
-@app.before_request
-def load_logged_in_user():
-    user_id = session.get("user_id")
-    g.user = None
-    g.user_minas = []  # ✅ SIEMPRE definido
-
-    if not user_id:
-        return
-
-    conn = get_conn()
-    try:
-        cur = conn.execute(
-            """
-                SELECT id, username, rol, is_active, debe_cambiar_pass
-                FROM users
-                WHERE id = ?
-                LIMIT 1
-            """,
-            (user_id,)
-        )
-        u = cur.fetchone()
-
-        # ✅ Cargar minas del usuario
-        cur2 = conn.execute(
-            """
-                SELECT mina
-                FROM user_minas
-                WHERE user_id = ?
-                ORDER BY mina
-            """,
-            (user_id,)
-        )
-        rows = cur2.fetchall()
-        g.user_minas = [r["mina"] for r in rows]
-
-    except Exception:
-        u = None
-        g.user_minas = []
-
-    if u is None:
-        session.clear()
-        g.user = None
-        g.user_minas = []
-        return
-
-    if u["is_active"] != 1:
-        session.clear()
-        g.user = None
-        g.user_minas = []
-        return
-
-    g.user = u
-
-    # ✅ Bloqueo para Cambio de Contraseña Obligatorio
-    # Si el usuario DEBE cambiarla, redirigir a /mi-cuenta/password
-    if g.user["debe_cambiar_pass"] == 1:
-        # Puntos a donde SÍ le dejamos ir: estáticos, logout, o cambiar clave.
-        if request.endpoint not in ["cambiar_password", "logout", "static"]:
-            flash("Por seguridad, debes cambiar la contraseña temporal asignada.", "warning")
-            return redirect(url_for("cambiar_password"))
-
-
-# ---------------------------------------------------------
-# [HELPER] Cambio de contraseña
-# ---------------------------------------------------------
-from functools import wraps
-
-def login_required(view):
-    @wraps(view)
-    def wrapped(*args, **kwargs):
-        if g.user is None:
-            return redirect(url_for("login"))
-        return view(*args, **kwargs)
-    return wrapped
-
-
-# ---------------------------------------------------------
-# [RUTA] Cambio de contraseña
-# ---------------------------------------------------------
-@app.route("/mi-cuenta/password", methods=["GET", "POST"])
-@login_required
-def cambiar_password():
-    error = None
-
-    # ✅ Lee el mensaje "ok" (si existe) y lo borra de la sesión
-    ok = session.pop("flash_ok", None)
-
-    if request.method == "POST":
-        actual = request.form.get("actual", "")
-        nueva = request.form.get("nueva", "")
-        confirmar = request.form.get("confirmar", "")
-
-        # Validaciones
-        if not actual or not nueva or not confirmar:
-            error = "Debes completar todos los campos."
-        elif nueva != confirmar:
-            error = "La nueva contraseña y la confirmación no coinciden."
-        elif len(nueva) < 6:
-            error = "La nueva contraseña debe tener al menos 6 caracteres."
-        else:
-            with get_conn() as conn:
-                u = conn.execute("""
-                    SELECT id, password_hash, is_active
-                    FROM users
-                    WHERE id = ?
-                    LIMIT 1
-                """, (g.user["id"],)).fetchone()
-
-                # Usuario no existe o inactivo
-                if (not u) or (u["is_active"] != 1):
-                    session.clear()
-                    return redirect(url_for("login"))
-
-                # Contraseña actual incorrecta
-                if not check_password_hash(u["password_hash"], actual):
-                    error = "La contraseña actual no es correcta."
-                else:
-                    # ✅ Recordar si venía de un cambio obligatorio ANTES de limpiarlo
-                    era_obligatorio = (g.user.get("debe_cambiar_pass") == 1)
-
-                    # ✅ Actualizar contraseña y quitar la obligación de cambiarla
-                    conn.execute("""
-                        UPDATE users
-                        SET password_hash = ?, debe_cambiar_pass = 0
-                        WHERE id = ?
-                    """, (generate_password_hash(nueva), g.user["id"]))
-
-                    # ✅ Actualizamos g.user temporalmente para evitar redirección en cadena antes del redirect
-                    g.user["debe_cambiar_pass"] = 0
-
-                    # ✅ Guardar mensaje
-                    session["flash_ok"] = "Contraseña actualizada correctamente."
-                    
-                    # ✅ Si el usuario estaba obligado a cambiarla, lo mandamos al index directo.
-                    # (Porque si no, se queda atrapado en la pantalla de contraseña sin botón de volver).
-                    if request.endpoint == "cambiar_password" and era_obligatorio:
-                        return redirect(url_for("ver_reportes"))
-
-                    # ✅ Si era un cambio normal voluntario, recargar la página
-                    return redirect(url_for("cambiar_password"))
-
-    return render_template("cambiar_password.html", error=error, ok=ok)
-
-
-# ---------------------------------------------------------
-# [HELPER] Permisos ADMIN
-# ---------------------------------------------------------
-def admin_required(view):
-    @wraps(view)
-    def wrapped(*args, **kwargs):
-        if g.user is None:
-            return redirect(url_for("login"))
-        if g.user["rol"] != "ADMIN":
-            return ("No autorizado", 403)
-        return view(*args, **kwargs)
-    return wrapped
 
 
 
@@ -256,7 +101,7 @@ def insert_and_get_id(conn, sql, params):
     sql2 = sql_params(sql)  # ? -> %s si es Postgres
 
     # Postgres
-    if is_postgres_conn(conn):
+    if getattr(conn, "_is_pg", is_postgres()):
         cur = conn.cursor()
         cur.execute(sql2 + " RETURNING id", params)
         new_id = cur.fetchone()[0]
@@ -269,24 +114,6 @@ def insert_and_get_id(conn, sql, params):
     return cur.lastrowid
 
 
-
-# ---------------------------------------------------------
-# [PERMISOS] Decorador por roles
-# ---------------------------------------------------------
-def roles_required(*roles):
-    """
-    Requiere usuario logueado y que su rol esté dentro de roles.
-    """
-    def decorator(view):
-        @wraps(view)
-        def wrapped(*args, **kwargs):
-            if g.user is None:
-                return redirect(url_for("login"))
-            if g.user["rol"] not in roles:
-                return ("No autorizado", 403)
-            return view(*args, **kwargs)
-        return wrapped
-    return decorator
 
 
 # ---------------------------------------------------------
@@ -301,7 +128,7 @@ def reporte_mina_required(view):
     @wraps(view)
     def wrapped(reporte_id, *args, **kwargs):
         if g.user is None:
-            return redirect(url_for("login"))
+            return redirect(url_for("auth.login"))
 
         # ADMIN bypass total
         if g.user["rol"] == "ADMIN":
@@ -1300,7 +1127,7 @@ def home():
 @app.route("/reportes")
 def ver_reportes():
     if g.user is None:
-        return redirect(url_for("login"))
+        return redirect(url_for("auth.login"))
 
     # -------------------------
     # Filtros (GET)
@@ -1373,7 +1200,7 @@ def ver_reportes():
 @app.route("/reportes/nuevo", methods=["GET", "POST"])
 def nuevo_reporte():
     if g.user is None:
-        return redirect(url_for("login"))
+        return redirect(url_for("auth.login"))
 
     # 🚫 DIGITADOR y LECTOR no pueden crear reportes
     if g.user["rol"] not in ("ADMIN", "SUPERVISOR"):
@@ -1583,7 +1410,7 @@ def gestion_areas(reporte_id):
 
         if request.method == "POST":
             if g.user is None:
-                return redirect(url_for("login"))
+                return redirect(url_for("auth.login"))
 
             if g.user["rol"] == "LECTOR":
                 error = "No tienes permisos para registrar información."
@@ -3155,7 +2982,7 @@ def seguridad(reporte_id):
             form_type = request.form.get("form_type", "").strip()
 
             if g.user is None:
-                return redirect(url_for("login"))
+                return redirect(url_for("auth.login"))
 
             if g.user["rol"] == "LECTOR":
                 msg = "No tienes permisos para registrar información."
@@ -4361,8 +4188,6 @@ def admin_usuario_eliminar(user_id):
 
 
 # ---------------------------------------------------------
-# [AUTH] Login / Logout
-# ---------------------------------------------------------
 @app.route("/login", methods=["GET", "POST"])
 def login():
     error = None
@@ -4408,7 +4233,7 @@ def login():
 @app.post("/logout")
 def logout():
     session.clear()
-    return redirect(url_for("login"))
+    return redirect(url_for("auth.login"))
 
 
 # ---------------------------------------------------------
