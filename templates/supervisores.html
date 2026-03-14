@@ -81,7 +81,7 @@
         <tr>
           <td>{{ it.grupo }}</td>
           <td>{{ it.supervisor }}</td>
-          {{ acciones_td(r, /reportes/ r.id /supervisores/ it.id /editar, /reportes/ r.id /supervisores/eliminar/ it.id) }}
+          {{ acciones_td(r, url_for('secciones.editar_item_supervisores', reporte_id=r.id, item_id=it.id), url_for('secciones.eliminar_item_supervisores', reporte_id=r.id, item_id=it.id)) }}
         </tr>
         {% endfor %}
       </tbody>

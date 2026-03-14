@@ -117,7 +117,7 @@
             </td>
             <td>{{ item.razon or 'Sin registros' }}</td>
 
-            {{ acciones_td(r, /reportes/ r.id /first_last/editar, /reportes/ r.id /first_last/eliminar) }}
+            {{ acciones_td(r, url_for('secciones.editar_item_first_last', reporte_id=r.id), url_for('secciones.eliminar_item_first_last', reporte_id=r.id)) }}
 
           </tr>
         </tbody>

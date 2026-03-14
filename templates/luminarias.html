@@ -63,7 +63,7 @@
             <td>{{ it.ubicacion }}</td>
 
             <!-- ACCIONES -->
-            {{ acciones_td(r, /reportes/ r.id /luminarias/ it.id /editar, /reportes/ r.id /luminarias/eliminar/ it.id) }}
+            {{ acciones_td(r, url_for('secciones.editar_item_luminarias', reporte_id=r.id, item_id=it.id), url_for('secciones.eliminar_item_luminarias', reporte_id=r.id, item_id=it.id)) }}
 
           </tr>
           {% endfor %}
