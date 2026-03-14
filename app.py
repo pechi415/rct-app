@@ -21,6 +21,9 @@ from flask import (
 from weasyprint import HTML
 from werkzeug.security import generate_password_hash, check_password_hash
 
+# Mensaje visible en logs para confirmar versión ejecutada.
+print("STARTUP: app.py cargado (fallback a SQLite disponible)", flush=True)
+
 # Flag que permite “caer” a SQLite si la conexión a Postgres falla.
 _USE_POSTGRES = None
 
