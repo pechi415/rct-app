@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import os
 import re
+import gc
 import sqlite3
 import psycopg2
 from psycopg2.extras import DictCursor
@@ -1557,6 +1558,8 @@ def reporte_pdf(reporte_id: int):
     base_dir = os.path.dirname(os.path.abspath(__file__))
     pdf_bytes = HTML(string=html, base_url=base_dir).write_pdf()
 
+    # Limpiar inmediatamente a Weasyprint de memoria para no saturar los 512MB de Render
+    gc.collect()
 
     resp = make_response(pdf_bytes)
     resp.headers["Content-Type"] = "application/pdf"
