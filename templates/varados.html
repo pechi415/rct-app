@@ -111,12 +111,12 @@
                     <span class="reporte-cerrado">Reporte cerrado</span>
                   {% else %}
                     <a class="btn btn-sm btn-outline-primary"
-                       href="{{ url_for('editar_item_varados', reporte_id=r.id, item_id=it.id) }}">
+                       href="{{ url_for('secciones.editar_item_varados', reporte_id=r.id, item_id=it.id) }}">
                       ✏️ Editar
                     </a>
 
                     <form method="POST"
-                          action="{{ url_for('eliminar_item_varados', reporte_id=r.id, item_id=it.id) }}"
+                          action="{{ url_for('secciones.eliminar_item_varados', reporte_id=r.id, item_id=it.id) }}"
                           class="m-0">
                       <button class="btn btn-sm btn-outline-danger"
                               onclick="return confirm('¿Eliminar este registro?');">
