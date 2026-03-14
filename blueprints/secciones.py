@@ -1,11 +1,17 @@
 
 import os
+import re
+import sqlite3
 from datetime import datetime
 from flask import Blueprint, render_template, request, redirect, url_for, g, flash, abort
 from database import get_conn, insert_and_get_id
-from utils import norm_text
+from utils import norm_text, calc_disponible_personal
 from blueprints.auth import roles_required
 from blueprints.reportes import fetch_reporte, reporte_mina_required
+from config import (
+    BAHIAS_POR_MINA, TIPOS_DISTRIBUCION_CAMIONES, CAMIONETAS_POR_MINA, ESTADOS_LIVIANO,
+    CATEGORIAS_PERSONAL, AREAS_OTRAS, ENTRENAMIENTOS_PERSONAL, TIPOS_CONTACTO, SUPERVISORES_POR_MINA, GRUPOS_SUP
+)
 
 secciones_bp = Blueprint("secciones", __name__)
 
