@@ -29,22 +29,9 @@ _USE_POSTGRES = None
 
 
 def is_postgres() -> bool:
-    """Determina si estamos en modo PostgreSQL según DATABASE_URL.
-
-    Si la conexión a Postgres falla, forzamos el modo SQLite para evitar que
-    la app se detenga en el arranque (Render necesita que el proceso quede
-    escuchando el puerto).
-    """
+    """Determina si estamos en modo PostgreSQL según DATABASE_URL y estado actual."""
     global _USE_POSTGRES
-    if _USE_POSTGRES is not None:
-        return _USE_POSTGRES
-
-    url = os.environ.get("DATABASE_URL", "").strip()
-    if not url:
-        _USE_POSTGRES = False
-    else:
-        _USE_POSTGRES = True
-    return _USE_POSTGRES
+    return _USE_POSTGRES if _USE_POSTGRES is not None else bool(os.environ.get("DATABASE_URL", "").strip())
 
 
 def get_db_connection():
@@ -660,10 +647,10 @@ def init_auth_tables():
                   id INTEGER PRIMARY KEY AUTOINCREMENT,
                   username TEXT NOT NULL UNIQUE,
                   password_hash TEXT NOT NULL,
-                  rol TEXT NOT NULL CHECK (rol IN ('ADMIN','SUPERVISOR','DIGITADOR','LECTOR')),
+                  rol TEXT NOT NULL,
                   is_active INTEGER NOT NULL DEFAULT 1,
                   debe_cambiar_pass INTEGER NOT NULL DEFAULT 0,
-                  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+                  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
                 )
             """)
             try:
