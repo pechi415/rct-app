@@ -35,6 +35,8 @@ init_db_app(app)
 
 from blueprints.auth import auth_bp, login_required, admin_required, roles_required
 app.register_blueprint(auth_bp)
+from blueprints.admin import admin_bp
+app.register_blueprint(admin_bp)
 
 
 # En local: clave fija para que la sesión no se invalide al cambiar cómo ejecutas la app
@@ -4002,11 +4004,11 @@ def admin_usuario_nuevo():
 
     if not username or not password:
         flash("Faltan datos obligatorios.", "warning")
-        return redirect(url_for("admin_usuario_nuevo"))
+        return redirect(url_for("admin.admin_usuario_nuevo"))
 
     if rol not in ROLES:
         flash("Rol inválido.", "warning")
-        return redirect(url_for("admin_usuario_nuevo"))
+        return redirect(url_for("admin.admin_usuario_nuevo"))
 
     # ✅ Regla de negocio: si no tiene minas, forzar INACTIVO (antes del INSERT)
     if not minas_sel:
@@ -4021,7 +4023,7 @@ def admin_usuario_nuevo():
             (username,)
         ).fetchone():
             flash("El usuario ya existe.", "warning")
-            return redirect(url_for("admin_usuario_nuevo"))
+            return redirect(url_for("admin.admin_usuario_nuevo"))
 
         # ✅ Crear user (solo columnas reales)
         if conn._is_pg:
@@ -4074,7 +4076,7 @@ def admin_usuario_nuevo():
         minas_txt = ", ".join(minas_sel)
         flash(f"Usuario creado: {username} ({rol}) — {estado_txt}. Minas: {minas_txt}", "success")
 
-    return redirect(url_for("admin_usuarios"))
+    return redirect(url_for("admin.admin_usuarios"))
 
 
 
@@ -4089,7 +4091,7 @@ def admin_usuario_editar(user_id):
 
         if not u:
             flash("Usuario no encontrado.", "warning")
-            return redirect(url_for("admin_usuarios"))
+            return redirect(url_for("admin.admin_usuarios"))
 
         if request.method == "GET":
             rows = conn.execute(
@@ -4114,12 +4116,12 @@ def admin_usuario_editar(user_id):
 
         if rol not in ROLES:
             flash("Rol inválido.", "warning")
-            return redirect(url_for("admin_usuario_editar", user_id=user_id))
+            return redirect(url_for("admin.admin_usuario_editar", user_id=user_id))
 
         # Validar nueva contraseña si se proporciona
         if new_password and len(new_password) < 6:
             flash("La contraseña debe tener al menos 6 caracteres.", "warning")
-            return redirect(url_for("admin_usuario_editar", user_id=user_id))
+            return redirect(url_for("admin.admin_usuario_editar", user_id=user_id))
 
         # Preparar valores a actualizar
         if new_password:
@@ -4159,7 +4161,7 @@ def admin_usuario_editar(user_id):
         conn.commit()
 
     flash("Usuario actualizado correctamente.", "success")
-    return redirect(url_for("admin_usuarios"))
+    return redirect(url_for("admin.admin_usuarios"))
 
 
 
@@ -4183,7 +4185,7 @@ def admin_usuario_eliminar(user_id):
         conn.execute("DELETE FROM user_minas WHERE user_id = ?", (user_id,))
         conn.execute("DELETE FROM users WHERE id = ?", (user_id,))
 
-    return redirect(url_for("admin_usuarios"))
+    return redirect(url_for("admin.admin_usuarios"))
 
 
 

@@ -3,7 +3,7 @@
 <div class="container py-4">
   <div class="d-flex justify-content-between align-items-center mb-3">
     <h3 class="m-0">Usuarios</h3>
-    <a class="btn btn-primary" href="{{ url_for('admin_usuario_nuevo') }}">+ Nuevo usuario</a>
+    <a class="btn btn-primary" href="{{ url_for('admin.admin_usuario_nuevo') }}">+ Nuevo usuario</a>
   </div>
 
   <div class="table-responsive">
@@ -38,13 +38,13 @@
           <td class="td-accion">
             <div class="acciones-usuarios">
               <a class="btn btn-sm btn-outline-primary"
-                 href="{{ url_for('admin_usuario_editar', user_id=u.id) }}">
+                 href="{{ url_for('admin.admin_usuario_editar', user_id=u.id) }}">
                 Editar
               </a>
 
               {% if u.id != g.user.id %}
                 <form method="post"
-                      action="{{ url_for('admin_usuario_eliminar', user_id=u.id) }}"
+                      action="{{ url_for('admin.admin_usuario_eliminar', user_id=u.id) }}"
                       onsubmit="return confirm('¿Seguro que deseas eliminar este usuario?');"
                       class="d-inline">
                   <button type="submit" class="btn btn-sm btn-outline-danger">
