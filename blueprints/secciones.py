@@ -200,7 +200,7 @@ def buses_bahias(reporte_id):
                         INSERT INTO buses_bahias (reporte_id, bahia, hora, observacion)
                         VALUES (?, ?, ?, ?)
                     """, (reporte_id, bahia, hora, observacion))
-                    return redirect(url_for("buses_bahias", reporte_id=reporte_id))
+                    return redirect(url_for("secciones.buses_bahias", reporte_id=reporte_id))
 
         # refrescar
         items = conn.execute(
@@ -229,7 +229,7 @@ def editar_item_buses(reporte_id, item_id):
         bahias_base = BAHIAS_POR_MINA.get(r["mina"], [])
 
         if r["estado"] == "CERRADO":
-            return redirect(url_for("buses_bahias", reporte_id=reporte_id))
+            return redirect(url_for("secciones.buses_bahias", reporte_id=reporte_id))
 
         item = conn.execute(
             "SELECT * FROM buses_bahias WHERE id = ? AND reporte_id = ?",
@@ -262,7 +262,7 @@ def editar_item_buses(reporte_id, item_id):
                     SET bahia = ?, hora = ?, observacion = ?
                     WHERE id = ? AND reporte_id = ?
                 """, (bahia, hora, observacion, item_id, reporte_id))
-                return redirect(url_for("buses_bahias", reporte_id=reporte_id))
+                return redirect(url_for("secciones.buses_bahias", reporte_id=reporte_id))
 
         return render_template(
             "buses_editar.html",
@@ -286,7 +286,7 @@ def eliminar_item_buses(reporte_id, item_id):
             abort(404)
 
         if rep["estado"] == "CERRADO":
-            return redirect(url_for("buses_bahias", reporte_id=reporte_id))
+            return redirect(url_for("secciones.buses_bahias", reporte_id=reporte_id))
 
         if g.user["rol"] == "LECTOR":
             return ("No autorizado", 403)
@@ -296,7 +296,7 @@ def eliminar_item_buses(reporte_id, item_id):
             (item_id, reporte_id)
         )
 
-    return redirect(url_for("buses_bahias", reporte_id=reporte_id))
+    return redirect(url_for("secciones.buses_bahias", reporte_id=reporte_id))
 
 
 # ---------------------------------------------------------
@@ -334,7 +334,7 @@ def equipos_varados(reporte_id):
                         VALUES (?, ?, ?, ?)
                     """, (reporte_id, equipo, ubicacion, motivo))
 
-                    return redirect(url_for("equipos_varados", reporte_id=reporte_id))
+                    return redirect(url_for("secciones.equipos_varados", reporte_id=reporte_id))
 
         items = conn.execute(
             "SELECT * FROM equipos_varados WHERE reporte_id = ? ORDER BY id DESC",
@@ -351,7 +351,7 @@ def editar_item_varados(reporte_id, item_id):
         r = fetch_reporte(conn, reporte_id)
 
         if r["estado"] == "CERRADO":
-            return redirect(url_for("equipos_varados", reporte_id=reporte_id))
+            return redirect(url_for("secciones.equipos_varados", reporte_id=reporte_id))
 
         it = conn.execute(
             "SELECT * FROM equipos_varados WHERE id = ? AND reporte_id = ?",
@@ -383,7 +383,7 @@ def editar_item_varados(reporte_id, item_id):
                     WHERE id = ? AND reporte_id = ?
                 """, (equipo, ubicacion, motivo, item_id, reporte_id))
 
-                return redirect(url_for("equipos_varados", reporte_id=reporte_id))
+                return redirect(url_for("secciones.equipos_varados", reporte_id=reporte_id))
 
     return render_template("varados_editar.html", r=r, reporte=r, it=it, error=error)
 
@@ -399,7 +399,7 @@ def eliminar_item_varados(reporte_id, item_id):
 
         # No permitir eliminar si está cerrado
         if r["estado"] == "CERRADO":
-            return redirect(url_for("equipos_varados", reporte_id=reporte_id))
+            return redirect(url_for("secciones.equipos_varados", reporte_id=reporte_id))
 
         # Validar que exista el item dentro del reporte
         it = conn.execute(
@@ -416,7 +416,7 @@ def eliminar_item_varados(reporte_id, item_id):
             (item_id, reporte_id)
         )
 
-    return redirect(url_for("equipos_varados", reporte_id=reporte_id))
+    return redirect(url_for("secciones.equipos_varados", reporte_id=reporte_id))
 
 
 # =========================================================
@@ -449,7 +449,7 @@ def ausentismo(reporte_id):
                         "INSERT INTO ausentismo (reporte_id, nombre, motivo) VALUES (?, ?, ?)",
                         (reporte_id, nombre, motivo)
                     )
-                    return redirect(url_for("ausentismo", reporte_id=reporte_id))
+                    return redirect(url_for("secciones.ausentismo", reporte_id=reporte_id))
 
         items = conn.execute(
             "SELECT * FROM ausentismo WHERE reporte_id = ? ORDER BY id DESC",
@@ -465,7 +465,7 @@ def editar_item_ausentismo(reporte_id, item_id):
     with get_conn() as conn:
         r = fetch_reporte(conn, reporte_id)
         if r["estado"] == "CERRADO":
-            return redirect(url_for("ausentismo", reporte_id=reporte_id))
+            return redirect(url_for("secciones.ausentismo", reporte_id=reporte_id))
 
         it = conn.execute(
             "SELECT * FROM ausentismo WHERE id = ? AND reporte_id = ?",
@@ -491,7 +491,7 @@ def editar_item_ausentismo(reporte_id, item_id):
                     SET nombre = ?, motivo = ?
                     WHERE id = ? AND reporte_id = ?
                 """, (nombre, motivo, item_id, reporte_id))
-                return redirect(url_for("ausentismo", reporte_id=reporte_id))
+                return redirect(url_for("secciones.ausentismo", reporte_id=reporte_id))
 
     return render_template("ausentismo_editar.html", r=r, reporte=r, it=it, error=error)
 
@@ -503,7 +503,7 @@ def eliminar_item_ausentismo(reporte_id, item_id):
         r = fetch_reporte(conn, reporte_id)
 
         if r["estado"] == "CERRADO":
-            return redirect(url_for("ausentismo", reporte_id=reporte_id))
+            return redirect(url_for("secciones.ausentismo", reporte_id=reporte_id))
 
         if g.user["rol"] == "LECTOR":
             return ("No autorizado", 403)
@@ -513,7 +513,7 @@ def eliminar_item_ausentismo(reporte_id, item_id):
             (item_id, reporte_id)
         )
 
-    return redirect(url_for("ausentismo", reporte_id=reporte_id))
+    return redirect(url_for("secciones.ausentismo", reporte_id=reporte_id))
 
 
 # ---------------------------------------------------------
@@ -543,7 +543,7 @@ def bombas(reporte_id):
                         INSERT INTO bombas (reporte_id, numero, estado, ubicacion)
                         VALUES (?, ?, ?, ?)
                     """, (reporte_id, numero, estado_bomba, ubicacion))
-                    return redirect(url_for("bombas", reporte_id=reporte_id))
+                    return redirect(url_for("secciones.bombas", reporte_id=reporte_id))
 
         items = conn.execute(
             "SELECT * FROM bombas WHERE reporte_id = ? ORDER BY id DESC",
@@ -559,7 +559,7 @@ def editar_bomba(reporte_id, item_id):
     with get_conn() as conn:
         r = fetch_reporte(conn, reporte_id)
         if r["estado"] == "CERRADO":
-            return redirect(url_for("bombas", reporte_id=reporte_id))
+            return redirect(url_for("secciones.bombas", reporte_id=reporte_id))
 
         it = conn.execute(
             "SELECT * FROM bombas WHERE id = ? AND reporte_id = ?",
@@ -586,7 +586,7 @@ def editar_bomba(reporte_id, item_id):
                     SET numero = ?, estado = ?, ubicacion = ?
                     WHERE id = ? AND reporte_id = ?
                 """, (numero, estado_bomba, ubicacion, item_id, reporte_id))
-                return redirect(url_for("bombas", reporte_id=reporte_id))
+                return redirect(url_for("secciones.bombas", reporte_id=reporte_id))
 
     return render_template("bombas_editar.html", r=r, reporte=r, it=it, error=error)
 
@@ -597,7 +597,7 @@ def eliminar_bomba(reporte_id, item_id):
     with get_conn() as conn:
         r = fetch_reporte(conn, reporte_id)
         if r["estado"] == "CERRADO":
-            return redirect(url_for("bombas", reporte_id=reporte_id))
+            return redirect(url_for("secciones.bombas", reporte_id=reporte_id))
 
         if g.user["rol"] == "LECTOR":
             return ("No autorizado", 403)
@@ -607,7 +607,7 @@ def eliminar_bomba(reporte_id, item_id):
             (item_id, reporte_id)
         )
 
-    return redirect(url_for("bombas", reporte_id=reporte_id))
+    return redirect(url_for("secciones.bombas", reporte_id=reporte_id))
 
 
 # ---------------------------------------------------------
@@ -641,7 +641,7 @@ def dist_camiones(reporte_id):
                             INSERT INTO distribucion_camiones (reporte_id, tipo, cantidad)
                             VALUES (?, ?, ?)
                         """, (reporte_id, tipo, cantidad))
-                        return redirect(url_for("dist_camiones", reporte_id=reporte_id))
+                        return redirect(url_for("secciones.dist_camiones", reporte_id=reporte_id))
 
         items = conn.execute("""
             SELECT id, tipo, cantidad
@@ -675,7 +675,7 @@ def editar_dist_camiones(reporte_id, item_id):
     with get_conn() as conn:
         r = fetch_reporte(conn, reporte_id)
         if r["estado"] == "CERRADO":
-            return redirect(url_for("dist_camiones", reporte_id=reporte_id))
+            return redirect(url_for("secciones.dist_camiones", reporte_id=reporte_id))
 
         item = conn.execute("""
             SELECT id, tipo, cantidad
@@ -707,7 +707,7 @@ def editar_dist_camiones(reporte_id, item_id):
                         SET tipo = ?, cantidad = ?
                         WHERE id = ? AND reporte_id = ?
                     """, (tipo, cantidad, item_id, reporte_id))
-                    return redirect(url_for("dist_camiones", reporte_id=reporte_id))
+                    return redirect(url_for("secciones.dist_camiones", reporte_id=reporte_id))
 
     return render_template(
         "dist_camiones_editar.html",
@@ -724,7 +724,7 @@ def eliminar_dist_camiones(reporte_id, item_id):
     with get_conn() as conn:
         r = fetch_reporte(conn, reporte_id)
         if r["estado"] == "CERRADO":
-            return redirect(url_for("dist_camiones", reporte_id=reporte_id))
+            return redirect(url_for("secciones.dist_camiones", reporte_id=reporte_id))
 
         if g.user["rol"] == "LECTOR":
             return ("No autorizado", 403)
@@ -734,7 +734,7 @@ def eliminar_dist_camiones(reporte_id, item_id):
             (item_id, reporte_id)
         )
 
-    return redirect(url_for("dist_camiones", reporte_id=reporte_id))
+    return redirect(url_for("secciones.dist_camiones", reporte_id=reporte_id))
 
 
 # =========================================================
@@ -802,7 +802,7 @@ def equipo_liviano(reporte_id):
                             INSERT INTO equipo_liviano (reporte_id, camioneta, estado, comentario)
                             VALUES (?, ?, ?, ?)
                         """, (reporte_id, camioneta_num, estado_l, comentario))
-                        return redirect(url_for("equipo_liviano", reporte_id=reporte_id))
+                        return redirect(url_for("secciones.equipo_liviano", reporte_id=reporte_id))
 
 
         items = conn.execute("""
@@ -839,7 +839,7 @@ def editar_equipo_liviano(reporte_id, item_id):
     with get_conn() as conn:
         r = fetch_reporte(conn, reporte_id)
         if r["estado"] == "CERRADO":
-            return redirect(url_for("equipo_liviano", reporte_id=reporte_id))
+            return redirect(url_for("secciones.equipo_liviano", reporte_id=reporte_id))
 
         it = conn.execute(
             "SELECT * FROM equipo_liviano WHERE id = ? AND reporte_id = ?",
@@ -902,7 +902,7 @@ def editar_equipo_liviano(reporte_id, item_id):
                         SET camioneta = ?, estado = ?, comentario = ?
                         WHERE id = ? AND reporte_id = ?
                     """, (camioneta_num, estado, comentario, item_id, reporte_id))
-                    return redirect(url_for("equipo_liviano", reporte_id=reporte_id))
+                    return redirect(url_for("secciones.equipo_liviano", reporte_id=reporte_id))
 
     camionetas_base = [str(x) for x in CAMIONETAS_POR_MINA.get(r["mina"], [])]
 
@@ -923,7 +923,7 @@ def eliminar_equipo_liviano(reporte_id, item_id):
     with get_conn() as conn:
         r = fetch_reporte(conn, reporte_id)
         if r["estado"] == "CERRADO":
-            return redirect(url_for("equipo_liviano", reporte_id=reporte_id))
+            return redirect(url_for("secciones.equipo_liviano", reporte_id=reporte_id))
 
         if g.user["rol"] == "LECTOR":
             return ("No autorizado", 403)
@@ -933,7 +933,7 @@ def eliminar_equipo_liviano(reporte_id, item_id):
             (item_id, reporte_id)
         )
 
-    return redirect(url_for("equipo_liviano", reporte_id=reporte_id))
+    return redirect(url_for("secciones.equipo_liviano", reporte_id=reporte_id))
 
 
 @secciones_bp.route("/reportes/<int:reporte_id>/equipo_liviano/todas_ok", methods=["POST"])
@@ -942,7 +942,7 @@ def equipo_liviano_todas_ok(reporte_id):
     with get_conn() as conn:
         r = fetch_reporte(conn, reporte_id)
         if r["estado"] == "CERRADO":
-            return redirect(url_for("equipo_liviano", reporte_id=reporte_id))
+            return redirect(url_for("secciones.equipo_liviano", reporte_id=reporte_id))
 
         if g.user["rol"] == "LECTOR":
             return ("No autorizado", 403)
@@ -965,7 +965,7 @@ def equipo_liviano_todas_ok(reporte_id):
                 VALUES (?, ?, 'OK', '')
             """, (reporte_id, c))
 
-    return redirect(url_for("equipo_liviano", reporte_id=reporte_id))
+    return redirect(url_for("secciones.equipo_liviano", reporte_id=reporte_id))
 
 
 # ---------------------------------------------------------
@@ -1018,7 +1018,7 @@ def distribucion_personal(reporte_id):
                             INSERT INTO distribucion_personal (reporte_id, categoria, cantidad)
                             VALUES (?, ?, ?)
                         """, (reporte_id, categoria, cantidad))
-                        return redirect(url_for("distribucion_personal", reporte_id=reporte_id))
+                        return redirect(url_for("secciones.distribucion_personal", reporte_id=reporte_id))
                     except sqlite3.IntegrityError:
                         error = "Esta categoría ya fue registrada. Edítala en Acciones."
 
@@ -1058,7 +1058,7 @@ def editar_personal(reporte_id, item_id):
     with get_conn() as conn:
         r = fetch_reporte(conn, reporte_id)
         if r["estado"] == "CERRADO":
-            return redirect(url_for("distribucion_personal", reporte_id=reporte_id))
+            return redirect(url_for("secciones.distribucion_personal", reporte_id=reporte_id))
 
         it = conn.execute("""
             SELECT id, categoria, cantidad
@@ -1084,7 +1084,7 @@ def editar_personal(reporte_id, item_id):
                     SET cantidad = ?
                     WHERE id = ? AND reporte_id = ?
                 """, (cantidad, item_id, reporte_id))
-                return redirect(url_for("distribucion_personal", reporte_id=reporte_id))
+                return redirect(url_for("secciones.distribucion_personal", reporte_id=reporte_id))
 
     return render_template("personal_editar.html", r=r, reporte=r, it=it, error=error)
 
@@ -1095,7 +1095,7 @@ def eliminar_personal(reporte_id, item_id):
     with get_conn() as conn:
         r = fetch_reporte(conn, reporte_id)
         if r["estado"] == "CERRADO":
-            return redirect(url_for("distribucion_personal", reporte_id=reporte_id))
+            return redirect(url_for("secciones.distribucion_personal", reporte_id=reporte_id))
 
         if g.user["rol"] == "LECTOR":
             return ("No autorizado", 403)
@@ -1105,7 +1105,7 @@ def eliminar_personal(reporte_id, item_id):
             (item_id, reporte_id)
         )
 
-    return redirect(url_for("distribucion_personal", reporte_id=reporte_id))
+    return redirect(url_for("secciones.distribucion_personal", reporte_id=reporte_id))
 
 
 # ---------------------------------------------------------
@@ -1136,7 +1136,7 @@ def otras_areas(reporte_id):
                         INSERT INTO operadores_otras_areas (reporte_id, nombre, area)
                         VALUES (?, ?, ?)
                     """, (reporte_id, nombre, area))
-                    return redirect(url_for("otras_areas", reporte_id=reporte_id))
+                    return redirect(url_for("secciones.otras_areas", reporte_id=reporte_id))
 
         items = conn.execute("""
             SELECT *
@@ -1160,7 +1160,7 @@ def editar_otras_areas(reporte_id, item_id):
     with get_conn() as conn:
         r = fetch_reporte(conn, reporte_id)
         if r["estado"] == "CERRADO":
-            return redirect(url_for("otras_areas", reporte_id=reporte_id))
+            return redirect(url_for("secciones.otras_areas", reporte_id=reporte_id))
 
         it = conn.execute(
             "SELECT * FROM operadores_otras_areas WHERE id = ? AND reporte_id = ?",
@@ -1188,7 +1188,7 @@ def editar_otras_areas(reporte_id, item_id):
                     SET nombre = ?, area = ?
                     WHERE id = ? AND reporte_id = ?
                 """, (nombre, area, item_id, reporte_id))
-                return redirect(url_for("otras_areas", reporte_id=reporte_id))
+                return redirect(url_for("secciones.otras_areas", reporte_id=reporte_id))
 
     return render_template(
         "otras_areas_editar.html",
@@ -1205,7 +1205,7 @@ def eliminar_otras_areas(reporte_id, item_id):
     with get_conn() as conn:
         r = fetch_reporte(conn, reporte_id)
         if r["estado"] == "CERRADO":
-            return redirect(url_for("otras_areas", reporte_id=reporte_id))
+            return redirect(url_for("secciones.otras_areas", reporte_id=reporte_id))
 
         if g.user["rol"] == "LECTOR":
             return ("No autorizado", 403)
@@ -1215,7 +1215,7 @@ def eliminar_otras_areas(reporte_id, item_id):
             (item_id, reporte_id)
         )
 
-    return redirect(url_for("otras_areas", reporte_id=reporte_id))
+    return redirect(url_for("secciones.otras_areas", reporte_id=reporte_id))
 
 
 # ---------------------------------------------------------
@@ -1260,7 +1260,7 @@ def entrenamiento_personal(reporte_id):
                             INSERT INTO entrenamiento_personal (reporte_id, entrenamiento, cantidad)
                             VALUES (?, ?, ?)
                         """, (reporte_id, entrenamiento, cantidad))
-                        return redirect(url_for("entrenamiento_personal", reporte_id=reporte_id))
+                        return redirect(url_for("secciones.entrenamiento_personal", reporte_id=reporte_id))
                     except sqlite3.IntegrityError:
                         error = "Este entrenamiento ya fue registrado. Edítalo en Acciones."
 
@@ -1290,7 +1290,7 @@ def editar_entrenamiento_personal(reporte_id, item_id):
     with get_conn() as conn:
         r = fetch_reporte(conn, reporte_id)
         if r["estado"] == "CERRADO":
-            return redirect(url_for("entrenamiento_personal", reporte_id=reporte_id))
+            return redirect(url_for("secciones.entrenamiento_personal", reporte_id=reporte_id))
 
         it = conn.execute("""
             SELECT id, entrenamiento, cantidad
@@ -1316,7 +1316,7 @@ def editar_entrenamiento_personal(reporte_id, item_id):
                     SET cantidad = ?
                     WHERE id = ? AND reporte_id = ?
                 """, (cantidad, item_id, reporte_id))
-                return redirect(url_for("entrenamiento_personal", reporte_id=reporte_id))
+                return redirect(url_for("secciones.entrenamiento_personal", reporte_id=reporte_id))
 
     return render_template(
         "entrenamiento_editar.html",
@@ -1335,7 +1335,7 @@ def eliminar_entrenamiento_personal(reporte_id, item_id):
             abort(404)
 
         if rep["estado"] == "CERRADO":
-            return redirect(url_for("entrenamiento_personal", reporte_id=reporte_id))
+            return redirect(url_for("secciones.entrenamiento_personal", reporte_id=reporte_id))
 
         if g.user["rol"] == "LECTOR":
             return ("No autorizado", 403)
@@ -1345,7 +1345,7 @@ def eliminar_entrenamiento_personal(reporte_id, item_id):
             (item_id, reporte_id)
         )
 
-    return redirect(url_for("entrenamiento_personal", reporte_id=reporte_id))
+    return redirect(url_for("secciones.entrenamiento_personal", reporte_id=reporte_id))
 
 
 # =========================================================
@@ -1382,7 +1382,7 @@ def luminarias(reporte_id):
                             INSERT INTO luminarias (reporte_id, numero, ubicacion)
                             VALUES (?, ?, ?)
                         """, (reporte_id, numero, ubicacion))
-                        return redirect(url_for("luminarias", reporte_id=reporte_id))
+                        return redirect(url_for("secciones.luminarias", reporte_id=reporte_id))
                     except sqlite3.IntegrityError:
                         error = f"La luminaria {numero} ya fue registrada en este reporte."
 
@@ -1402,7 +1402,7 @@ def editar_luminaria(reporte_id, item_id):
     with get_conn() as conn:
         r = fetch_reporte(conn, reporte_id)
         if r["estado"] == "CERRADO":
-            return redirect(url_for("luminarias", reporte_id=reporte_id))
+            return redirect(url_for("secciones.luminarias", reporte_id=reporte_id))
 
         it = conn.execute(
             "SELECT * FROM luminarias WHERE id = ? AND reporte_id = ?",
@@ -1442,7 +1442,7 @@ def editar_luminaria(reporte_id, item_id):
                         SET numero = ?, ubicacion = ?
                         WHERE id = ? AND reporte_id = ?
                     """, (numero, ubicacion, item_id, reporte_id))
-                    return redirect(url_for("luminarias", reporte_id=reporte_id))
+                    return redirect(url_for("secciones.luminarias", reporte_id=reporte_id))
 
     return render_template("luminarias_editar.html", r=r, reporte=r, it=it, error=error)
 
@@ -1456,7 +1456,7 @@ def eliminar_luminaria(reporte_id, item_id):
             abort(404)
 
         if rep["estado"] == "CERRADO":
-            return redirect(url_for("luminarias", reporte_id=reporte_id))
+            return redirect(url_for("secciones.luminarias", reporte_id=reporte_id))
 
         if g.user["rol"] == "LECTOR":
             return ("No autorizado", 403)
@@ -1466,7 +1466,7 @@ def eliminar_luminaria(reporte_id, item_id):
             (item_id, reporte_id)
         )
 
-    return redirect(url_for("luminarias", reporte_id=reporte_id))
+    return redirect(url_for("secciones.luminarias", reporte_id=reporte_id))
 
 
 # ---------------------------------------------------------
@@ -1497,7 +1497,7 @@ def contactos_operadores(reporte_id):
                         INSERT INTO contactos_operadores (reporte_id, tipo, operador)
                         VALUES (?, ?, ?)
                     """, (reporte_id, tipo, operador))
-                    return redirect(url_for("contactos_operadores", reporte_id=reporte_id))
+                    return redirect(url_for("secciones.contactos_operadores", reporte_id=reporte_id))
 
         items = conn.execute("""
             SELECT *
@@ -1521,7 +1521,7 @@ def editar_contacto_operador(reporte_id, item_id):
     with get_conn() as conn:
         r = fetch_reporte(conn, reporte_id)
         if r["estado"] == "CERRADO":
-            return redirect(url_for("contactos_operadores", reporte_id=reporte_id))
+            return redirect(url_for("secciones.contactos_operadores", reporte_id=reporte_id))
 
         it = conn.execute(
             "SELECT * FROM contactos_operadores WHERE id = ? AND reporte_id = ?",
@@ -1549,7 +1549,7 @@ def editar_contacto_operador(reporte_id, item_id):
                     SET tipo = ?, operador = ?
                     WHERE id = ? AND reporte_id = ?
                 """, (tipo, operador, item_id, reporte_id))
-                return redirect(url_for("contactos_operadores", reporte_id=reporte_id))
+                return redirect(url_for("secciones.contactos_operadores", reporte_id=reporte_id))
 
     return render_template(
         "contactos_editar.html",
@@ -1569,7 +1569,7 @@ def eliminar_contacto_operador(reporte_id, item_id):
             abort(404)
 
         if rep["estado"] == "CERRADO":
-            return redirect(url_for("contactos_operadores", reporte_id=reporte_id))
+            return redirect(url_for("secciones.contactos_operadores", reporte_id=reporte_id))
 
         if g.user["rol"] == "LECTOR":
             return ("No autorizado", 403)
@@ -1579,7 +1579,7 @@ def eliminar_contacto_operador(reporte_id, item_id):
             (item_id, reporte_id)
         )
 
-    return redirect(url_for("contactos_operadores", reporte_id=reporte_id))
+    return redirect(url_for("secciones.contactos_operadores", reporte_id=reporte_id))
 
 
 # ---------------------------------------------------------
@@ -1639,7 +1639,7 @@ def seguridad(reporte_id):
                                         (reporte_id, lugar, lugar_norm, hallazgos, divulgada)
                                         VALUES (?, ?, ?, ?, ?)
                                     """, (reporte_id, lugar, lugar_norm, hallazgos, divulgada))
-                                    return redirect(url_for("seguridad", reporte_id=reporte_id))
+                                    return redirect(url_for("secciones.seguridad", reporte_id=reporte_id))
                                 except sqlite3.IntegrityError:
                                     error_obs = "Este registro ya existe (duplicado)."
 
@@ -1667,7 +1667,7 @@ def seguridad(reporte_id):
                                         (reporte_id, tema, tema_norm, personas, lugar, lugar_norm)
                                         VALUES (?, ?, ?, ?, ?, ?)
                                     """, (reporte_id, tema, tema_norm, personas, lugar, lugar_norm))
-                                    return redirect(url_for("seguridad", reporte_id=reporte_id))
+                                    return redirect(url_for("secciones.seguridad", reporte_id=reporte_id))
                                 except sqlite3.IntegrityError:
                                     error_charla = "Este registro ya existe (duplicado)."
                 else:
@@ -1706,7 +1706,7 @@ def seguridad_obs_editar(reporte_id, item_id):
     with get_conn() as conn:
         r = fetch_reporte(conn, reporte_id)
         if r["estado"] == "CERRADO":
-            return redirect(url_for("seguridad", reporte_id=reporte_id))
+            return redirect(url_for("secciones.seguridad", reporte_id=reporte_id))
 
         it = conn.execute("""
             SELECT id, lugar, hallazgos, divulgada
@@ -1747,7 +1747,7 @@ def seguridad_obs_editar(reporte_id, item_id):
                                 SET lugar = ?, lugar_norm = ?, hallazgos = ?, divulgada = ?
                                 WHERE id = ? AND reporte_id = ?
                             """, (lugar, lugar_norm, hallazgos, divulgada, item_id, reporte_id))
-                            return redirect(url_for("seguridad", reporte_id=reporte_id))
+                            return redirect(url_for("secciones.seguridad", reporte_id=reporte_id))
                         except sqlite3.IntegrityError:
                             error = "Este registro ya existe (duplicado)."
 
@@ -1769,7 +1769,7 @@ def seguridad_obs_eliminar(reporte_id, item_id):
             abort(404)
 
         if rep["estado"] == "CERRADO":
-            return redirect(url_for("seguridad", reporte_id=reporte_id))
+            return redirect(url_for("secciones.seguridad", reporte_id=reporte_id))
 
         if g.user["rol"] == "LECTOR":
             return ("No autorizado", 403)
@@ -1779,7 +1779,7 @@ def seguridad_obs_eliminar(reporte_id, item_id):
             (item_id, reporte_id)
         )
 
-    return redirect(url_for("seguridad", reporte_id=reporte_id))
+    return redirect(url_for("secciones.seguridad", reporte_id=reporte_id))
 
 
 @secciones_bp.route("/reportes/<int:reporte_id>/seguridad/charla/<int:item_id>/editar", methods=["GET", "POST"])
@@ -1788,7 +1788,7 @@ def seguridad_charla_editar(reporte_id, item_id):
     with get_conn() as conn:
         r = fetch_reporte(conn, reporte_id)
         if r["estado"] == "CERRADO":
-            return redirect(url_for("seguridad", reporte_id=reporte_id))
+            return redirect(url_for("secciones.seguridad", reporte_id=reporte_id))
 
         it = conn.execute("""
             SELECT id, tema, personas, lugar
@@ -1827,7 +1827,7 @@ def seguridad_charla_editar(reporte_id, item_id):
                                 SET tema = ?, tema_norm = ?, personas = ?, lugar = ?, lugar_norm = ?
                                 WHERE id = ? AND reporte_id = ?
                             """, (tema, tema_norm, personas, lugar, lugar_norm, item_id, reporte_id))
-                            return redirect(url_for("seguridad", reporte_id=reporte_id))
+                            return redirect(url_for("secciones.seguridad", reporte_id=reporte_id))
                         except sqlite3.IntegrityError:
                             error = "Este registro ya existe (duplicado)."
 
@@ -1848,7 +1848,7 @@ def seguridad_charla_eliminar(reporte_id, item_id):
             abort(404)
 
         if rep["estado"] == "CERRADO":
-            return redirect(url_for("seguridad", reporte_id=reporte_id))
+            return redirect(url_for("secciones.seguridad", reporte_id=reporte_id))
 
         if g.user["rol"] == "LECTOR":
             return ("No autorizado", 403)
@@ -1858,7 +1858,7 @@ def seguridad_charla_eliminar(reporte_id, item_id):
             (item_id, reporte_id)
         )
 
-    return redirect(url_for("seguridad", reporte_id=reporte_id))
+    return redirect(url_for("secciones.seguridad", reporte_id=reporte_id))
 
 
 # =========================================================
@@ -1936,7 +1936,7 @@ def first_last(reporte_id):
                             final_pit2, final_pit5,
                             camiones, razon
                         ))
-                        return redirect(url_for("first_last", reporte_id=reporte_id))
+                        return redirect(url_for("secciones.first_last", reporte_id=reporte_id))
 
         # refrescar
         item = conn.execute(
@@ -1953,14 +1953,14 @@ def editar_first_last(reporte_id):
     with get_conn() as conn:
         r = fetch_reporte(conn, reporte_id)
         if r["estado"] == "CERRADO":
-            return redirect(url_for("first_last", reporte_id=reporte_id))
+            return redirect(url_for("secciones.first_last", reporte_id=reporte_id))
 
         it = conn.execute(
             "SELECT * FROM first_last WHERE reporte_id = ?",
             (reporte_id,)
         ).fetchone()
         if it is None:
-            return redirect(url_for("first_last", reporte_id=reporte_id))
+            return redirect(url_for("secciones.first_last", reporte_id=reporte_id))
 
         error = None
 
@@ -2020,7 +2020,7 @@ def editar_first_last(reporte_id):
                     camiones, razon,
                     reporte_id
                 ))
-                return redirect(url_for("first_last", reporte_id=reporte_id))
+                return redirect(url_for("secciones.first_last", reporte_id=reporte_id))
 
         # ✅ IMPORTANTE: siempre retornar respuesta (evita el error de "did not return a valid response")
         return render_template("first_last_editar.html", r=r, reporte=r, it=it, error=error)
@@ -2035,14 +2035,14 @@ def eliminar_first_last(reporte_id):
             abort(404)
 
         if rep["estado"] == "CERRADO":
-            return redirect(url_for("first_last", reporte_id=reporte_id))
+            return redirect(url_for("secciones.first_last", reporte_id=reporte_id))
 
         if g.user["rol"] == "LECTOR":
             return ("No autorizado", 403)
 
         conn.execute("DELETE FROM first_last WHERE reporte_id = ?", (reporte_id,))
 
-    return redirect(url_for("first_last", reporte_id=reporte_id))
+    return redirect(url_for("secciones.first_last", reporte_id=reporte_id))
 
 
 # ---------------------------------------------------------
@@ -2077,7 +2077,7 @@ def pts_divulgacion(reporte_id):
                             "INSERT INTO pts_divulgacion (reporte_id, texto) VALUES (?, ?)",
                             (reporte_id, texto)
                         )
-                        return redirect(url_for("pts_divulgacion", reporte_id=reporte_id))
+                        return redirect(url_for("secciones.pts_divulgacion", reporte_id=reporte_id))
 
         item = conn.execute(
             "SELECT * FROM pts_divulgacion WHERE reporte_id = ?",
@@ -2093,14 +2093,14 @@ def pts_editar(reporte_id):
     with get_conn() as conn:
         r = fetch_reporte(conn, reporte_id)
         if r["estado"] == "CERRADO":
-            return redirect(url_for("pts_divulgacion", reporte_id=reporte_id))
+            return redirect(url_for("secciones.pts_divulgacion", reporte_id=reporte_id))
 
         item = conn.execute(
             "SELECT * FROM pts_divulgacion WHERE reporte_id = ?",
             (reporte_id,)
         ).fetchone()
         if item is None:
-            return redirect(url_for("pts_divulgacion", reporte_id=reporte_id))
+            return redirect(url_for("secciones.pts_divulgacion", reporte_id=reporte_id))
 
         error = None
 
@@ -2116,7 +2116,7 @@ def pts_editar(reporte_id):
                     "UPDATE pts_divulgacion SET texto = ? WHERE reporte_id = ?",
                     (texto, reporte_id)
                 )
-                return redirect(url_for("pts_divulgacion", reporte_id=reporte_id))
+                return redirect(url_for("secciones.pts_divulgacion", reporte_id=reporte_id))
 
     return render_template("pts_editar.html", r=r, reporte=r, item=item, error=error)
 
@@ -2130,14 +2130,14 @@ def pts_eliminar(reporte_id):
             abort(404)
 
         if rep["estado"] == "CERRADO":
-            return redirect(url_for("pts_divulgacion", reporte_id=reporte_id))
+            return redirect(url_for("secciones.pts_divulgacion", reporte_id=reporte_id))
 
         if g.user["rol"] == "LECTOR":
             return ("No autorizado", 403)
 
         conn.execute("DELETE FROM pts_divulgacion WHERE reporte_id = ?", (reporte_id,))
 
-    return redirect(url_for("pts_divulgacion", reporte_id=reporte_id))
+    return redirect(url_for("secciones.pts_divulgacion", reporte_id=reporte_id))
 
 
 # ---------------------------------------------------------
@@ -2164,7 +2164,7 @@ def comentarios_turno(reporte_id):
                         "INSERT INTO comentarios_turno (reporte_id, comentario) VALUES (?, ?)",
                         (reporte_id, comentario)
                     )
-                    return redirect(url_for("comentarios_turno", reporte_id=reporte_id))
+                    return redirect(url_for("secciones.comentarios_turno", reporte_id=reporte_id))
 
         items = conn.execute(
             "SELECT * FROM comentarios_turno WHERE reporte_id = ? ORDER BY id DESC",
@@ -2180,7 +2180,7 @@ def comentarios_editar(reporte_id, item_id):
     with get_conn() as conn:
         r = fetch_reporte(conn, reporte_id)
         if r["estado"] == "CERRADO":
-            return redirect(url_for("comentarios_turno", reporte_id=reporte_id))
+            return redirect(url_for("secciones.comentarios_turno", reporte_id=reporte_id))
 
         item = conn.execute(
             "SELECT * FROM comentarios_turno WHERE id = ? AND reporte_id = ?",
@@ -2203,7 +2203,7 @@ def comentarios_editar(reporte_id, item_id):
                     "UPDATE comentarios_turno SET comentario = ? WHERE id = ? AND reporte_id = ?",
                     (comentario, item_id, reporte_id)
                 )
-                return redirect(url_for("comentarios_turno", reporte_id=reporte_id))
+                return redirect(url_for("secciones.comentarios_turno", reporte_id=reporte_id))
 
     return render_template("comentarios_editar.html", r=r, reporte=r, item=item, error=error)
 
@@ -2217,7 +2217,7 @@ def comentarios_eliminar(reporte_id, item_id):
             abort(404)
 
         if rep["estado"] == "CERRADO":
-            return redirect(url_for("comentarios_turno", reporte_id=reporte_id))
+            return redirect(url_for("secciones.comentarios_turno", reporte_id=reporte_id))
 
         if g.user["rol"] == "LECTOR":
             return ("No autorizado", 403)
@@ -2227,7 +2227,7 @@ def comentarios_eliminar(reporte_id, item_id):
             (item_id, reporte_id)
         )
 
-    return redirect(url_for("comentarios_turno", reporte_id=reporte_id))
+    return redirect(url_for("secciones.comentarios_turno", reporte_id=reporte_id))
 
 
 # ---------------------------------------------------------
@@ -2276,7 +2276,7 @@ def supervisores_turno(reporte_id):
                             except sqlite3.IntegrityError:
                                 pass
 
-                        return redirect(url_for("supervisores_turno", reporte_id=reporte_id))
+                        return redirect(url_for("secciones.supervisores_turno", reporte_id=reporte_id))
 
         items = conn.execute("""
             SELECT *
@@ -2308,7 +2308,7 @@ def editar_supervisor_turno(reporte_id, item_id):
         sup_mina = SUPERVISORES_POR_MINA.get(r["mina"], {})
 
         if r["estado"] == "CERRADO":
-            return redirect(url_for("supervisores_turno", reporte_id=reporte_id))
+            return redirect(url_for("secciones.supervisores_turno", reporte_id=reporte_id))
 
         it = conn.execute("""
             SELECT *
@@ -2350,7 +2350,7 @@ def editar_supervisor_turno(reporte_id, item_id):
                             WHERE id = ? AND reporte_id = ?
                         """, (grupo, supervisor, item_id, reporte_id))
 
-                        return redirect(url_for("supervisores_turno", reporte_id=reporte_id))
+                        return redirect(url_for("secciones.supervisores_turno", reporte_id=reporte_id))
 
     return render_template(
         "supervisores_editar.html",
@@ -2372,7 +2372,7 @@ def eliminar_supervisor_turno(reporte_id, item_id):
             abort(404)
 
         if rep["estado"] == "CERRADO":
-            return redirect(url_for("supervisores_turno", reporte_id=reporte_id))
+            return redirect(url_for("secciones.supervisores_turno", reporte_id=reporte_id))
 
         if g.user["rol"] == "LECTOR":
             return ("No autorizado", 403)
@@ -2382,7 +2382,7 @@ def eliminar_supervisor_turno(reporte_id, item_id):
             WHERE id = ? AND reporte_id = ?
         """, (item_id, reporte_id))
 
-    return redirect(url_for("supervisores_turno", reporte_id=reporte_id))
+    return redirect(url_for("secciones.supervisores_turno", reporte_id=reporte_id))
 
 
 # ---------------------------------------------------------

@@ -74,7 +74,7 @@
             <td>{{ it.entrenamiento }}</td>
             <td>{{ it.cantidad }}</td>
 
-            {{ acciones_td(r, url_for('secciones.editar_item_entrenamiento', reporte_id=r.id, item_id=it.id), url_for('secciones.eliminar_item_entrenamiento', reporte_id=r.id, item_id=it.id)) }}
+            {{ acciones_td(r, url_for('secciones.editar_entrenamiento_personal', reporte_id=r.id, item_id=it.id), url_for('secciones.eliminar_entrenamiento_personal', reporte_id=r.id, item_id=it.id)) }}
 
           </tr>
           {% endfor %}

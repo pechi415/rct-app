@@ -68,7 +68,7 @@
             <td>{{ it.tipo }}</td>
             <td>{{ it.operador }}</td>
 
-            {{ acciones_td(r, url_for('secciones.editar_item_contactos', reporte_id=r.id, item_id=it.id), url_for('secciones.eliminar_item_contactos', reporte_id=r.id, item_id=it.id)) }}
+            {{ acciones_td(r, url_for('secciones.editar_contacto_operador', reporte_id=r.id, item_id=it.id), url_for('secciones.eliminar_contacto_operador', reporte_id=r.id, item_id=it.id)) }}
           </tr>
           {% endfor %}
         </tbody>

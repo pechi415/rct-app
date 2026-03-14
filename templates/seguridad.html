@@ -80,7 +80,7 @@
                       <td>{{ it.lugar }}</td>
                       <td>{{ it.hallazgos }}</td>
                       <td>{% if it.divulgada == 1 %}Sí{% else %}No{% endif %}</td>
-                      {{ acciones_td(r, url_for('secciones.editar_item_seguridad_obs', reporte_id=r.id, item_id=it.id), url_for('secciones.eliminar_item_seguridad_obs', reporte_id=r.id, item_id=it.id)) }}
+                      {{ acciones_td(r, url_for('secciones.seguridad_obs_editar', reporte_id=r.id, item_id=it.id), url_for('secciones.seguridad_obs_eliminar', reporte_id=r.id, item_id=it.id)) }}
                     </tr>
                   {% endfor %}
                 </tbody>
@@ -153,7 +153,7 @@
                       <td>{{ it.tema }}</td>
                       <td>{{ it.personas }}</td>
                       <td>{{ it.lugar }}</td>
-                      {{ acciones_td(r, url_for('secciones.editar_item_seguridad_charlas', reporte_id=r.id, item_id=it.id), url_for('secciones.eliminar_item_seguridad_charlas', reporte_id=r.id, item_id=it.id)) }}
+                      {{ acciones_td(r, url_for('secciones.seguridad_charla_editar', reporte_id=r.id, item_id=it.id), url_for('secciones.seguridad_charla_eliminar', reporte_id=r.id, item_id=it.id)) }}
                     </tr>
                   {% endfor %}
                 </tbody>

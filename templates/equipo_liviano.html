@@ -134,7 +134,7 @@
       <td>{{ it.estado }}</td>
       <td>{{ it.comentario }}</td>
 
-      {{ acciones_td(r, url_for('secciones.editar_item_equipo_liviano', reporte_id=r.id, item_id=it.id), url_for('secciones.eliminar_item_equipo_liviano', reporte_id=r.id, item_id=it.id)) }}
+      {{ acciones_td(r, url_for('secciones.editar_equipo_liviano', reporte_id=r.id, item_id=it.id), url_for('secciones.eliminar_equipo_liviano', reporte_id=r.id, item_id=it.id)) }}
     </tr>
     {% endfor %}
   </tbody>
