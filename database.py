@@ -12,6 +12,22 @@ def is_postgres() -> bool:
     """Siempre usar PostgreSQL si DATABASE_URL está definida."""
     return bool(os.environ.get("DATABASE_URL", "").strip())
 
+def insert_and_get_id(conn, sql, params):
+    sql2 = sql_params(sql)  # ? -> %s si es Postgres
+
+    # Postgres
+    if getattr(conn, "_is_pg", is_postgres()):
+        cur = conn.cursor()
+        cur.execute(sql2 + " RETURNING id", params)
+        new_id = cur.fetchone()[0]
+        conn.commit()
+        return new_id
+
+    # SQLite
+    cur = conn.execute(sql, params)
+    conn.commit()
+    return cur.lastrowid
+
 
 def get_db_connection():
     database_url = os.environ.get("DATABASE_URL")
