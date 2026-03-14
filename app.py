@@ -4760,11 +4760,15 @@ def eliminar_reporte(reporte_id):
 # ---------------------------------------------------------
 # [INIT] Ejecutar inicialización (ORDEN CORRECTO)
 # ---------------------------------------------------------
-init_auth_tables()
-init_db()
-
-seed_admin_once()
-seed_user_minas_once()
+try:
+    init_auth_tables()
+    init_db()
+    seed_admin_once()
+    seed_user_minas_once()
+    print("INFO: Base de datos inicializada correctamente.", flush=True)
+except Exception as e:
+    print(f"ERROR: No se pudo inicializar la base de datos: {e}", flush=True)
+    print("WARNING: La app iniciará, pero las operaciones de BD fallarán hasta corregir la conexión.", flush=True)
 
 # =========================================================
 # RUN
