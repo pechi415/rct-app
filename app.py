@@ -21,37 +21,28 @@ from flask import (
 from weasyprint import HTML
 from werkzeug.security import generate_password_hash, check_password_hash
 
-# Mensaje visible en logs para confirmar versión ejecutada.
-print("STARTUP: app.py cargado (fallback a SQLite disponible)", flush=True)
-
 # Flag que permite “caer” a SQLite si la conexión a Postgres falla.
 _USE_POSTGRES = None
 
 
 def is_postgres() -> bool:
-    """Determina si estamos en modo PostgreSQL según DATABASE_URL y estado actual."""
-    global _USE_POSTGRES
-    return _USE_POSTGRES if _USE_POSTGRES is not None else bool(os.environ.get("DATABASE_URL", "").strip())
+    """Siempre usar PostgreSQL si DATABASE_URL está definida."""
+    return bool(os.environ.get("DATABASE_URL", "").strip())
 
 
 def get_db_connection():
     database_url = os.environ.get("DATABASE_URL")
 
-    if database_url and is_postgres():
-        # Render / PostgreSQL
-        try:
-            conn = psycopg2.connect(database_url, cursor_factory=DictCursor, connect_timeout=5)
-            conn.autocommit = True  # <-- CLAVE
-            return conn
-        except Exception as e:
-            # Si no podemos conectar a Postgres, seguimos con SQLite local.
-            print(f"WARNING: no se pudo conectar a PostgreSQL ({e}). Usando SQLite local.", flush=True)
-            _USE_POSTGRES = False
-
-    # Local / SQLite
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
-    return conn
+    if database_url:
+        # Render / PostgreSQL - SIEMPRE usar Postgres si DATABASE_URL existe
+        conn = psycopg2.connect(database_url, cursor_factory=DictCursor)
+        conn.autocommit = True  # <-- CLAVE
+        return conn
+    else:
+        # Local / SQLite
+        conn = sqlite3.connect(DB_PATH)
+        conn.row_factory = sqlite3.Row
+        return conn
 
 
 def sql_params(query: str) -> str:
@@ -4769,15 +4760,11 @@ def eliminar_reporte(reporte_id):
 # ---------------------------------------------------------
 # [INIT] Ejecutar inicialización (ORDEN CORRECTO)
 # ---------------------------------------------------------
-try:
-    init_auth_tables()
-    init_db()
-    seed_admin_once()
-    seed_user_minas_once()
-except Exception as e:
-    # No queremos que un fallo de conexión a la BD detenga el proceso.
-    # Render espera que el servidor escuche un puerto.
-    print("WARNING: No se pudo inicializar la base de datos:", e, flush=True)
+init_auth_tables()
+init_db()
+
+seed_admin_once()
+seed_user_minas_once()
 
 # =========================================================
 # RUN
