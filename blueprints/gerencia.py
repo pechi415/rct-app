@@ -146,10 +146,38 @@ def dashboard(fecha, turno):
     if request.args.get("pdf") == "1":
         html = render_template("pdf/gerencia_pdf.html", **gerencia_context)
         from flask import current_app
-        from weasyprint import HTML
+        import subprocess
+        import tempfile
+        import os
+        
         base_dir = current_app.root_path
-        pdf_bytes = HTML(string=html, base_url=base_dir).write_pdf()
-        gc.collect()
+        
+        with tempfile.NamedTemporaryFile(suffix=".html", delete=False) as f_in, \
+             tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as f_out:
+            f_in.write(html.encode("utf-8"))
+            in_name = f_in.name
+            out_name = f_out.name
+            
+        try:
+            # Ejecutar weasyprint como subproceso CLI completamente aislado para evitar
+            # cruce de memoria y OOM Killer en el worker Gunicorn de Render.
+            subprocess.run(
+                ["python", "-m", "weasyprint", in_name, out_name, "--base-url", str(base_dir)],
+                check=True,
+                timeout=55
+            )
+            with open(out_name, "rb") as f:
+                pdf_bytes = f.read()
+        except subprocess.TimeoutExpired:
+            flash("Error: Tiempo de espera agotado al generar el PDF. El servidor está saturado.", "danger")
+            return redirect(url_for("gerencia.index"))
+        except subprocess.CalledProcessError:
+            flash("Error interno al renderizar PDF. La tarea consumió demasiada memoria del servidor.", "danger")
+            return redirect(url_for("gerencia.index"))
+        finally:
+            if os.path.exists(in_name): os.remove(in_name)
+            if os.path.exists(out_name): os.remove(out_name)
+            gc.collect()
 
         resp = make_response(pdf_bytes)
         resp.headers["Content-Type"] = "application/pdf"

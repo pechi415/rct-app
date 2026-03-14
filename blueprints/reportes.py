@@ -325,12 +325,34 @@ def reporte_pdf(reporte_id: int):
     html = render_template(tpl, **ctx)
 
     from flask import current_app
+    import subprocess
+    import tempfile
+    import os
+
     base_dir = current_app.root_path
     
-    pdf_bytes = HTML(string=html, base_url=base_dir).write_pdf()
+    with tempfile.NamedTemporaryFile(suffix=".html", delete=False) as f_in, \
+         tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as f_out:
+        f_in.write(html.encode("utf-8"))
+        in_name = f_in.name
+        out_name = f_out.name
 
-    # Limpieza proactiva de RAM
-    gc.collect()
+    try:
+        subprocess.run(
+            ["python", "-m", "weasyprint", in_name, out_name, "--base-url", str(base_dir)],
+            check=True,
+            timeout=55
+        )
+        with open(out_name, "rb") as f:
+            pdf_bytes = f.read()
+    except subprocess.TimeoutExpired:
+        abort(504, "El servidor tardó demasiado en generar el PDF (Timeout).")
+    except subprocess.CalledProcessError:
+        abort(500, "Error interno al renderizar el archivo PDF.")
+    finally:
+        if os.path.exists(in_name): os.remove(in_name)
+        if os.path.exists(out_name): os.remove(out_name)
+        gc.collect()
 
     resp = make_response(pdf_bytes)
     resp.headers["Content-Type"] = "application/pdf"
