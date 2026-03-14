@@ -174,6 +174,10 @@
                   <a class="btn btn-sm btn-outline-primary" href="{{ url_for('reporte_pdf', reporte_id=r.id, v='B') }}" target="_blank">
                     📄 PDF
                   </a>
+                  <!-- [NUEVO] Botón de impresión nativa (Prueba OOM) -->
+                  <a class="btn btn-sm btn-outline-success" href="{{ url_for('reporte_print_web', reporte_id=r.id, v='B') }}" target="_blank">
+                    🖨️ Imprimir (Rápido)
+                  </a>
                   {% endif %}
 
 

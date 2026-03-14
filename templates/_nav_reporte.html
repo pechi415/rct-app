@@ -14,11 +14,23 @@
         🗃️ Secciones
       </a>
 
+      <!-- Botones de Impresión/PDF (Solo si cerrado) -->
+      {% if r.estado == "CERRADO" %}
+      <a class="btn btn-sm btn-outline-primary" href="{{ url_for('reporte_pdf', reporte_id=r.id, v='B') }}"
+        target="_blank">
+        📄 PDF
+      </a>
+      <a class="btn btn-sm btn-outline-success" href="{{ url_for('reporte_print_web', reporte_id=r.id, v='B') }}"
+        target="_blank">
+        🖨️ Imprimir (Rápido)
+      </a>
+      {% endif %}
+
       <!-- Estado del reporte -->
       {% if r.estado == "ABIERTO" %}
-        <span class="badge bg-success">ABIERTO</span>
+      <span class="badge bg-success">ABIERTO</span>
       {% else %}
-        <span class="badge bg-secondary">CERRADO</span>
+      <span class="badge bg-secondary">CERRADO</span>
       {% endif %}
 
     </div>

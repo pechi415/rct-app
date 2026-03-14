@@ -1576,6 +1576,39 @@ def reporte_pdf(reporte_id: int):
     resp.headers["Content-Disposition"] = f'inline; filename="RCT_{reporte_id}.pdf"'
     return resp
 
+# ---------------------------------------------------------
+# [RUTA] Reporte Print (Prueba PDF Liviano)
+# ---------------------------------------------------------
+@app.route("/reportes/<int:reporte_id>/print")
+@reporte_mina_required
+def reporte_print_web(reporte_id: int):
+    with get_conn() as conn:
+        ctx = build_reporte_context(conn, reporte_id)
+
+    ctx["generado_en"] = datetime.now().strftime("%Y-%m-%d %H:%M")
+
+    ctx.setdefault("operacion", {
+        "inicio_turno": None,
+        "fin_p2": None,
+        "fin_p5": None,
+        "condicion_general": "Normal",
+        "observacion_corta": None,
+        "alertas": []
+    })
+    ctx.setdefault("bahias", [])
+    ctx.setdefault("bahias_nota", "")
+
+    variant = request.args.get("v", "B").strip().upper()  # Forzar versión B de momento
+
+    template_map = {
+        "B": "pdf/reporte_print_B.html",  
+    }
+
+    tpl = template_map.get(variant, "pdf/reporte_print_B.html")
+    
+    # Simplemente retornar el HTML, sin weasyprint
+    return render_template(tpl, **ctx)
+
 
 # =========================================================
 # Bloque 5: Home, listado, creación y estado del reporte
