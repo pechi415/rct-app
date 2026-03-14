@@ -35,6 +35,14 @@ def get_db_connection():
 
     if database_url:
         # Render / PostgreSQL - SIEMPRE usar Postgres si DATABASE_URL existe
+        
+        # Asegurar sslmode=require para conexiones a la nube (Supabase)
+        if "sslmode=require" not in database_url:
+            if "?" in database_url:
+                database_url += "&sslmode=require"
+            else:
+                database_url += "?sslmode=require"
+                
         conn = psycopg2.connect(database_url, cursor_factory=DictCursor, connect_timeout=10)
         conn.autocommit = True  # <-- CLAVE
         return conn
