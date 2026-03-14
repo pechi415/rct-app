@@ -2,6 +2,8 @@
 {% block title %}First - Last{% endblock %}
 
 {% block content %}
+{% from 'macros.html' import render_header, render_alertas, acciones_td, btn_agregar %}
+
 
 {% set label_pit2 = "Pit 2" if r.mina == "ED" else "Pribbenow" %}
 {% set label_pit5 = "Pit 5" if r.mina == "ED" else "El Corozo" %}
@@ -9,29 +11,12 @@
 <!-- =======================
      HEADER: TÍTULO + NAV REPORTE
 ======================= -->
-<div class="d-flex justify-content-between align-items-center gap-3 mb-2">
-  <div>
-    <h1 class="mb-1">First - Last</h1>
-    <div class="text-muted">
-      Reporte #{{ r.id }} | {{ r.fecha }} | {{ r.turno }} | {{ r.mina }} | Estado: {{ r.estado }}
-    </div>
-  </div>
-
-  {% include "_nav_reporte.html" %}
-</div>
+{{ render_header('First - Last', r) }}
 
 <!-- =======================
      MENSAJES
 ======================= -->
-{% if error %}
-<div class="alert alert-danger">{{ error }}</div>
-{% endif %}
-
-{% if r.estado == "CERRADO" %}
-<div class="alert alert-warning">
-  Este reporte está cerrado. No se puede editar.
-</div>
-{% endif %}
+{{ render_alertas(r, error) }}
 
 <!-- =========================================================
      FORM: CREAR (solo si NO existe registro)
@@ -132,23 +117,7 @@
             </td>
             <td>{{ item.razon or 'Sin registros' }}</td>
 
-            <td class="acciones-td">
-              <div class="d-flex gap-1 align-items-center">
-                {% if r.estado == "CERRADO" %}
-                <span class="reporte-cerrado">Reporte cerrado</span>
-                {% else %}
-                <a class="btn btn-sm btn-outline-primary" href="/reportes/{{ r.id }}/first_last/editar">
-                  ✏️ Editar
-                </a>
-
-                <form method="POST" action="/reportes/{{ r.id }}/first_last/eliminar" class="m-0">
-                  <button class="btn btn-sm btn-outline-danger" onclick="return confirm('¿Eliminar este registro?');">
-                    🗑 Eliminar
-                  </button>
-                </form>
-                {% endif %}
-              </div>
-            </td>
+            {{ acciones_td(r, /reportes/ r.id /first_last/editar, /reportes/ r.id /first_last/eliminar) }}
 
           </tr>
         </tbody>

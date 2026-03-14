@@ -1,0 +1,58 @@
+{# Plantilla de macros para reducir la duplicación de código en los reportes #}
+
+{# 1. Cabecera estándar de las subsecciones del reporte #}
+{% macro render_header(titulo, r) %}
+<div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+    <div>
+        <h1 class="mb-1">{{ titulo }}</h1>
+        <div class="text-muted">
+            Reporte #{{ r.id }} | {{ r.fecha }} | {{ r.turno }} | {{ r.mina }} | Estado: {{ r.estado }}
+        </div>
+    </div>
+    {% include "_nav_reporte.html" %}
+</div>
+{% endmacro %}
+
+{# 2. Mensajes de alerta (error y cerrado) #}
+{% macro render_alertas(r, error=None) %}
+{% if error %}
+<div class="alert alert-danger mb-2">{{ error }}</div>
+{% endif %}
+
+{% if r.estado == "CERRADO" %}
+<div class="alert alert-warning mb-3">
+    Este reporte está cerrado. No se puede editar.
+</div>
+{% endif %}
+{% endmacro %}
+
+{# 3. Columna de acciones (Editar / Eliminar) #}
+{% macro acciones_td(r, url_editar, url_eliminar) %}
+<td class="acciones-td">
+    <div class="d-flex gap-1 align-items-center">
+        {% if r.estado == "CERRADO" %}
+        <span class="reporte-cerrado">Reporte cerrado</span>
+        {% else %}
+        <a class="btn btn-sm btn-outline-primary" href="{{ url_editar }}">
+            ✏️ Editar
+        </a>
+        <form method="POST" action="{{ url_eliminar }}" class="m-0">
+            <button class="btn btn-sm btn-outline-danger" onclick="return confirm('¿Eliminar este registro?');">
+                🗑 Eliminar
+            </button>
+        </form>
+        {% endif %}
+    </div>
+</td>
+{% endmacro %}
+
+{# 4. Botón Agregar estándar #}
+{% macro btn_agregar(r) %}
+<div class="mt-3">
+    {% if r.estado != "CERRADO" %}
+    <button class="btn btn-primary" type="submit">✅ Agregar</button>
+    {% else %}
+    <button class="btn btn-secondary" type="button" disabled>Reporte cerrado</button>
+    {% endif %}
+</div>
+{% endmacro %}

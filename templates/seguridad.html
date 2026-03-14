@@ -2,27 +2,17 @@
 {% block title %}Seguridad{% endblock %}
 
 {% block content %}
+{% from 'macros.html' import render_header, render_alertas, acciones_td, btn_agregar %}
+
 
 <div class="contenido-reporte">
 
   <!-- =========================
     HEADER: TÍTULO + NAV REPORTE
   ========================= -->
-  <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
-    <div>
-      <h1 class="mb-1">Seguridad</h1>
-      <div class="text-muted">
-        Reporte #{{ r.id }} | {{ r.fecha }} | {{ r.turno }} | {{ r.mina }} | Estado: {{ r.estado }}
-      </div>
-    </div>
-    {% include "_nav_reporte.html" %}
-  </div>
+  {{ render_header('Seguridad', r) }}
 
-  {% if r.estado == "CERRADO" %}
-    <div class="alert alert-warning">
-      Este reporte está cerrado. No se puede editar.
-    </div>
-  {% endif %}
+  {{ render_alertas(r, error) }}
 
   <div class="row g-3">
 
@@ -90,25 +80,7 @@
                       <td>{{ it.lugar }}</td>
                       <td>{{ it.hallazgos }}</td>
                       <td>{% if it.divulgada == 1 %}Sí{% else %}No{% endif %}</td>
-                      <td class="acciones-td">
-                        <div class="d-flex gap-1 align-items-center">
-                          {% if r.estado == "CERRADO" %}
-                            <span class="reporte-cerrado">Reporte cerrado</span>
-                          {% else %}
-                            <a class="btn btn-sm btn-outline-primary"
-                               href="/reportes/{{ r.id }}/seguridad/obs/{{ it.id }}/editar">✏️ Editar</a>
-
-                            <form method="POST"
-                                  action="/reportes/{{ r.id }}/seguridad/obs/{{ it.id }}/eliminar"
-                                  class="m-0">
-                              <button class="btn btn-sm btn-outline-danger"
-                                      onclick="return confirm('¿Eliminar este registro?');">
-                                🗑 Eliminar
-                              </button>
-                            </form>
-                          {% endif %}
-                        </div>
-                      </td>
+                      {{ acciones_td(r, /reportes/ r.id /seguridad/obs/ it.id /editar, /reportes/ r.id /seguridad/obs/ it.id /eliminar) }}
                     </tr>
                   {% endfor %}
                 </tbody>
@@ -181,25 +153,7 @@
                       <td>{{ it.tema }}</td>
                       <td>{{ it.personas }}</td>
                       <td>{{ it.lugar }}</td>
-                      <td class="acciones-td">
-                        <div class="d-flex gap-1 align-items-center">
-                          {% if r.estado == "CERRADO" %}
-                            <span class="reporte-cerrado">Reporte cerrado</span>
-                          {% else %}
-                            <a class="btn btn-sm btn-outline-primary"
-                               href="/reportes/{{ r.id }}/seguridad/charla/{{ it.id }}/editar">✏️ Editar</a>
-
-                            <form method="POST"
-                                  action="/reportes/{{ r.id }}/seguridad/charla/{{ it.id }}/eliminar"
-                                  class="m-0">
-                              <button class="btn btn-sm btn-outline-danger"
-                                      onclick="return confirm('¿Eliminar este registro?');">
-                                🗑 Eliminar
-                              </button>
-                            </form>
-                          {% endif %}
-                        </div>
-                      </td>
+                      {{ acciones_td(r, /reportes/ r.id /seguridad/charla/ it.id /editar, /reportes/ r.id /seguridad/charla/ it.id /eliminar) }}
                     </tr>
                   {% endfor %}
                 </tbody>

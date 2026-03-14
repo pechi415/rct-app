@@ -2,33 +2,18 @@
 {% block title %}Buses a Bahías{% endblock %}
 
 {% block content %}
+{% from 'macros.html' import render_header, render_alertas, acciones_td, btn_agregar %}
+
 
 <!-- =======================
      HEADER: TÍTULO + NAV REPORTE
 ======================= -->
-<div class="d-flex justify-content-between align-items-center gap-3 mb-2">
-  <div>
-    <h1 class="mb-1">Llegada de buses a bahías</h1>
-    <div class="text-muted">
-      Reporte #{{ r.id }} | {{ r.fecha }} | {{ r.turno }} | {{ r.mina }} | Estado: {{ r.estado }}
-    </div>
-  </div>
-
-  {% include "_nav_reporte.html" %}
-</div>
+{{ render_header('Llegada de buses a bahías', r) }}
 
 <!-- =======================
      MENSAJES
 ======================= -->
-{% if error %}
-  <div class="alert alert-danger">{{ error }}</div>
-{% endif %}
-
-{% if r.estado == "CERRADO" %}
-  <div class="alert alert-warning">
-    Este reporte está cerrado. No se puede editar.
-  </div>
-{% endif %}
+{{ render_alertas(r, error) }}
 
 <!-- =======================
      FORM: AGREGAR REGISTRO
@@ -57,13 +42,7 @@
 
   </div>
 
-  <div class="mt-3">
-    {% if r.estado != "CERRADO" %}
-      <button class="btn btn-primary" type="submit">✅ Agregar</button>
-    {% else %}
-      <button class="btn btn-secondary" type="button" disabled>Reporte cerrado</button>
-    {% endif %}
-  </div>
+  {{ btn_agregar(r) }}
 </form>
 
 <!-- =======================
@@ -88,27 +67,7 @@
             <td>{{ it.bahia }}</td>
             <td>{{ it.hora }}</td>
 
-            <td class="acciones-td">
-              <div class="d-flex gap-1 align-items-center">
-                {% if r.estado == "CERRADO" %}
-                  <span class="reporte-cerrado">Reporte cerrado</span>
-                {% else %}
-                  <a class="btn btn-sm btn-outline-primary"
-                     href="{{ url_for('secciones.editar_item_buses', reporte_id=r.id, item_id=it.id) }}">
-                    ✏️ Editar
-                  </a>
-
-                  <form method="POST"
-                        action="{{ url_for('secciones.eliminar_item_buses', reporte_id=r.id, item_id=it.id) }}"
-                        class="m-0">
-                    <button class="btn btn-sm btn-outline-danger"
-                            onclick="return confirm('¿Eliminar este registro?');">
-                      🗑 Eliminar
-                    </button>
-                  </form>
-                {% endif %}
-              </div>
-            </td>
+            {{ acciones_td(r, url_for('secciones.editar_item_buses', reporte_id=r.id, item_id=it.id), url_for('secciones.eliminar_item_buses', reporte_id=r.id, item_id=it.id)) }}
           </tr>
         {% endfor %}
       </tbody>
