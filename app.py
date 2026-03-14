@@ -23,60 +23,15 @@ from flask import (
 from weasyprint import HTML
 from werkzeug.security import generate_password_hash, check_password_hash
 
-# Flag que permite “caer” a SQLite si la conexión a Postgres falla.
-_USE_POSTGRES = None
 
-
-def is_postgres() -> bool:
-    """Siempre usar PostgreSQL si DATABASE_URL está definida."""
-    return bool(os.environ.get("DATABASE_URL", "").strip())
-
-
-def get_db_connection():
-    database_url = os.environ.get("DATABASE_URL")
-
-    if database_url:
-        # Render / PostgreSQL - SIEMPRE usar Postgres si DATABASE_URL existe
-        
-        # Asegurar sslmode=require para conexiones a la nube (Supabase)
-        if "sslmode=require" not in database_url:
-            if "?" in database_url:
-                database_url += "&sslmode=require"
-            else:
-                database_url += "?sslmode=require"
-                
-        # Aumentar timeout por si el PgBouncer de Supabase AWS tarda en despertar 
-        for attempt in range(3):
-            try:
-                conn = psycopg2.connect(database_url, cursor_factory=DictCursor, connect_timeout=15)
-                conn.autocommit = True  # <-- CLAVE
-                return conn
-            except psycopg2.OperationalError as e:
-                # Si falla intentamos reconectar tras una brevísima pausa, en caso el pooler esté frío
-                if attempt == 2:
-                    raise e
-                time.sleep(1)
-                
-    else:
-        # Local / SQLite
-        conn = sqlite3.connect(DB_PATH)
-        conn.row_factory = sqlite3.Row
-        return conn
-
-
-def sql_params(query: str) -> str:
-    """
-    Convierte placeholders de SQLite (?) a psycopg2 (%s) cuando estamos en Postgres.
-    En SQLite deja la query igual.
-    """
-    if is_postgres():
-        return query.replace("?", "%s")
-    return query
 
 # =========================================================
 # [APP] Flask
 # =========================================================
 app = Flask(__name__)
+
+from database import init_app as init_db_app, get_conn, is_postgres, sql_params, get_db_connection
+init_db_app(app)
 
 # En local: clave fija para que la sesión no se invalide al cambiar cómo ejecutas la app
 app.secret_key = os.environ.get("FLASK_SECRET_KEY")
@@ -97,224 +52,19 @@ os.makedirs(INSTANCE_DIR, exist_ok=True)
 DB_PATH = os.path.join(INSTANCE_DIR, "rct.db")
 
 # =========================================================
-# [CATÁLOGOS] Bahías por mina
-# =========================================================
-BAHIAS_POR_MINA = {
-    "ED": [
-        "bahía Draga",
-        "bahía Platanal",
-        "bahía Conveyor",
-        "bahía 1.5",
-        "bahía Ban 3 Nor",
-        "bahía 5",
-        "bahía 7A",
-        "bahía Retro",
-        "bahía 14",
-        "bahía 15",
-        "bahia 3 postes",
-    ],
-    "PB": [
-        "Bahía Michoacán",
-        "Bahía R39",
-        "Bahía W3",
-        "Bahía R24",
-        "Bahía Cerrejones",
-        "Bahía San Antonio",
-        "Bahía Los Tupes",
-    ],
-}
-
-
-ROLES = ["ADMIN", "SUPERVISOR", "DIGITADOR", "LECTOR"]
-
-
-MINAS = [
-    ("ED", "El Descanso"),
-    ("PB", "Pribbenow"),
-]
-
-def mina_label(mina_code: str) -> str:
-    """Devuelve etiqueta legible de la mina."""
-    return dict(MINAS).get(mina_code, mina_code or "")
+from config import (
+    DB_PATH, BAHIAS_POR_MINA, ROLES, MINAS, CAMIONETAS_POR_MINA,
+    ESTADOS_LIVIANO, TIPOS_DISTRIBUCION_CAMIONES, CATEGORIAS_PERSONAL,
+    IMPACTO_PERSONAL, AREAS_OTRAS, ENTRENAMIENTOS_PERSONAL, TIPOS_CONTACTO,
+    SUPERVISORES_POR_MINA, GRUPOS_SUP
+)
+from utils import mina_label, calc_disponible_personal, norm_text
 
 @app.context_processor
 def inject_helpers():
     return dict(mina_label=mina_label)
 
 
-CAMIONETAS_POR_MINA = {
-    "ED": [2732, 2733, 2734, 2736, 2674, 2676, 2945],
-    "PB": [2059, 2683, 2954, 3216, 3252, 3264],
-}
-
-ESTADOS_LIVIANO = ["OK", "PM", "DOWN"]
-
-TIPOS_DISTRIBUCION_CAMIONES = [
-    "Operativos",
-    "Down",
-    "Stand By con Operador",
-    "Stand By sin Operador",
-    "Carbon",
-    "Stand By no programado",
-]
-
-
-# =========================================================
-# [CONFIG] Distribución del personal
-# =========================================================
-CATEGORIAS_PERSONAL = [
-    "ROSTER",
-    "Ausentes",
-    "Personal prestado a PB",
-    "Personal recibido desde PB",
-    "Personal prestado a Carbón",
-    "Personal recibido desde Carbón",
-    "Personal solo día",
-    "Vacaciones",
-    "Entrenamiento",
-    "Trainer",
-    "En otras áreas",
-    "Auxiliares",
-]
-
-IMPACTO_PERSONAL = {
-    "ROSTER": 0,
-    "Ausentes": -1,
-    "Personal prestado a PB": -1,
-    "Personal recibido desde PB": +1,
-    "Personal prestado a Carbón": -1,
-    "Personal recibido desde Carbón": +1,
-    "Personal solo día": +1,
-    "Trainer": +1,
-    "Vacaciones": -1,
-    "Entrenamiento": -1,
-    "En otras áreas": -1,
-    "Auxiliares": -1,
-}
-
-def calc_disponible_personal(items):
-    """
-    Calcula personal disponible.
-    Retorna: (roster, disponible)
-
-    REGLA:
-      - roster = ROSTER + "Personal solo día"
-      - "Personal solo día" NO se vuelve a aplicar en impactos (para no duplicar)
-    """
-    data = {row["categoria"]: int(row["cantidad"]) for row in items}
-
-    roster_base = data.get("ROSTER", 0)
-    solo_dia = data.get("Personal solo día", 0)
-
-    roster = roster_base + solo_dia
-
-    disponible = roster
-    for cat, sign in IMPACTO_PERSONAL.items():
-        if cat not in ("ROSTER", "Personal solo día"):
-            disponible += sign * data.get(cat, 0)
-
-    return roster, disponible
-
-
-
-
-# =========================================================
-# [CATÁLOGO] Áreas / Departamentos
-# =========================================================
-AREAS_OTRAS = sorted([
-    "Botaderos",
-    "Carbón",
-    "C.A.S.F",
-    "Despacho",
-    "Dtech",
-    "Dragalina",
-    "Etto",
-    "voladura",
-    "Bombas",
-    "Palas",
-    "Seg. Ind",
-    "Vías",
-], key=lambda x: x.lower())
-
-
-# =========================================================
-# [DB] Conexión (SQLite local / PostgreSQL en Render)
-# =========================================================
-from flask import g, has_app_context
-
-class DBConnWrapper:
-    def __init__(self, raw_conn, is_pg: bool):
-        self._conn = raw_conn
-        self._is_pg = is_pg
-
-    def execute(self, query: str, params=()):
-        if self._is_pg:
-            cur = self._conn.cursor()
-            cur.execute(sql_params(query), params or ())
-            return cur
-        else:
-            return self._conn.execute(query, params or ())
-
-    def fetchval(self, query: str, params=(), default=None):
-        cur = self.execute(query, params)
-        row = cur.fetchone()
-        if row is None:
-            return default
-        try:
-            return row[0]
-        except Exception:
-            if hasattr(row, "keys") and row.keys():
-                return row[list(row.keys())[0]]
-            return default
-
-    def commit(self):
-        return self._conn.commit()
-
-    def close(self):
-        return self._conn.close()
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, exc_type, exc, tb):
-        # ✅ NO cerrar aquí, porque get_conn() la guarda en g y teardown la cierra.
-        return False
-
-
-
-def _open_conn():
-    # Render / PostgreSQL
-    if is_postgres():
-        raw = get_db_connection()  # ya viene con RealDictCursor
-        return DBConnWrapper(raw, is_pg=True)
-
-    # Local / SQLite
-    raw = sqlite3.connect(DB_PATH, timeout=30, check_same_thread=False)
-    raw.row_factory = sqlite3.Row
-    raw.execute("PRAGMA journal_mode=WAL;")
-    raw.execute("PRAGMA synchronous=NORMAL;")
-    return DBConnWrapper(raw, is_pg=False)
-
-
-def get_conn():
-    # Dentro de Flask (request): usar g
-    if has_app_context():
-        if "db" not in g:
-            g.db = _open_conn()
-        return g.db
-
-    # Fuera de Flask (inicio del programa / scripts)
-    return _open_conn()
-
-
-@app.teardown_appcontext
-def close_db(exception=None):
-    db = g.pop("db", None)
-    if db is not None:
-        try:
-            db.close()
-        except Exception:
-            pass
 
 
 
@@ -566,46 +316,6 @@ def reporte_mina_required(view):
         return view(reporte_id, *args, **kwargs)
 
     return wrapped
-
-
-# ---------------------------------------------------------
-# [HELPER] Normalizar texto (para evitar duplicados en seguridad)
-# ---------------------------------------------------------
-def norm_text(s: str) -> str:
-    s = (s or "").strip()
-    s = " ".join(s.split())
-    return s.lower()
-
-
-# =========================================================
-# [CATÁLOGOS] Entrenamientos / Contactos / Supervisores
-# =========================================================
-ENTRENAMIENTOS_PERSONAL = ["Regular", "Brigada", "Equipos", "Especial"]
-
-TIPOS_CONTACTO = [
-    "Contacto Personal",
-    "Contacto en Cabina",
-    "Contacto en Oficina",
-]
-
-# =========================================================
-# [CATÁLOGOS] Supervisores por mina y por grupo
-# =========================================================
-SUPERVISORES_POR_MINA = {
-    "ED": {
-        "G1": ["A. Ramirez", "G. Hidalgo", "J. Diaz", "O. Araujo"],
-        "G2": ["A. Morales", "S. Rodríguez", "L. Jiménez"],
-        "G3": ["D. Tapias", "J. Hernández", "C. Daza", "E. Duran"],
-    },
-    "PB": {
-        "G1": ["J. Ballesteros", "J. Reyes", "J. Vargas"],
-        "G2": ["J. Hernández", "M. Maestre"],
-        "G3": ["J. Daza", "Q. Muñoz"],
-    },
-}
-
-GRUPOS_SUP = ["G1", "G2", "G3"]
-
 
 
 # =========================================================
