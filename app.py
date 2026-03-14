@@ -35,7 +35,7 @@ def get_db_connection():
 
     if database_url:
         # Render / PostgreSQL - SIEMPRE usar Postgres si DATABASE_URL existe
-        conn = psycopg2.connect(database_url, cursor_factory=DictCursor)
+        conn = psycopg2.connect(database_url, cursor_factory=DictCursor, connect_timeout=10)
         conn.autocommit = True  # <-- CLAVE
         return conn
     else:
