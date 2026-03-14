@@ -313,7 +313,8 @@ def reporte_pdf(reporte_id: int):
     tpl = template_map.get(variant, template_map["A"])
     html = render_template(tpl, **ctx)
 
-    base_dir = os.path.dirname(os.path.abspath(__file__))
+    from flask import current_app
+    base_dir = current_app.root_path
     pdf_bytes = HTML(string=html, base_url=base_dir).write_pdf()
 
     # Limpiar inmediatamente a Weasyprint de memoria para no saturar los 512MB de Render
