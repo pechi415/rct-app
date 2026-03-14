@@ -131,7 +131,7 @@ def login():
         else:
             session.clear()
             session["user_id"] = user["id"]
-            return redirect(url_for("ver_reportes"))
+            return redirect(url_for("reportes.ver_reportes"))
 
     return render_template("login.html", error=error)
 
@@ -188,7 +188,7 @@ def cambiar_password():
                     session["flash_ok"] = "Contraseña actualizada correctamente."
                     
                     if request.endpoint == "auth.cambiar_password" and era_obligatorio:
-                        return redirect(url_for("ver_reportes"))
+                        return redirect(url_for("reportes.ver_reportes"))
 
                     return redirect(url_for("auth.cambiar_password"))
 
