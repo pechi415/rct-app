@@ -12,6 +12,7 @@ import sqlite3
 import psycopg2
 from psycopg2.extras import DictCursor
 from datetime import date, datetime
+import time
 from functools import wraps
 
 from flask import (
@@ -44,9 +45,18 @@ def get_db_connection():
             else:
                 database_url += "?sslmode=require"
                 
-        conn = psycopg2.connect(database_url, cursor_factory=DictCursor, connect_timeout=10)
-        conn.autocommit = True  # <-- CLAVE
-        return conn
+        # Aumentar timeout por si el PgBouncer de Supabase AWS tarda en despertar 
+        for attempt in range(3):
+            try:
+                conn = psycopg2.connect(database_url, cursor_factory=DictCursor, connect_timeout=15)
+                conn.autocommit = True  # <-- CLAVE
+                return conn
+            except psycopg2.OperationalError as e:
+                # Si falla intentamos reconectar tras una brevísima pausa, en caso el pooler esté frío
+                if attempt == 2:
+                    raise e
+                time.sleep(1)
+                
     else:
         # Local / SQLite
         conn = sqlite3.connect(DB_PATH)
