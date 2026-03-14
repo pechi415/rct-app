@@ -335,39 +335,35 @@ def load_logged_in_user():
     if not user_id:
         return
 
-    conn = get_db_connection()
-    cur = conn.cursor()
+    conn = get_conn()
     try:
-        cur.execute(
-            sql_params("""
+        cur = conn.execute(
+            """
                 SELECT id, username, rol, is_active, debe_cambiar_pass
                 FROM users
                 WHERE id = ?
                 LIMIT 1
-            """),
+            """,
             (user_id,)
         )
         u = cur.fetchone()
 
         # ✅ Cargar minas del usuario
-        cur.execute(
-            sql_params("""
+        cur2 = conn.execute(
+            """
                 SELECT mina
                 FROM user_minas
                 WHERE user_id = ?
                 ORDER BY mina
-            """),
+            """,
             (user_id,)
         )
-        rows = cur.fetchall()
+        rows = cur2.fetchall()
         g.user_minas = [r["mina"] for r in rows]
 
-    finally:
-        try:
-            cur.close()
-        except Exception:
-            pass
-        conn.close()
+    except Exception:
+        u = None
+        g.user_minas = []
 
     if u is None:
         session.clear()
