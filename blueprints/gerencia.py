@@ -97,14 +97,61 @@ def dashboard(fecha, turno):
         total_contactos = len(contactos_consolidado)
 
         # 3. Personal Disposición (roster, presentes, ausentes, etc)
-        # Sumamos los conteos base
+        # Sumamos los conteos base y aplicamos orden específico
         def merge_personal(p1, p2):
             result = {}
             for row in p1:
                 result[row["categoria"]] = result.get(row["categoria"], 0) + row["cantidad"]
             for row in p2:
                 result[row["categoria"]] = result.get(row["categoria"], 0) + row["cantidad"]
-            return [{"categoria": k, "cantidad": v} for k, v in result.items()]
+            
+            # Orden deseado por gerencia
+            orden_deseado = [
+                "ROSTER",
+                "Ausentes",
+                "Vacaciones",
+                "Entrenamiento",
+                "Personal solo dia",
+                "Personal prestados",
+                "Auxiliares",
+                "Trainer",
+                "En otras areas"
+            ]
+            
+            # Crear un diccionario para búsquedas rápidas de índice { "Categoría": índice_numérico }
+            # Ojo: Algunas categorías en la base de datos se escriben diferente (ej. "En otras áreas" con tilde, "Personal solo día")
+            # Así que primero normalizamos o hacemos un match flexible, o bien usamos los nombres exactos que vienen de config.py
+            # Veamos los nombres reales de la BD según config.py:
+            # "ROSTER", "Ausentes", "Personal prestado a PB", "Personal recibido desde PB", 
+            # "Personal prestado a Carbón", "Personal recibido desde Carbón", "Personal solo día",
+            # "Vacaciones", "Entrenamiento", "Trainer", "En otras áreas", "Auxiliares"
+            
+            # Mapeo según nombres reales de la BD
+            orden_real = [
+                "ROSTER",
+                "Ausentes",
+                "Vacaciones",
+                "Entrenamiento",
+                "Personal solo día",
+                "Personal prestado a PB",
+                "Personal recibido desde PB",
+                "Personal prestado a Carbón",
+                "Personal recibido desde Carbón",
+                "Auxiliares",
+                "Trainer",
+                "En otras áreas"
+            ]
+            
+            orden_dict = {cat: i for i, cat in enumerate(orden_real)}
+            
+            # Agrupar las "Personal prestado..." si el usuario quería agruparlas bajo "Personal prestados"
+            # Pero para hacerlo simple por ahora, ordenaremos usando los nombres reales tal como vienen
+            
+            items = [{"categoria": k, "cantidad": v} for k, v in result.items() if v > 0 or k == "ROSTER"]
+            # Ordenar por el índice predefinido, y si no existe lo ponemos al final (orden 99)
+            items.sort(key=lambda x: orden_dict.get(x["categoria"], 99))
+            
+            return items
 
         personal = merge_personal(ctx_ed["personal"], ctx_prb["personal"])
         
