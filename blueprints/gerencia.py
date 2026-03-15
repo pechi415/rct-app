@@ -97,7 +97,7 @@ def dashboard(fecha, turno):
         total_contactos = len(contactos_consolidado)
 
         # 3. Personal Disposición (roster, presentes, ausentes, etc)
-        # Sumamos los conteos base y aplicamos orden específico
+        # Sumamos los conteos base y aplicamos orden y filtro específico
         def merge_personal(p1, p2):
             result = {}
             for row in p1:
@@ -105,53 +105,42 @@ def dashboard(fecha, turno):
             for row in p2:
                 result[row["categoria"]] = result.get(row["categoria"], 0) + row["cantidad"]
             
-            # Orden deseado por gerencia
-            orden_deseado = [
-                "ROSTER",
-                "Ausentes",
-                "Vacaciones",
-                "Entrenamiento",
-                "Personal solo dia",
-                "Personal prestados",
-                "Auxiliares",
-                "Trainer",
-                "En otras areas"
-            ]
+            # Categorías permitidas y sus nuevos nombres
+            categorias_permitidas = {
+                "Ausentes": "Ausentes",
+                "Vacaciones": "Vacaciones",
+                "Auxiliares": "Capataces", # Renombrado
+                "Entrenamiento": "Entrenamiento",
+                "En otras áreas": "En otras areas", # Manejando la tilde original
+                "En otras areas": "En otras areas"
+            }
             
-            # Crear un diccionario para búsquedas rápidas de índice { "Categoría": índice_numérico }
-            # Ojo: Algunas categorías en la base de datos se escriben diferente (ej. "En otras áreas" con tilde, "Personal solo día")
-            # Así que primero normalizamos o hacemos un match flexible, o bien usamos los nombres exactos que vienen de config.py
-            # Veamos los nombres reales de la BD según config.py:
-            # "ROSTER", "Ausentes", "Personal prestado a PB", "Personal recibido desde PB", 
-            # "Personal prestado a Carbón", "Personal recibido desde Carbón", "Personal solo día",
-            # "Vacaciones", "Entrenamiento", "Trainer", "En otras áreas", "Auxiliares"
-            
-            # Mapeo según nombres reales de la BD
             orden_real = [
-                "ROSTER",
                 "Ausentes",
                 "Vacaciones",
-                "Entrenamiento",
-                "Personal solo día",
-                "Personal prestado a PB",
-                "Personal recibido desde PB",
-                "Personal prestado a Carbón",
-                "Personal recibido desde Carbón",
                 "Auxiliares",
-                "Trainer",
-                "En otras áreas"
+                "Entrenamiento",
+                "En otras áreas",
+                "En otras areas"
             ]
             
             orden_dict = {cat: i for i, cat in enumerate(orden_real)}
             
-            # Agrupar las "Personal prestado..." si el usuario quería agruparlas bajo "Personal prestados"
-            # Pero para hacerlo simple por ahora, ordenaremos usando los nombres reales tal como vienen
+            # Filtrar y renombrar
+            items = []
+            for k, v in result.items():
+                if k in categorias_permitidas and v > 0:
+                    items.append({
+                        "categoria": categorias_permitidas[k], 
+                        "cantidad": v,
+                        "original_key": k # para mantener el sort original
+                    })
+                    
+            # Ordenar por el índice predefinido
+            items.sort(key=lambda x: orden_dict.get(x["original_key"], 99))
             
-            items = [{"categoria": k, "cantidad": v} for k, v in result.items() if v > 0 or k == "ROSTER"]
-            # Ordenar por el índice predefinido, y si no existe lo ponemos al final (orden 99)
-            items.sort(key=lambda x: orden_dict.get(x["categoria"], 99))
-            
-            return items
+            # Limpiar la data final
+            return [{"categoria": x["categoria"], "cantidad": x["cantidad"]} for x in items]
 
         personal = merge_personal(ctx_ed["personal"], ctx_prb["personal"])
         
