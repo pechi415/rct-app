@@ -111,17 +111,17 @@ def dashboard(fecha, turno):
                 "Vacaciones": "Vacaciones",
                 "Auxiliares": "Capataces", # Renombrado
                 "Entrenamiento": "Entrenamiento",
-                "En otras áreas": "En otras areas", # Manejando la tilde original
-                "En otras areas": "En otras areas"
+                "En otras áreas": "En otras áreas",
+                "Personal solo dia": "Solo dia" # Renombrado
             }
             
             orden_real = [
                 "Ausentes",
                 "Vacaciones",
+                "Personal solo dia",
                 "Auxiliares",
                 "Entrenamiento",
-                "En otras áreas",
-                "En otras areas"
+                "En otras áreas"
             ]
             
             orden_dict = {cat: i for i, cat in enumerate(orden_real)}
