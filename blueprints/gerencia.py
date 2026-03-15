@@ -25,10 +25,10 @@ def index():
                 ("ED", fecha, turno)
             ).fetchone()
 
-            # Buscar Reporte PRB
+            # Buscar Reporte PB
             rep_prb = conn.execute(
                 "SELECT id, estado FROM reportes WHERE mina = ? AND fecha = ? AND turno = ?",
-                ("PRB", fecha, turno)
+                ("PB", fecha, turno)
             ).fetchone()
 
             if not rep_ed or not rep_prb:
@@ -56,7 +56,7 @@ def dashboard(fecha, turno):
 
         rep_prb = conn.execute(
             "SELECT id FROM reportes WHERE mina = ? AND fecha = ? AND turno = ?",
-            ("PRB", fecha, turno)
+            ("PB", fecha, turno)
         ).fetchone()
 
         if not rep_ed or not rep_prb:
