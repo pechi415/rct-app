@@ -128,40 +128,54 @@
     <!-- 5. FIRST LAST (PARALELO) -->
     <div class="col-md-12">
         <div class="row g-4">
-            
+
             <!-- EL DESCANSO -->
             <div class="col-md-6">
                 <div class="card border mb-3 rounded-4 shadow-sm h-100">
                     <div class="card-body p-4">
                         <h5 class="fw-bold text-dark mb-4 border-bottom pb-3">First - Last (El Descanso)</h5>
-                        
+
                         <div class="d-flex flex-wrap gap-2 mb-3">
-                            <div class="border rounded-3 p-2 flex-fill text-center px-3" style="min-width: 110px; background-color: #fcfcfc;">
-                                <div class="text-muted text-uppercase" style="font-size: 0.75rem; font-weight: 700; letter-spacing: 0.5px;">Inicio P2</div>
+                            <div class="border rounded-3 p-2 flex-fill text-center px-3"
+                                style="min-width: 110px; background-color: #fcfcfc;">
+                                <div class="text-muted text-uppercase"
+                                    style="font-size: 0.75rem; font-weight: 700; letter-spacing: 0.5px;">Inicio PIT 2
+                                </div>
                                 <div class="fw-bold fs-5 text-dark mt-1">{{ fl_ed.inicio_pit2 or '-' }}</div>
                             </div>
-                            <div class="border rounded-3 p-2 flex-fill text-center px-3" style="min-width: 110px; background-color: #fcfcfc;">
-                                <div class="text-muted text-uppercase" style="font-size: 0.75rem; font-weight: 700; letter-spacing: 0.5px;">Inicio P5</div>
+                            <div class="border rounded-3 p-2 flex-fill text-center px-3"
+                                style="min-width: 110px; background-color: #fcfcfc;">
+                                <div class="text-muted text-uppercase"
+                                    style="font-size: 0.75rem; font-weight: 700; letter-spacing: 0.5px;">Inicio PIT 5
+                                </div>
                                 <div class="fw-bold fs-5 text-dark mt-1">{{ fl_ed.inicio_pit5 or '-' }}</div>
                             </div>
-                            <div class="border rounded-3 p-2 flex-fill text-center px-3" style="min-width: 110px; background-color: #fcfcfc;">
-                                <div class="text-muted text-uppercase" style="font-size: 0.75rem; font-weight: 700; letter-spacing: 0.5px;">Final P2</div>
+                            <div class="border rounded-3 p-2 flex-fill text-center px-3"
+                                style="min-width: 110px; background-color: #fcfcfc;">
+                                <div class="text-muted text-uppercase"
+                                    style="font-size: 0.75rem; font-weight: 700; letter-spacing: 0.5px;">Final PIT 2
+                                </div>
                                 <div class="fw-bold fs-5 text-dark mt-1">{{ fl_ed.final_pit2 or '-' }}</div>
                             </div>
-                            <div class="border rounded-3 p-2 flex-fill text-center px-3" style="min-width: 110px; background-color: #fcfcfc;">
-                                <div class="text-muted text-uppercase" style="font-size: 0.75rem; font-weight: 700; letter-spacing: 0.5px;">Final P5</div>
+                            <div class="border rounded-3 p-2 flex-fill text-center px-3"
+                                style="min-width: 110px; background-color: #fcfcfc;">
+                                <div class="text-muted text-uppercase"
+                                    style="font-size: 0.75rem; font-weight: 700; letter-spacing: 0.5px;">Final PIT 5
+                                </div>
                                 <div class="fw-bold fs-5 text-dark mt-1">{{ fl_ed.final_pit5 or '-' }}</div>
                             </div>
                         </div>
 
                         <div class="rounded-3 p-3 w-100 mt-auto" style="background-color: #f8f9fa;">
-                            <div class="text-muted mb-1" style="font-size: 0.8rem; font-weight: 600;">Cam. x Operador (1ra Hr)</div>
+                            <div class="text-muted mb-1" style="font-size: 0.8rem; font-weight: 600;">Cam. x Operador
+                                (1ra Hr)</div>
                             <div class="text-dark d-flex align-items-center flex-wrap gap-2">
                                 <span class="fw-bold fs-5">{{ fl_ed.camiones_por_operador or '0' }}</span>
                                 {% if fl_ed.razon %}
                                 <span class="text-muted" style="font-size: 0.9rem;">•</span>
                                 <span style="font-size: 0.95rem;">
-                                    <span class="text-muted">Razón:</span> <span class="fw-bold text-dark">{{ fl_ed.razon }}</span>
+                                    <span class="text-muted">Razón:</span> <span class="fw-bold text-dark">{{
+                                        fl_ed.razon }}</span>
                                 </span>
                                 {% endif %}
                             </div>
@@ -175,34 +189,48 @@
                 <div class="card border mb-3 rounded-4 shadow-sm h-100">
                     <div class="card-body p-4">
                         <h5 class="fw-bold text-dark mb-4 border-bottom pb-3">First - Last (Pribbenow)</h5>
-                        
+
                         <div class="d-flex flex-wrap gap-2 mb-3">
-                            <div class="border rounded-3 p-2 flex-fill text-center px-3" style="min-width: 110px; background-color: #fcfcfc;">
-                                <div class="text-muted text-uppercase" style="font-size: 0.75rem; font-weight: 700; letter-spacing: 0.5px;">Inicio P2</div>
+                            <div class="border rounded-3 p-2 flex-fill text-center px-3"
+                                style="min-width: 110px; background-color: #fcfcfc;">
+                                <div class="text-muted text-uppercase"
+                                    style="font-size: 0.75rem; font-weight: 700; letter-spacing: 0.5px;">Inicio
+                                    PRIBBENOW</div>
                                 <div class="fw-bold fs-5 text-dark mt-1">{{ fl_prb.inicio_pit2 or '-' }}</div>
                             </div>
-                            <div class="border rounded-3 p-2 flex-fill text-center px-3" style="min-width: 110px; background-color: #fcfcfc;">
-                                <div class="text-muted text-uppercase" style="font-size: 0.75rem; font-weight: 700; letter-spacing: 0.5px;">Inicio P5</div>
+                            <div class="border rounded-3 p-2 flex-fill text-center px-3"
+                                style="min-width: 110px; background-color: #fcfcfc;">
+                                <div class="text-muted text-uppercase"
+                                    style="font-size: 0.75rem; font-weight: 700; letter-spacing: 0.5px;">Inicio COROZO
+                                </div>
                                 <div class="fw-bold fs-5 text-dark mt-1">{{ fl_prb.inicio_pit5 or '-' }}</div>
                             </div>
-                            <div class="border rounded-3 p-2 flex-fill text-center px-3" style="min-width: 110px; background-color: #fcfcfc;">
-                                <div class="text-muted text-uppercase" style="font-size: 0.75rem; font-weight: 700; letter-spacing: 0.5px;">Final P2</div>
+                            <div class="border rounded-3 p-2 flex-fill text-center px-3"
+                                style="min-width: 110px; background-color: #fcfcfc;">
+                                <div class="text-muted text-uppercase"
+                                    style="font-size: 0.75rem; font-weight: 700; letter-spacing: 0.5px;">Final PRIBBENOW
+                                </div>
                                 <div class="fw-bold fs-5 text-dark mt-1">{{ fl_prb.final_pit2 or '-' }}</div>
                             </div>
-                            <div class="border rounded-3 p-2 flex-fill text-center px-3" style="min-width: 110px; background-color: #fcfcfc;">
-                                <div class="text-muted text-uppercase" style="font-size: 0.75rem; font-weight: 700; letter-spacing: 0.5px;">Final P5</div>
+                            <div class="border rounded-3 p-2 flex-fill text-center px-3"
+                                style="min-width: 110px; background-color: #fcfcfc;">
+                                <div class="text-muted text-uppercase"
+                                    style="font-size: 0.75rem; font-weight: 700; letter-spacing: 0.5px;">Final COROZO
+                                </div>
                                 <div class="fw-bold fs-5 text-dark mt-1">{{ fl_prb.final_pit5 or '-' }}</div>
                             </div>
                         </div>
 
                         <div class="rounded-3 p-3 w-100 mt-auto" style="background-color: #f8f9fa;">
-                            <div class="text-muted mb-1" style="font-size: 0.8rem; font-weight: 600;">Cam. x Operador (1ra Hr)</div>
+                            <div class="text-muted mb-1" style="font-size: 0.8rem; font-weight: 600;">Cam. x Operador
+                                (1ra Hr)</div>
                             <div class="text-dark d-flex align-items-center flex-wrap gap-2">
                                 <span class="fw-bold fs-5">{{ fl_prb.camiones_por_operador or '0' }}</span>
                                 {% if fl_prb.razon %}
                                 <span class="text-muted" style="font-size: 0.9rem;">•</span>
                                 <span style="font-size: 0.95rem;">
-                                    <span class="text-muted">Razón:</span> <span class="fw-bold text-dark">{{ fl_prb.razon }}</span>
+                                    <span class="text-muted">Razón:</span> <span class="fw-bold text-dark">{{
+                                        fl_prb.razon }}</span>
                                 </span>
                                 {% endif %}
                             </div>
