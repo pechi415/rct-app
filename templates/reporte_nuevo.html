@@ -2,7 +2,10 @@
 {% block title %}Nuevo reporte{% endblock %}
 
 {% block content %}
-<h2 class="mb-3">Nuevo reporte</h2>
+<div class="d-flex align-items-center gap-3 mb-3">
+  <a class="btn btn-secondary" href="{{ url_for('reportes.ver_reportes') }}">⬅ Volver a Inicio</a>
+  <h2 class="m-0">Nuevo reporte</h2>
+</div>
 
 {% if error %}
   <div class="alert alert-danger">{{ error }}</div>

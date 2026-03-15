@@ -4,7 +4,10 @@
 
 <div class="container py-4">
   <div class="d-flex justify-content-between align-items-center mb-3">
-    <h3 class="m-0">Usuarios</h3>
+    <div class="d-flex align-items-center gap-3">
+      <a class="btn btn-secondary" href="{{ url_for('reportes.ver_reportes') }}">⬅ Volver a Inicio</a>
+      <h3 class="m-0">Usuarios</h3>
+    </div>
     <a class="btn btn-primary" href="{{ url_for('admin.admin_usuario_nuevo') }}">+ Nuevo usuario</a>
   </div>
 
