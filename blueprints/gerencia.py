@@ -87,11 +87,11 @@ def dashboard(fecha, turno):
         contactos_consolidado = []
         for x in ctx_ed["contactos"]:
             contactos_consolidado.append({
-                "mina": "El Descanso", "tipo_contacto": x["tipo_contacto"], "operador": x["operador"]
+                "mina": "El Descanso", "tipo_contacto": x["tipo"], "operador": x["operador"]
             })
         for x in ctx_prb["contactos"]:
             contactos_consolidado.append({
-                "mina": "Pribbenow", "tipo_contacto": x["tipo_contacto"], "operador": x["operador"]
+                "mina": "Pribbenow", "tipo_contacto": x["tipo"], "operador": x["operador"]
             })
             
         total_contactos = len(contactos_consolidado)
