@@ -6,7 +6,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, g, fla
 from weasyprint import HTML
 from database import get_conn, get_db_connection
 from config import MINAS, CAMIONETAS_POR_MINA
-from utils import mina_label, calc_disponible_personal
+from utils import mina_label, calc_disponible_personal, get_personal_label
 from blueprints.auth import roles_required
 
 reportes_bp = Blueprint("reportes", __name__)
@@ -796,7 +796,8 @@ def resumen(reporte_id):
         first_last=first_last,
         pts=pts,
         comentarios=comentarios,
-        supervisores=supervisores
+        supervisores=supervisores,
+        get_label=get_personal_label
     )
 
 

@@ -7,11 +7,11 @@ def mina_label(mina_code: str) -> str:
 def get_personal_label(categoria: str, mina_code: str = None) -> str:
     """
     Devuelve la etiqueta visual para una categoría de personal.
-    - ROSTER -> Roster General
+    - ROSTER -> Roster del grupo
     - Si mina es PB, intercambia etiquetas de prestado/recibido.
     """
     if categoria == "ROSTER":
-        return "Roster General"
+        return "Roster del grupo"
     
     if mina_code == "PB":
         if categoria == "Personal prestado a PB":

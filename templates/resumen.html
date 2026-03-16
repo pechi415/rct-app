@@ -270,7 +270,7 @@
               <tbody>
                 {% for p in personal_items %}
                   <tr>
-                    <td>{{ p.categoria }}</td>
+                    <td>{{ get_label(p.categoria, r.mina) }}</td>
                     <td>{{ p.cantidad }}</td>
                   </tr>
                 {% endfor %}
