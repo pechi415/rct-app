@@ -137,6 +137,10 @@ def build_reporte_context(conn, reporte_id: int) -> dict:
             id DESC
     """, (reporte_id,)).fetchall()
 
+    # Condición: En turno NOCHE no aparece 'Personal solo día'
+    if r["turno"] == "NOCHE":
+        personal_items = [p for p in personal_items if p["categoria"] != "Personal solo día"]
+
     roster_p, disponible_p = calc_disponible_personal(personal_items)
 
     otras_areas_items = conn.execute(
@@ -699,6 +703,10 @@ def resumen(reporte_id):
                 id DESC
         """, (reporte_id,)).fetchall()
 
+        # Condición: En turno NOCHE no aparece 'Personal solo día'
+        if r["turno"] == "NOCHE":
+            personal_items = [p for p in personal_items if p["categoria"] != "Personal solo día"]
+
         roster_p, disponible_p = calc_disponible_personal(personal_items)
 
         otras_areas_items = conn.execute(
@@ -805,63 +813,16 @@ def eliminar_reporte(reporte_id):
     if confirmar != esperado:
         # si usas flash en el proyecto, esto es ideal
         try:
-            flash("Confirmación inválida. No se eliminó el reporte.", "danger")
-        except Exception:
+            flash(f"Confirmación incorrecta para eliminar el reporte {reporte_id}.", "danger")
+        except:
             pass
         return redirect(url_for("reportes.ver_reportes"))
 
     with get_conn() as conn:
-        # (opcional) verifica que exista
-        r = fetch_reporte(conn, reporte_id)
-        if not r:
-            abort(404)
-
-        # 1) borrar tablas hijas (ignorar si alguna no existe)
-        tablas_hijas = [
-            "buses_bahias",
-            "supervisores_turno",
-            "first_last",
-            "gestion_areas",
-            "equipos_varados",
-
-            # Personal
-            "distribucion_personal",
-            "ausentismo",
-            "operadores_otras_areas",
-            "entrenamiento_personal",
-            "contactos_operadores",
-
-            # Operación / complementarios
-            "distribucion_camiones",
-            "equipo_liviano",
-            "bombas",
-            "luminarias",
-
-            # Seguridad / socialización
-            "seguridad_observaciones",
-            "seguridad_charlas",
-            "pts_divulgacion",
-            "comentarios_turno",
-        ]
-
-
-        for t in tablas_hijas:
-            try:
-                conn.execute(f"DELETE FROM {t} WHERE reporte_id = ?", (reporte_id,))
-            except Exception:
-                # tabla no existe en tu esquema o nombre distinto
-                pass
-
-        # 2) borrar el reporte padre
         conn.execute("DELETE FROM reportes WHERE id = ?", (reporte_id,))
-
+    
     try:
-        flash(f"Reporte #{reporte_id} eliminado correctamente.", "success")
-    except Exception:
+        flash(f"Reporte {reporte_id} eliminado exitosamente.", "success")
+    except:
         pass
-
     return redirect(url_for("reportes.ver_reportes"))
-
-
-
-

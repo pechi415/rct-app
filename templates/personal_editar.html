@@ -30,8 +30,8 @@
 <form method="POST" class="card card-body">
   <div class="row g-2">
     <div class="col-md-6">
-      <label class="form-label">Categoría</label>
-      <input class="form-control" value="{{ it.categoria }}" disabled>
+      <label class="form-label">{{ get_label(it.categoria) }}</label>
+      <input class="form-control" value="{{ get_label(it.categoria) }}" disabled>
     </div>
 
     <div class="col-md-6">

@@ -5,7 +5,7 @@ import sqlite3
 from datetime import datetime
 from flask import Blueprint, render_template, request, redirect, url_for, g, flash, abort
 from database import get_conn, insert_and_get_id
-from utils import norm_text, calc_disponible_personal
+from utils import norm_text, calc_disponible_personal, get_personal_label
 from blueprints.auth import roles_required
 from blueprints.reportes import fetch_reporte, reporte_mina_required
 from config import (
@@ -993,7 +993,13 @@ def distribucion_personal(reporte_id):
 
 
         usadas = {it["categoria"] for it in items}
-        categorias_disponibles = [c for c in CATEGORIAS_PERSONAL if c not in usadas]
+        
+        # Condición: En turno NOCHE no aparece 'Personal solo día'
+        categorias_base = [c for c in CATEGORIAS_PERSONAL if c not in usadas]
+        if r["turno"] == "NOCHE":
+            categorias_base = [c for c in categorias_base if c != "Personal solo día"]
+            
+        categorias_disponibles = categorias_base
         roster, disponible = calc_disponible_personal(items)
 
         if request.method == "POST":
@@ -1009,6 +1015,8 @@ def distribucion_personal(reporte_id):
                     error = "Debe seleccionar una categoría válida."
                 elif categoria in usadas:
                     error = "Esta categoría ya fue registrada. Edítala en Acciones."
+                elif categoria == "Personal solo día" and r["turno"] == "NOCHE":
+                    error = "La categoría 'Personal solo día' no está permitida en turno noche."
                 elif not cantidad_raw.isdigit():
                     error = "La cantidad debe ser un número entero (0 o mayor)."
                 else:
@@ -1039,7 +1047,12 @@ def distribucion_personal(reporte_id):
 
         roster, disponible = calc_disponible_personal(items)
         usadas = {it["categoria"] for it in items}
-        categorias_disponibles = [c for c in CATEGORIAS_PERSONAL if c not in usadas]
+        
+        categorias_base = [c for c in CATEGORIAS_PERSONAL if c not in usadas]
+        if r["turno"] == "NOCHE":
+            categorias_base = [c for c in categorias_base if c != "Personal solo día"]
+            
+        categorias_disponibles = categorias_base
 
     return render_template(
         "personal.html",
@@ -1048,6 +1061,7 @@ def distribucion_personal(reporte_id):
         categorias=categorias_disponibles,
         roster=roster,
         disponible=disponible,
+        get_label=get_personal_label,
         error=error
     )
 
@@ -1086,7 +1100,7 @@ def editar_personal(reporte_id, item_id):
                 """, (cantidad, item_id, reporte_id))
                 return redirect(url_for("secciones.distribucion_personal", reporte_id=reporte_id))
 
-    return render_template("personal_editar.html", r=r, reporte=r, it=it, error=error)
+    return render_template("personal_editar.html", r=r, reporte=r, it=it, get_label=get_personal_label, error=error)
 
 
 @secciones_bp.route("/reportes/<int:reporte_id>/personal/eliminar/<int:item_id>", methods=["POST"])

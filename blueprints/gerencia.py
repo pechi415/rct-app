@@ -124,12 +124,20 @@ def dashboard(fecha, turno):
                 "En otras áreas"
             ]
             
+            # Condición: En turno NOCHE no aparece 'Personal solo día' (Solo día)
+            if turno == "NOCHE":
+                orden_real = [cat for cat in orden_real if cat != "Personal solo dia"]
+
             orden_dict = {cat: i for i, cat in enumerate(orden_real)}
             
             # Filtrar y renombrar
             items = []
             for k, v in result.items():
                 if k in categorias_permitidas and v > 0:
+                    # Aplicar condición de noche para el consolidado también
+                    if turno == "NOCHE" and k == "Personal solo dia":
+                        continue
+                        
                     items.append({
                         "categoria": categorias_permitidas[k], 
                         "cantidad": v,

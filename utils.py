@@ -4,6 +4,23 @@ def mina_label(mina_code: str) -> str:
     """Devuelve etiqueta legible de la mina."""
     return dict(MINAS).get(mina_code, mina_code or "")
 
+def get_personal_label(categoria: str, mina_code: str = None) -> str:
+    """
+    Devuelve la etiqueta visual para una categoría de personal.
+    - ROSTER -> Roster General
+    - Si mina es PB, intercambia etiquetas de prestado/recibido.
+    """
+    if categoria == "ROSTER":
+        return "Roster General"
+    
+    if mina_code == "PB":
+        if categoria == "Personal prestado a PB":
+            return "Personal prestado a ED"
+        if categoria == "Personal recibido desde PB":
+            return "Personal recibido desde ED"
+            
+    return categoria
+
 def calc_disponible_personal(items):
     """
     Calcula personal disponible.
