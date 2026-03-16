@@ -10,7 +10,7 @@
         .hdr-title { font-size: 18pt; }
         .kpi-mini-label { font-size: 7.5pt; }
         .kpi-mini-value { font-size: 14pt; }
-        .kpi-strip { grid-template-columns: repeat(3, 1fr); }
+        .kpi-strip { grid-template-columns: repeat(4, 1fr); }
         
         .mine-card-container { display: table; width: 100%; table-layout: fixed; border-spacing: 5mm 0; margin-left: -2.5mm; }
         .mine-card-cell { display: table-cell; vertical-align: top; width: 50%; }
@@ -71,6 +71,10 @@
         </div>
 
 
+        <div class="kpi-mini">
+            <div class="kpi-mini-label">Contactos Operativos</div>
+            <div class="kpi-mini-value">{{ total_contactos }}</div>
+        </div>
     </div>
 
     <!-- 1. OPERACIÓN: FIRST / LAST -->
