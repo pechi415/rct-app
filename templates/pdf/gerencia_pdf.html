@@ -10,6 +10,7 @@
         .hdr-title { font-size: 18pt; }
         .kpi-mini-label { font-size: 7.5pt; }
         .kpi-mini-value { font-size: 14pt; }
+        .kpi-strip { grid-template-columns: repeat(3, 1fr); }
         
         .mine-card-container { display: table; width: 100%; table-layout: fixed; border-spacing: 5mm 0; margin-left: -2.5mm; }
         .mine-card-cell { display: table-cell; vertical-align: top; width: 50%; }
@@ -69,10 +70,7 @@
             <div class="kpi-mini-value">{{ camiones_disponibles }} / {{ total_camiones }}</div>
         </div>
 
-        <div class="kpi-mini">
-            <div class="kpi-mini-label">Contactos Operativos</div>
-            <div class="kpi-mini-value">{{ total_contactos }}</div>
-        </div>
+
     </div>
 
     <!-- 1. OPERACIÓN: FIRST / LAST -->
@@ -218,38 +216,7 @@
         </section>
     </div>
 
-    <!-- 4. CONTACTOS -->
-    <section class="section">
-        <div class="section-title">
-            <h2 class="h2">Contactos Operativos</h2>
-        </div>
-        <div class="card">
-            <table class="table table-compact">
-                <thead>
-                    <tr>
-                        <th style="width: 15%;">Mina</th>
-                        <th style="width: 35%;">Tipo de Contacto</th>
-                        <th style="width: 50%;">Operador / Detalle</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% if contactos %}
-                        {% for c in contactos %}
-                        <tr>
-                            <td>{{ c.mina }}</td>
-                            <td>{{ c.tipo_contacto }}</td>
-                            <td>{{ c.operador }}</td>
-                        </tr>
-                        {% endfor %}
-                    {% else %}
-                        <tr>
-                            <td colspan="3" class="empty">No se registraron contactos en el turno.</td>
-                        </tr>
-                    {% endif %}
-                </tbody>
-            </table>
-        </div>
-    </section>
+
 
 </body>
 
