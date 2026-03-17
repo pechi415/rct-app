@@ -114,18 +114,18 @@
                         <div class="v">
                             {% set cam = operacion.get('camiones_por_operador') %}
                             {% set rz = operacion.get('razon') %}
-                            
+
                             {% if cam is none %}
-                                Sin registro
+                            Sin registro
                             {% elif cam|int == 0 and (rz is none or rz|string|trim == '') %}
-                                Sin registro
+                            Sin registro
                             {% else %}
-                                {{ cam }}
+                            {{ cam }}
                             {% endif %}
-                            
+
                             {% if rz %}
-                                <span class="op-sep">·</span>
-                                <span class="op-muted">Razón:</span> {{ rz }}
+                            <span class="op-sep">·</span>
+                            <span class="op-muted">Razón:</span> {{ rz }}
                             {% endif %}
 
                         </div>
@@ -155,15 +155,16 @@
                         <tbody>
                             {% for i in range(0, bahias|length, 2) %}
                             {% set b1 = bahias[i] %}
-                            {% set b2 = bahias[i+1] if i+1 < bahias|length else None %} {% set n1=b1.get('nombre') if b1 is mapping else b1.nombre
-                                %} {% set h1=b1.get('hora_arribo') if b1 is mapping else b1.hora_arribo %} {% if b2 %} {% set n2=b2.get('nombre') if
-                                b2 is mapping else b2.nombre %} {% set h2=b2.get('hora_arribo') if b2 is mapping else b2.hora_arribo %} {% endif %}
+                            {% set b2 = bahias[i+1] if i+1 < bahias|length else None %} {% set n1=b1.get('nombre') if b1
+                                is mapping else b1.nombre %} {% set h1=b1.get('hora_arribo') if b1 is mapping else
+                                b1.hora_arribo %} {% if b2 %} {% set n2=b2.get('nombre') if b2 is mapping else b2.nombre
+                                %} {% set h2=b2.get('hora_arribo') if b2 is mapping else b2.hora_arribo %} {% endif %}
                                 <tr>
                                 <td>
                                     <div class="td-main">{{ n1 }}</div>
                                 </td>
                                 <td class="mono">{{ h1 or '—' }}</td>
-                            
+
                                 <td class="split">
                                     {% if b2 %}
                                     <div class="td-main">{{ n2 }}</div>
@@ -176,7 +177,7 @@
                                 </td>
                                 </tr>
 
-                            {% endfor %}
+                                {% endfor %}
                         </tbody>
                     </table>
                     {% endif %}
@@ -265,7 +266,7 @@
             <div class="card" id="equipo-liviano">
                 <div class="section-title">
                     <h2 class="h2">Equipo liviano (Camionetas)</h2>
-            
+
                     {% set ns = namespace(ok=0) %}
                     {% for it in equipo_liviano %}
                     {% set estado = (it["estado"] if it is mapping else it.estado) or "" %}
@@ -274,7 +275,7 @@
                     {% set ns.ok = ns.ok + 1 %}
                     {% endif %}
                     {% endfor %}
-            
+
                     <span class="badge
                                 {% if ns.ok >= 7 %} badge-ok
                                 {% elif ns.ok >= 5 %} badge-warn
@@ -283,7 +284,7 @@
                         Disponible: {{ ns.ok }}
                     </span>
                 </div>
-            
+
                 {% if equipo_liviano|length == 0 %}
                 <div class="empty">Sin registros.</div>
                 {% else %}
@@ -303,10 +304,10 @@
                         {% set cam = (it["camioneta"] if it is mapping else it.camioneta) %}
                         {% set cam_str = cam|string %}
                         {% set com = (it["comentario"] if it is mapping else it.comentario) %}
-            
+
                         {# Manual si NO está en la lista base de la mina #}
                         {% set es_manual = (camionetas_base is defined) and (cam_str not in camionetas_base) %}
-            
+
                         {# Regla: mostrar si PM/DOWN o si es MANUAL #}
                         {% if ('pm' in est) or ('down' in est) or es_manual %}
                         {% set ns.hay = true %}
@@ -327,7 +328,7 @@
                         </tr>
                         {% endif %}
                         {% endfor %}
-            
+
                         {% if not ns.hay %}
                         <tr>
                             <td colspan="3" class="muted">Sin camionetas en PM o DOWN.</td>
@@ -358,9 +359,9 @@
                 {% else %}
                 <table class="table table-compact table-varados">
                     <colgroup>
-                        <col style="width:80px;">   <!-- Equipo -->
-                        <col style="width:55%;">    <!-- Ubicación (más grande) -->
-                        <col style="width:45%;">    <!-- Motivo -->
+                        <col style="width:80px;"> <!-- Equipo -->
+                        <col style="width:55%;"> <!-- Ubicación (más grande) -->
+                        <col style="width:45%;"> <!-- Motivo -->
                     </colgroup>
                     <thead>
                         <tr>
@@ -389,13 +390,13 @@
                     <h2 class="h2">Complementarios</h2>
                     <span class="badge">Bombas: {{ bombas|length }} · Luminarias: {{ luminarias|length }}</span>
                 </div>
-            
+
                 <!-- =======================
                      Bombas (doble columna)
                 ======================= -->
                 <div class="subcard">
                     <div class="subhead">Bombas</div>
-            
+
                     {% if bombas|length == 0 %}
                     <div class="empty">Sin registros.</div>
                     {% else %}
@@ -405,7 +406,7 @@
                                 <th style="width:55px;">No.</th>
                                 <th style="width:80px;">Estado</th>
                                 <th>Ubicación</th>
-            
+
                                 <th class="split" style="width:55px;">No.</th>
                                 <th style="width:80px;">Estado</th>
                                 <th>Ubicación</th>
@@ -414,15 +415,16 @@
                         <tbody>
                             {% for i in range(0, bombas|length, 2) %}
                             {% set b1 = bombas[i] %}
-                            {% set b2 = bombas[i+1] if i+1 < bombas|length else None %} {% set n1=b1.get('numero') if b1 is mapping
-                                else b1.numero %} {% set e1=b1.get('estado') if b1 is mapping else b1.estado %} {% set
-                                u1=b1.get('ubicacion') if b1 is mapping else b1.ubicacion %} {% if b2 %} {% set n2=b2.get('numero')
-                                if b2 is mapping else b2.numero %} {% set e2=b2.get('estado') if b2 is mapping else b2.estado %} {%
-                                set u2=b2.get('ubicacion') if b2 is mapping else b2.ubicacion %} {% endif %} <tr>
+                            {% set b2 = bombas[i+1] if i+1 < bombas|length else None %} {% set n1=b1.get('numero') if b1
+                                is mapping else b1.numero %} {% set e1=b1.get('estado') if b1 is mapping else b1.estado
+                                %} {% set u1=b1.get('ubicacion') if b1 is mapping else b1.ubicacion %} {% if b2 %} {%
+                                set n2=b2.get('numero') if b2 is mapping else b2.numero %} {% set e2=b2.get('estado') if
+                                b2 is mapping else b2.estado %} {% set u2=b2.get('ubicacion') if b2 is mapping else
+                                b2.ubicacion %} {% endif %} <tr>
                                 <td class="nowrap">{{ n1 }}</td>
                                 <td class="nowrap">{{ e1 }}</td>
                                 <td class="wrap-soft">{{ u1 }}</td>
-            
+
                                 <td class="split">
                                     {% if b2 %}{{ n2 }}{% else %}&nbsp;{% endif %}
                                 </td>
@@ -438,13 +440,13 @@
                     </table>
                     {% endif %}
                 </div>
-            
+
                 <!-- =======================
                      Luminarias (doble columna)
                 ======================= -->
                 <div class="subcard mt-10">
                     <div class="subhead">Luminarias</div>
-            
+
                     {% if luminarias|length == 0 %}
                     <div class="empty">Sin registros.</div>
                     {% else %}
@@ -460,13 +462,14 @@
                         <tbody>
                             {% for i in range(0, luminarias|length, 2) %}
                             {% set x1 = luminarias[i] %}
-                            {% set x2 = luminarias[i+1] if i+1 < luminarias|length else None %} {% set n1=x1.get('numero') if x1 is
-                                mapping else x1.numero %} {% set u1=x1.get('ubicacion') if x1 is mapping else x1.ubicacion %} {% if
-                                x2 %} {% set n2=x2.get('numero') if x2 is mapping else x2.numero %} {% set u2=x2.get('ubicacion') if
-                                x2 is mapping else x2.ubicacion %} {% endif %} <tr>
+                            {% set x2 = luminarias[i+1] if i+1 < luminarias|length else None %} {% set
+                                n1=x1.get('numero') if x1 is mapping else x1.numero %} {% set u1=x1.get('ubicacion') if
+                                x1 is mapping else x1.ubicacion %} {% if x2 %} {% set n2=x2.get('numero') if x2 is
+                                mapping else x2.numero %} {% set u2=x2.get('ubicacion') if x2 is mapping else
+                                x2.ubicacion %} {% endif %} <tr>
                                 <td class="nowrap">{{ n1 }}</td>
                                 <td class="wrap-soft">{{ u1 }}</td>
-            
+
                                 <td class="split">
                                     {% if x2 %}{{ n2 }}{% else %}&nbsp;{% endif %}
                                 </td>
@@ -479,7 +482,7 @@
                     </table>
                     {% endif %}
                 </div>
-            
+
             </div>
         </div>
     </section>
@@ -508,33 +511,33 @@
 
             <div class="card subcard">
                 <div class="subhead">Distribución del personal</div>
-            
+
                 <div class="mini-kpi-row mini-kpi-4">
                     <div class="mini-kpi mini-muted">
-                        <div class="mini-kpi-label">Roster</div>
+                        <div class="mini-kpi-label">Roster General</div>
                         <div class="mini-kpi-value">{{ roster_p|default(0) }}</div>
                     </div>
-            
+
                     <div class="mini-kpi mini-ok">
                         <div class="mini-kpi-label">Disponible</div>
                         <div class="mini-kpi-value">{{ disponible_p|default(0) }}</div>
                     </div>
-            
+
                     <div class="mini-kpi mini-bad">
                         <div class="mini-kpi-label">Ausentismo</div>
                         <div class="mini-kpi-value">{{ ausentismo|length }}</div>
                     </div>
-            
+
                     <div class="mini-kpi mini-warn">
                         <div class="mini-kpi-label">Vacaciones</div>
                         <div class="mini-kpi-value">{{ ns.vac_total|round(0)|int }}</div>
                     </div>
                 </div>
-            
+
                 {% if personal_items|length == 0 %}
                 <div class="empty">Sin registros.</div>
                 {% else %}
-            
+
                 {# 🔹 Filtrar SOLO las categorías “extra” que sí van a tabla #}
                 {% set rows = [] %}
                 {% for p in personal_items %}
@@ -549,7 +552,7 @@
                 {% set _ = rows.append({"cat": cat, "cant": cant}) %}
                 {% endif %}
                 {% endfor %}
-            
+
                 {% if rows|length == 0 %}
                 <div class="empty">Sin registros.</div>
                 {% else %}
@@ -568,7 +571,7 @@
                         {% set r2 = rows[i+1] if i+1 < rows|length else None %} <tr>
                             <td class="wrap-soft">{{ r1.cat }}</td>
                             <td class="t-right nowrap">{{ r1.cant }}</td>
-            
+
                             <td class="split">
                                 {% if r2 %}{{ r2.cat }}{% else %}&nbsp;{% endif %}
                             </td>
@@ -580,54 +583,55 @@
                     </tbody>
                 </table>
                 {% endif %}
-            
+
                 {% endif %}
             </div>
 
 
-        <div class="card subcard">
-            <div class="subhead">Ausentismo</div>
-        
-            {% if ausentismo|length == 0 %}
-            <div class="empty">Sin registros.</div>
-            {% else %}
-        
-            {# 🔹 Ordenar por motivo alfabéticamente #}
-            {% set aus = ausentismo
-            | sort(attribute='motivo')
-            %}
-        
-            <table class="table table-compact table-split">
-                <thead>
-                    <tr>
-                        <th style="width:120px;">Motivo</th>
-                        <th>Nombre</th>
-                        <th class="split" style="width:120px;">Motivo</th>
-                        <th>Nombre</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for i in range(0, aus|length, 2) %}
-                    {% set a1 = aus[i] %}
-                    {% set a2 = aus[i+1] if i+1 < aus|length else None %} {% set nom1=(a1["nombre"] if a1 is mapping else
-                        a1.nombre) or "—" %} {% set mot1=(a1["motivo"] if a1 is mapping else a1.motivo) or "Sin motivo" %} {% if
-                        a2 %} {% set nom2=(a2["nombre"] if a2 is mapping else a2.nombre) or "—" %} {% set mot2=(a2["motivo"] if
-                        a2 is mapping else a2.motivo) or "Sin motivo" %} {% endif %} <tr>
-                        <td class="nowrap">{{ mot1 }}</td>
-                        <td class="wrap-soft">{{ nom1 }}</td>
-        
-                        <td class="split">
-                            {% if a2 %}{{ mot2 }}{% else %}&nbsp;{% endif %}
-                        </td>
-                        <td class="{% if not a2 %}empty-right{% endif %} wrap-soft">
-                            {% if a2 %}{{ nom2 }}{% else %}&nbsp;{% endif %}
-                        </td>
+            <div class="card subcard">
+                <div class="subhead">Ausentismo</div>
+
+                {% if ausentismo|length == 0 %}
+                <div class="empty">Sin registros.</div>
+                {% else %}
+
+                {# 🔹 Ordenar por motivo alfabéticamente #}
+                {% set aus = ausentismo
+                | sort(attribute='motivo')
+                %}
+
+                <table class="table table-compact table-split">
+                    <thead>
+                        <tr>
+                            <th style="width:120px;">Nombre</th>
+                            <th>Motivo</th>
+                            <th class="split" style="width:120px;">Nombre</th>
+                            <th>Motivo</th>
                         </tr>
-                        {% endfor %}
-                </tbody>
-            </table>
-            {% endif %}
-        </div>
+                    </thead>
+                    <tbody>
+                        {% for i in range(0, aus|length, 2) %}
+                        {% set a1 = aus[i] %}
+                        {% set a2 = aus[i+1] if i+1 < aus|length else None %} {% set nom1=(a1["nombre"] if a1 is mapping
+                            else a1.nombre) or "—" %} {% set mot1=(a1["motivo"] if a1 is mapping else a1.motivo)
+                            or "Sin motivo" %} {% if a2 %} {% set nom2=(a2["nombre"] if a2 is mapping else a2.nombre)
+                            or "—" %} {% set mot2=(a2["motivo"] if a2 is mapping else a2.motivo) or "Sin motivo" %} {%
+                            endif %} <tr>
+                            <td class="nowrap">{{ nom1 }}</td>
+                            <td class="wrap-soft">{{ mot1 }}</td>
+
+                            <td class="split">
+                                {% if a2 %}{{ nom2 }}{% else %}&nbsp;{% endif %}
+                            </td>
+                            <td class="{% if not a2 %}empty-right{% endif %} wrap-soft">
+                                {% if a2 %}{{ mot2 }}{% else %}&nbsp;{% endif %}
+                            </td>
+                            </tr>
+                            {% endfor %}
+                    </tbody>
+                </table>
+                {% endif %}
+            </div>
 
 
         </div>
@@ -636,29 +640,29 @@
 
             <div class="card subcard">
                 <div class="subhead">Operadores prestados a otras áreas</div>
-            
+
                 {% if otras_areas|length == 0 %}
                 <div class="empty">Sin registros.</div>
                 {% else %}
                 <table class="table table-compact table-split">
                     <thead>
                         <tr>
-                            <th class="w-30">Operador</th>
+                            <th class="w-30">Nombre</th>
                             <th class="w-20">Área</th>
-                            <th class="w-30 split">Operador</th>
+                            <th class="w-30 split">Nombre</th>
                             <th class="w-20">Área</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for i in range(0, otras_areas|length, 2) %}
                         {% set a1 = otras_areas[i] %}
-                        {% set a2 = otras_areas[i+1] if i+1 < otras_areas|length else None %} {% set nom1=a1.get('nombre') if a1 is
-                            mapping else a1.nombre %} {% set area1=a1.get('area') if a1 is mapping else a1.area %} {% if a2 %} {%
-                            set nom2=a2.get('nombre') if a2 is mapping else a2.nombre %} {% set area2=a2.get('area') if a2 is
-                            mapping else a2.area %} {% endif %} <tr>
+                        {% set a2 = otras_areas[i+1] if i+1 < otras_areas|length else None %} {% set
+                            nom1=a1.get('nombre') if a1 is mapping else a1.nombre %} {% set area1=a1.get('area') if a1
+                            is mapping else a1.area %} {% if a2 %} {% set nom2=a2.get('nombre') if a2 is mapping else
+                            a2.nombre %} {% set area2=a2.get('area') if a2 is mapping else a2.area %} {% endif %} <tr>
                             <td class="nowrap">{{ nom1 }}</td>
                             <td class="wrap-soft">{{ area1 }}</td>
-            
+
                             <td class="split">
                                 {% if a2 %}{{ nom2 }}{% else %}&nbsp;{% endif %}
                             </td>
@@ -698,22 +702,16 @@
                         {% set cantL = left["cantidad"] if left is mapping else left.cantidad %}
 
                         {% set j = i + half %}
-                        {% if j < items|length %}
-                        {% set right = items[j] %}
-                        {% set entR = right["entrenamiento"] if right is mapping else right.entrenamiento %}
-                        {% set cantR = right["cantidad"] if right is mapping else right.cantidad %}
-                        {% else %}
-                        {% set entR = "" %}
-                        {% set cantR = "" %}
-                        {% endif %}
-                        <tr>
+                        {% if j < items|length %} {% set right=items[j] %} {% set entR=right["entrenamiento"] if right
+                            is mapping else right.entrenamiento %} {% set cantR=right["cantidad"] if right is mapping
+                            else right.cantidad %} {% else %} {% set entR="" %} {% set cantR="" %} {% endif %} <tr>
                             <td>{{ entL }}</td>
                             <td class="t-right nowrap">{{ cantL }}</td>
 
                             <td class="split">{{ entR or '' }}</td>
                             <td class="t-right nowrap">{{ cantR if cantR != "" else '' }}</td>
-                        </tr>
-                        {% endfor %}
+                            </tr>
+                            {% endfor %}
                     </tbody>
                 </table>
                 {% endif %}
@@ -761,7 +759,7 @@
     </section>
 
     <!-- ✅ MOVIDO: Gestión de áreas a la página 2 debajo de Prestados/Entrenamiento -->
-    
+
     <section class="section" id="gestion-areas">
         <div class="section-title">
             <h2 class="h2">Gestión de áreas</h2>
@@ -808,7 +806,7 @@
        SEGURIDAD
   ========================================================== -->
     <section class="section" id="seguridad">
-        
+
         <div class="two-col">
             <div class="card subcard">
                 <div class="subhead">Observaciones</div>
@@ -882,7 +880,7 @@
        PTS + COMENTARIOS (50/50)
   ========================================================== -->
     <section class="section" id="pts-comentarios">
-        
+
 
         <div class="two-col">
             <div class="card subcard">
