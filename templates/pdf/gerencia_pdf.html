@@ -159,6 +159,36 @@
     </section>
 
     <div class="two-col mt-14">
+        <!-- 3. CAMIONES -->
+        <section class="section">
+            <div class="section-title">
+                <h2 class="h2">Estatus de Equipos</h2>
+                <span class="badge">Op: {{ camiones_disponibles }}/{{ total_camiones }}</span>
+            </div>
+            <div class="card">
+                <table class="table table-compact">
+                    <thead>
+                        <tr>
+                            <th>Distribución de Camiones</th>
+                            <th class="t-right">Cantidad</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for d in distribucion_camiones %}
+                        <tr {% if d.tipo == 'Operativos' %}class="row-ok"{% elif d.tipo == 'Down' %}class="row-bad"{% endif %}>
+                            <td>{{ d.tipo }}</td>
+                            <td class="t-right">{{ d.cantidad }}</td>
+                        </tr>
+                        {% endfor %}
+                        <tr class="row-strong">
+                            <td>Total Flota</td>
+                            <td class="t-right">{{ total_camiones }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
         <!-- 2. PERSONAL -->
         <section class="section">
             <div class="section-title">
@@ -183,36 +213,6 @@
                         <tr class="row-strong">
                             <td>Disponibles para operar (Neto)</td>
                             <td class="t-right">{{ disponible_p }}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </section>
-
-        <!-- 3. CAMIONES -->
-        <section class="section">
-            <div class="section-title">
-                <h2 class="h2">Estatus de Equipos</h2>
-                <span class="badge">Op: {{ camiones_disponibles }}/{{ total_camiones }}</span>
-            </div>
-            <div class="card">
-                <table class="table table-compact">
-                    <thead>
-                        <tr>
-                            <th>Roster General</th>
-                            <th class="t-right">Cantidad</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for d in distribucion_camiones %}
-                        <tr {% if d.tipo == 'Operativos' %}class="row-ok"{% elif d.tipo == 'Down' %}class="row-bad"{% endif %}>
-                            <td>{{ d.tipo }}</td>
-                            <td class="t-right">{{ d.cantidad }}</td>
-                        </tr>
-                        {% endfor %}
-                        <tr class="row-strong">
-                            <td>Total Flota</td>
-                            <td class="t-right">{{ total_camiones }}</td>
                         </tr>
                     </tbody>
                 </table>
