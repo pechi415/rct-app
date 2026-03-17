@@ -276,9 +276,12 @@
                     {% endif %}
                     {% endfor %}
 
+                    {% set th_ok = 7 if r.mina == 'ED' else 6 %}
+                    {% set th_warn = 5 if r.mina == 'ED' else 4 %}
+
                     <span class="badge
-                                {% if ns.ok >= 7 %} badge-ok
-                                {% elif ns.ok >= 5 %} badge-warn
+                                {% if ns.ok >= th_ok %} badge-ok
+                                {% elif ns.ok >= th_warn %} badge-warn
                                 {% else %} badge-bad
                                 {% endif %}">
                         Disponible: {{ ns.ok }}
