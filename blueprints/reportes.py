@@ -316,17 +316,8 @@ def reporte_pdf(reporte_id: int):
     ctx.setdefault("bahias_nota", "")
 
 
-    variant = request.args.get("v", "A").strip().upper()  # uso interno
-
-    template_map = {
-        "A": "pdf/reporte_pdf.html",
-        "B": "pdf/reporte_B.html",  
-        "C": "pdf/reporte_C.html",   # NUEVO (1 hoja)
-        # "D": "pdf/reporte_D.html",
-    }
-
-    tpl = template_map.get(variant, template_map["A"])
-    html = render_template(tpl, **ctx)
+    # Se usa exclusivamente la plantilla B (limpieza de versiones C y PDF antiguas)
+    html = render_template("pdf/reporte_B.html", **ctx)
 
     from flask import current_app
     import subprocess

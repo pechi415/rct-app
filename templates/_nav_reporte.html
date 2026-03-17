@@ -16,7 +16,7 @@
 
       <!-- Botones de Impresión/PDF (Solo si cerrado) -->
       {% if r.estado == "CERRADO" %}
-      <a class="btn btn-sm btn-outline-primary" href="{{ url_for('reportes.reporte_pdf', reporte_id=r.id, v='B') }}"
+      <a class="btn btn-sm btn-outline-primary" href="{{ url_for('reportes.reporte_pdf', reporte_id=r.id) }}"
         target="_blank">
         📄 PDF
       </a>
