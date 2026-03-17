@@ -544,12 +544,8 @@
                 {% set cat = (p["categoria"] if p is mapping else p.categoria) or "" %}
                 {% set cant = p["cantidad"] if p is mapping else p.cantidad %}
                 {% set cat_l = cat|lower|trim %}
-                {% if ("roster" not in cat_l)
-                and ("dispon" not in cat_l)
-                and ("ausent" not in cat_l)
-                and ("vac" not in cat_l)
-                and ("para operar" not in cat_l) %}
-                {% set _ = rows.append({"cat": cat, "cant": cant}) %}
+                {% if cat not in ["ROSTER", "Ausentes", "Vacaciones"] %}
+                {% set _ = rows.append({"cat": get_label(cat, r.mina), "cant": cant}) %}
                 {% endif %}
                 {% endfor %}
 

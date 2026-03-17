@@ -289,6 +289,8 @@ def build_reporte_context(conn, reporte_id: int) -> dict:
         supervisores=supervisores,
         fatiga_total_sueno=total_sueno,
         fatiga_total_pausas=total_pausas,
+        personal_items=personal_items,
+        get_label=get_personal_label
     )
 
 
