@@ -24,12 +24,12 @@
         <div class="card h-100 border-dark shadow-sm">
             <div class="card-header bg-dark text-white fw-bold d-flex justify-content-between align-items-center">
                 <span>Distribución de Personal</span>
-                <span class="badge bg-light text-dark">Disp: {{ disponible_p }}</span>
+                <span class="badge bg-light text-dark">Roster General: {{ roster_p }}</span>
             </div>
             <div class="card-body">
                 <div class="mb-3 d-flex justify-content-between align-items-center border-bottom pb-2">
-                    <span class="text-muted small fw-bold">Roster General:</span>
-                    <span class="h5 mb-0 fw-bold text-primary">{{ roster_p }}</span>
+                    <span class="text-muted small fw-bold">Disponible para operar:</span>
+                    <span class="h5 mb-0 fw-bold text-primary">{{ disponible_p }}</span>
                 </div>
                 <div class="row row-cols-2 g-2">
                     {% for p in personal %}
