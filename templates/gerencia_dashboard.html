@@ -166,6 +166,12 @@
                             <span class="small fw-bold">Cam. x Operador (1ra Hr)</span>
                             <span class="badge bg-primary">{{ fl_ed.camiones_por_operador or '0' }}</span>
                         </div>
+                        {% if fl_ed.razon %}
+                        <div class="mt-2 p-2 border-start border-3 border-primary bg-light">
+                            <i class="bi bi-info-circle me-1 text-primary"></i>
+                            <span class="small text-muted italic">{{ fl_ed.razon }}</span>
+                        </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -206,6 +212,12 @@
                             <span class="small fw-bold">Cam. x Operador (1ra Hr)</span>
                             <span class="badge bg-primary">{{ fl_prb.camiones_por_operador or '0' }}</span>
                         </div>
+                        {% if fl_prb.razon %}
+                        <div class="mt-2 p-2 border-start border-3 border-primary bg-light">
+                            <i class="bi bi-info-circle me-1 text-primary"></i>
+                            <span class="small text-muted italic">{{ fl_prb.razon }}</span>
+                        </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>
