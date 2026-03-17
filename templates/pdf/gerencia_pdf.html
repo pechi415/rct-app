@@ -7,28 +7,64 @@
     <link rel="stylesheet" href="static/css/pdf.css">
     <style>
         /* Ajustes específicos para Gerencia PDF horizontal */
-        .hdr-title { font-size: 18pt; }
-        .kpi-mini-label { font-size: 7.5pt; }
-        .kpi-mini-value { font-size: 14pt; }
-        .kpi-strip { grid-template-columns: repeat(4, 1fr); }
-        
-        .mine-card-container { display: table; width: 100%; table-layout: fixed; border-spacing: 5mm 0; margin-left: -2.5mm; }
-        .mine-card-cell { display: table-cell; vertical-align: top; width: 50%; }
-        
-        .op-2x2 { border-spacing: 4px; }
-        .op-cell { padding: 4px 6px; border-radius: 6px; }
-        .op-cell .k { font-size: 7.5pt; }
-        .op-cell .v { font-size: 10pt; }
-        
-        .section-title { margin-top: 10px; }
+        .hdr-title {
+            font-size: 18pt;
+        }
+
+        .kpi-mini-label {
+            font-size: 7.5pt;
+        }
+
+        .kpi-mini-value {
+            font-size: 14pt;
+        }
+
+        .kpi-strip {
+            grid-template-columns: repeat(4, 1fr);
+        }
+
+        .mine-card-container {
+            display: table;
+            width: 100%;
+            table-layout: fixed;
+            border-spacing: 5mm 0;
+            margin-left: -2.5mm;
+        }
+
+        .mine-card-cell {
+            display: table-cell;
+            vertical-align: top;
+            width: 50%;
+        }
+
+        .op-2x2 {
+            border-spacing: 4px;
+        }
+
+        .op-cell {
+            padding: 4px 6px;
+            border-radius: 6px;
+        }
+
+        .op-cell .k {
+            font-size: 7.5pt;
+        }
+
+        .op-cell .v {
+            font-size: 10pt;
+        }
+
+        .section-title {
+            margin-top: 10px;
+        }
     </style>
 </head>
 
 <body>
 
     {# =========================
-       HEADER (running element)
-       ========================= #}
+    HEADER (running element)
+    ========================= #}
     <div class="page-header">
         <div class="header-inner">
             <div class="hdr-left">
@@ -52,8 +88,8 @@
     </div>
 
     {# =========================
-       KPI STRIP (4 metrics)
-       ========================= #}
+    KPI STRIP (4 metrics)
+    ========================= #}
     <div class="kpi-strip">
         <div class="kpi-mini">
             <div class="kpi-mini-label">Disponibilidad de Personal</div>
@@ -77,7 +113,70 @@
         </div>
     </div>
 
-    <!-- 1. OPERACIÓN: FIRST / LAST -->
+    <div class="two-col mt-14">
+        <!-- 1. CAMIONES -->
+        <section class="section">
+            <div class="section-title">
+                <h2 class="h2">Estatus de Equipos</h2>
+                <span class="badge">Op: {{ camiones_disponibles }}/{{ total_camiones }}</span>
+            </div>
+            <div class="card">
+                <table class="table table-compact">
+                    <thead>
+                        <tr>
+                            <th>Distribución de Camiones</th>
+                            <th class="t-right">Cantidad</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for d in distribucion_camiones %}
+                        <tr {% if d.tipo=='Operativos' %}class="row-ok" {% elif d.tipo=='Down' %}class="row-bad" {%
+                            endif %}>
+                            <td>{{ d.tipo }}</td>
+                            <td class="t-right">{{ d.cantidad }}</td>
+                        </tr>
+                        {% endfor %}
+                        <tr class="row-strong">
+                            <td>Total Flota</td>
+                            <td class="t-right">{{ total_camiones }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- 2. PERSONAL -->
+        <section class="section">
+            <div class="section-title">
+                <h2 class="h2">Distribución de Personal</h2>
+                <span class="badge">Disp: {{ disponible_p }}</span>
+            </div>
+            <div class="card">
+                <table class="table table-compact">
+                    <thead>
+                        <tr>
+                            <th>Categoría</th>
+                            <th class="t-right">Cantidad</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for p in personal %}
+                        <tr>
+                            <td>{{ p.categoria }}</td>
+                            <td class="t-right">{{ p.cantidad }}</td>
+                        </tr>
+                        {% endfor %}
+                        <tr class="row-strong">
+                            <td>Disponibles para operar (Neto)</td>
+                            <td class="t-right">{{ disponible_p }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <!-- 3. OPERACIÓN: FIRST / LAST -->
     <section class="section">
         <div class="section-title">
             <h2 class="h2">First - Last (Tiempos de Arribo)</h2>
@@ -157,70 +256,6 @@
             </div>
         </div>
     </section>
-
-    <div class="two-col mt-14">
-        <!-- 3. CAMIONES -->
-        <section class="section">
-            <div class="section-title">
-                <h2 class="h2">Estatus de Equipos</h2>
-                <span class="badge">Op: {{ camiones_disponibles }}/{{ total_camiones }}</span>
-            </div>
-            <div class="card">
-                <table class="table table-compact">
-                    <thead>
-                        <tr>
-                            <th>Distribución de Camiones</th>
-                            <th class="t-right">Cantidad</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for d in distribucion_camiones %}
-                        <tr {% if d.tipo == 'Operativos' %}class="row-ok"{% elif d.tipo == 'Down' %}class="row-bad"{% endif %}>
-                            <td>{{ d.tipo }}</td>
-                            <td class="t-right">{{ d.cantidad }}</td>
-                        </tr>
-                        {% endfor %}
-                        <tr class="row-strong">
-                            <td>Total Flota</td>
-                            <td class="t-right">{{ total_camiones }}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </section>
-
-        <!-- 2. PERSONAL -->
-        <section class="section">
-            <div class="section-title">
-                <h2 class="h2">Distribución de Personal</h2>
-                <span class="badge">Disp: {{ disponible_p }}</span>
-            </div>
-            <div class="card">
-                <table class="table table-compact">
-                    <thead>
-                        <tr>
-                            <th>Categoría</th>
-                            <th class="t-right">Cantidad</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for p in personal %}
-                        <tr>
-                            <td>{{ p.categoria }}</td>
-                            <td class="t-right">{{ p.cantidad }}</td>
-                        </tr>
-                        {% endfor %}
-                        <tr class="row-strong">
-                            <td>Disponibles para operar (Neto)</td>
-                            <td class="t-right">{{ disponible_p }}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </section>
-    </div>
-
-
 
 </body>
 
