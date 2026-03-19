@@ -2,13 +2,14 @@ from flask import Blueprint, render_template, request, flash, redirect, url_for,
 from database import get_conn
 from blueprints.reportes import fetch_reporte, build_reporte_context
 from config import MINAS
-from blueprints.auth import login_required
+from blueprints.auth import login_required, roles_required
 import gc
 
 gerencia_bp = Blueprint("gerencia", __name__)
 
 @gerencia_bp.route("/gerencia", methods=["GET", "POST"])
 @login_required
+@roles_required("ADMIN", "SUPERVISOR")
 def index():
     if request.method == "POST":
         fecha = request.form.get("fecha")
@@ -47,6 +48,7 @@ def index():
 
 @gerencia_bp.route("/gerencia/dashboard/<fecha>/<turno>")
 @login_required
+@roles_required("ADMIN", "SUPERVISOR")
 def dashboard(fecha, turno):
     with get_conn() as conn:
         rep_ed = conn.execute(
