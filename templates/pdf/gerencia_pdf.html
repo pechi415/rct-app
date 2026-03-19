@@ -113,8 +113,39 @@
         </div>
     </div>
 
+    <!-- 1. PERSONAL -->
+    <section class="section">
+        <div class="section-title">
+            <h2 class="h2">Distribución de Personal</h2>
+            <span class="badge">Disp: {{ disponible_p }}</span>
+        </div>
+        <div class="card">
+            <table class="table table-compact">
+                <thead>
+                    <tr>
+                        <th>Categoría</th>
+                        <th class="t-right">Cantidad</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in personal %}
+                    <tr>
+                        <td>{{ p.categoria }}</td>
+                        <td class="t-right">{{ p.cantidad }}</td>
+                    </tr>
+                    {% endfor %}
+                    <tr class="row-strong">
+                        <td>Disponibles para operar (Neto)</td>
+                        <td class="t-right">{{ disponible_p }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+    </div>
+
     <div class="two-col mt-14">
-        <!-- 1. CAMIONES -->
+        <!-- 2. CAMIONES -->
         <section class="section">
             <div class="section-title">
                 <h2 class="h2">Estatus de Equipos</h2>
@@ -145,117 +176,86 @@
             </div>
         </section>
 
-        <!-- 2. PERSONAL -->
+        <!-- 3. OPERACIÓN: FIRST / LAST -->
         <section class="section">
             <div class="section-title">
-                <h2 class="h2">Distribución de Personal</h2>
-                <span class="badge">Disp: {{ disponible_p }}</span>
+                <h2 class="h2">First - Last (Tiempos de Arribo)</h2>
             </div>
-            <div class="card">
-                <table class="table table-compact">
-                    <thead>
-                        <tr>
-                            <th>Categoría</th>
-                            <th class="t-right">Cantidad</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for p in personal %}
-                        <tr>
-                            <td>{{ p.categoria }}</td>
-                            <td class="t-right">{{ p.cantidad }}</td>
-                        </tr>
-                        {% endfor %}
-                        <tr class="row-strong">
-                            <td>Disponibles para operar (Neto)</td>
-                            <td class="t-right">{{ disponible_p }}</td>
-                        </tr>
-                    </tbody>
-                </table>
+
+            <div class="mine-card-container">
+                <!-- COLUMNA EL DESCANSO -->
+                <div class="mine-card-cell">
+                    <div class="card card-soft">
+                        <div class="card-title">El Descanso</div>
+                        <div class="op-2x2">
+                            <div class="op-row">
+                                <div class="op-cell">
+                                    <div class="k">Inicio PIT 2</div>
+                                    <div class="v">{{ fl_ed.inicio_pit2 or '-' }}</div>
+                                </div>
+                                <div class="op-cell">
+                                    <div class="k">Inicio PIT 5</div>
+                                    <div class="v">{{ fl_ed.inicio_pit5 or '-' }}</div>
+                                </div>
+                            </div>
+                            <div class="op-row">
+                                <div class="op-cell">
+                                    <div class="k">Final PIT 2</div>
+                                    <div class="v">{{ fl_ed.final_pit2 or '-' }}</div>
+                                </div>
+                                <div class="op-cell">
+                                    <div class="k">Final PIT 5</div>
+                                    <div class="v">{{ fl_ed.final_pit5 or '-' }}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="op-note mt-10">
+                            <div class="k">Cam. x Operador (1ra Hr)</div>
+                            <div class="v">
+                                <strong>{{ fl_ed.camiones_por_operador or '0' }}</strong>
+                                {% if fl_ed.razon %} <span class="op-sep">|</span> {{ fl_ed.razon }}{% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- COLUMNA PRIBBENOW -->
+                <div class="mine-card-cell">
+                    <div class="card card-soft">
+                        <div class="card-title">Pribbenow</div>
+                        <div class="op-2x2">
+                            <div class="op-row">
+                                <div class="op-cell">
+                                    <div class="k">Inicio PRIBBENOW</div>
+                                    <div class="v">{{ fl_prb.inicio_pit2 or '-' }}</div>
+                                </div>
+                                <div class="op-cell">
+                                    <div class="k">Inicio COROZO</div>
+                                    <div class="v">{{ fl_prb.inicio_pit5 or '-' }}</div>
+                                </div>
+                            </div>
+                            <div class="op-row">
+                                <div class="op-cell">
+                                    <div class="k">Final PRIBBENOW</div>
+                                    <div class="v">{{ fl_prb.final_pit2 or '-' }}</div>
+                                </div>
+                                <div class="op-cell">
+                                    <div class="k">Final COROZO</div>
+                                    <div class="v">{{ fl_prb.final_pit5 or '-' }}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="op-note mt-10">
+                            <div class="k">Cam. x Operador (1ra Hr)</div>
+                            <div class="v">
+                                <strong>{{ fl_prb.camiones_por_operador or '0' }}</strong>
+                                {% if fl_prb.razon %} <span class="op-sep">|</span> {{ fl_prb.razon }}{% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
-    </div>
-
-    <!-- 3. OPERACIÓN: FIRST / LAST -->
-    <section class="section">
-        <div class="section-title">
-            <h2 class="h2">First - Last (Tiempos de Arribo)</h2>
-        </div>
-
-        <div class="mine-card-container">
-            <!-- COLUMNA EL DESCANSO -->
-            <div class="mine-card-cell">
-                <div class="card card-soft">
-                    <div class="card-title">El Descanso</div>
-                    <div class="op-2x2">
-                        <div class="op-row">
-                            <div class="op-cell">
-                                <div class="k">Inicio PIT 2</div>
-                                <div class="v">{{ fl_ed.inicio_pit2 or '-' }}</div>
-                            </div>
-                            <div class="op-cell">
-                                <div class="k">Inicio PIT 5</div>
-                                <div class="v">{{ fl_ed.inicio_pit5 or '-' }}</div>
-                            </div>
-                        </div>
-                        <div class="op-row">
-                            <div class="op-cell">
-                                <div class="k">Final PIT 2</div>
-                                <div class="v">{{ fl_ed.final_pit2 or '-' }}</div>
-                            </div>
-                            <div class="op-cell">
-                                <div class="k">Final PIT 5</div>
-                                <div class="v">{{ fl_ed.final_pit5 or '-' }}</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="op-note mt-10">
-                        <div class="k">Cam. x Operador (1ra Hr)</div>
-                        <div class="v">
-                            <strong>{{ fl_ed.camiones_por_operador or '0' }}</strong>
-                            {% if fl_ed.razon %} <span class="op-sep">|</span> {{ fl_ed.razon }}{% endif %}
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- COLUMNA PRIBBENOW -->
-            <div class="mine-card-cell">
-                <div class="card card-soft">
-                    <div class="card-title">Pribbenow</div>
-                    <div class="op-2x2">
-                        <div class="op-row">
-                            <div class="op-cell">
-                                <div class="k">Inicio PRIBBENOW</div>
-                                <div class="v">{{ fl_prb.inicio_pit2 or '-' }}</div>
-                            </div>
-                            <div class="op-cell">
-                                <div class="k">Inicio COROZO</div>
-                                <div class="v">{{ fl_prb.inicio_pit5 or '-' }}</div>
-                            </div>
-                        </div>
-                        <div class="op-row">
-                            <div class="op-cell">
-                                <div class="k">Final PRIBBENOW</div>
-                                <div class="v">{{ fl_prb.final_pit2 or '-' }}</div>
-                            </div>
-                            <div class="op-cell">
-                                <div class="k">Final COROZO</div>
-                                <div class="v">{{ fl_prb.final_pit5 or '-' }}</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="op-note mt-10">
-                        <div class="k">Cam. x Operador (1ra Hr)</div>
-                        <div class="v">
-                            <strong>{{ fl_prb.camiones_por_operador or '0' }}</strong>
-                            {% if fl_prb.razon %} <span class="op-sep">|</span> {{ fl_prb.razon }}{% endif %}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
 
 </body>
 
