@@ -813,6 +813,17 @@ def eliminar_reporte(reporte_id):
         return redirect(url_for("reportes.ver_reportes"))
 
     with get_conn() as conn:
+        tablas_hijas = [
+            "gestion_areas", "buses_bahias", "equipos_varados", "ausentismo",
+            "bombas", "distribucion_camiones", "equipo_liviano", "distribucion_personal",
+            "operadores_otras_areas", "entrenamiento_personal", "luminarias",
+            "contactos_operadores", "seguridad_observaciones", "seguridad_charlas",
+            "first_last", "pts_divulgacion", "comentarios_turno", "supervisores_turno",
+            "fatiga_pausas"
+        ]
+        for tabla in tablas_hijas:
+            conn.execute(f"DELETE FROM {tabla} WHERE reporte_id = ?", (reporte_id,))
+            
         conn.execute("DELETE FROM reportes WHERE id = ?", (reporte_id,))
     
     try:
