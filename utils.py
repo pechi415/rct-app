@@ -32,11 +32,11 @@ def calc_disponible_personal(items):
     """
     data = {row["categoria"]: int(row["cantidad"]) for row in items}
 
-    roster = data.get("ROSTER", 0)
+    roster = data.get("ROSTER", 0) + data.get("Personal solo día", 0)
 
     disponible = roster
     for cat, sign in IMPACTO_PERSONAL.items():
-        if cat != "ROSTER":
+        if cat not in ("ROSTER", "Personal solo día"):
             disponible += sign * data.get(cat, 0)
 
     return roster, disponible
