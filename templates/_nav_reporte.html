@@ -10,9 +10,11 @@
       </a>
 
       <!-- Secciones (Dashboard): vuelve al dashboard del reporte -->
+      {% if r.estado == 'ABIERTO' %}
       <a class="btn btn-sm btn-outline-primary" href="/reportes/{{ r.id }}">
         🗃️ Secciones
       </a>
+      {% endif %}
 
       <!-- Botones de Impresión/PDF (Solo si cerrado) -->
       {% if r.estado == "CERRADO" %}
