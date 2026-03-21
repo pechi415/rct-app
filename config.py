@@ -75,11 +75,11 @@ TIPOS_CONTACTO = [
 SUPERVISORES_POR_MINA = {
     "ED": {
         "G1": ["A. Ramirez", "G. Hidalgo", "J. Diaz", "O. Araujo"],
-        "G2": ["A. Morales", "S. Rodríguez", "L. Jiménez"],
+        "G2": ["A. Morales", "S. Rodríguez", "L. Jiménez", "J. Vargas"],
         "G3": ["D. Tapias", "J. Hernández", "C. Daza", "E. Duran"],
     },
     "PB": {
-        "G1": ["J. Ballesteros", "J. Reyes", "J. Vargas"],
+        "G1": ["J. Ballesteros", "J. Reyes"],
         "G2": ["J. Hernández", "M. Maestre"],
         "G3": ["J. Daza", "Q. Muñoz"],
     },
