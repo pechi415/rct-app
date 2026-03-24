@@ -588,19 +588,20 @@ def editar_fecha_reporte(reporte_id):
     
     # POST
     nueva_fecha = request.form.get("fecha", "").strip()
+    nuevo_turno = request.form.get("turno", "").strip().upper()
     
-    if nueva_fecha == "":
+    if nueva_fecha == "" or nuevo_turno not in ("DIA", "NOCHE"):
         return render_template(
             "reporte_editar_fecha.html",
             r=r,
-            error="Debes ingresar una fecha válida."
+            error="Debes ingresar una fecha válida y seleccionar un turno (DIA o NOCHE)."
         )
     
-    # Actualizar la fecha en la base de datos
+    # Actualizar la fecha y turno en la base de datos
     with get_conn() as conn:
         conn.execute(
-            "UPDATE reportes SET fecha = ? WHERE id = ?",
-            (nueva_fecha, reporte_id)
+            "UPDATE reportes SET fecha = ?, turno = ? WHERE id = ?",
+            (nueva_fecha, nuevo_turno, reporte_id)
         )
     
     return redirect(url_for("reportes.reporte_inicio", reporte_id=reporte_id))

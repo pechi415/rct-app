@@ -13,7 +13,7 @@
 
   <div class="d-flex gap-2">
     {% if g.user and g.user.rol in ('ADMIN', 'SUPERVISOR') %}
-    <a class="btn btn-primary btn-sm" href="/reportes/{{ r.id }}/editar-fecha" title="Editar Fecha">✏️ <span class="d-none d-md-inline">Editar Fecha</span></a>
+    <a class="btn btn-primary btn-sm" href="/reportes/{{ r.id }}/editar-fecha" title="Editar Fecha/Turno">✏️ <span class="d-none d-md-inline">Editar Fecha/Turno</span></a>
     {% endif %}
     <a class="btn btn-secondary btn-sm" href="/reportes" title="Inicio">🏠 <span class="d-none d-md-inline">Inicio</span></a>
   </div>
