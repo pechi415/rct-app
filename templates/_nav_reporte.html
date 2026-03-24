@@ -5,14 +5,14 @@
     <div class="{% if _inline %}nav-reporte-bar{% else %}nav-reporte-fixed{% endif %}">
 
       <!-- Inicio: vuelve a la lista de reportes -->
-      <a class="btn btn-sm btn-outline-primary" href="/reportes">
-        🏠 Inicio
+      <a class="btn btn-sm btn-outline-primary" href="/reportes" title="Inicio">
+        🏠 <span class="d-none d-md-inline">Inicio</span>
       </a>
 
       <!-- Secciones (Dashboard): vuelve al dashboard del reporte -->
       {% if r.estado == 'ABIERTO' %}
-      <a class="btn btn-sm btn-outline-primary" href="/reportes/{{ r.id }}">
-        🗃️ Secciones
+      <a class="btn btn-sm btn-outline-primary" href="/reportes/{{ r.id }}" title="Secciones">
+        🗃️ <span class="d-none d-md-inline">Secciones</span>
       </a>
       {% endif %}
 
