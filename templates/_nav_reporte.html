@@ -22,6 +22,9 @@
         target="_blank">
         📄 PDF
       </a>
+      <button class="btn btn-sm btn-outline-success" onclick="sharePDF('{{ url_for('reportes.reporte_pdf', reporte_id=r.id) }}', 'RCT_{{ r.id }}.pdf')" title="Compartir">
+        📤 <span class="d-none d-md-inline">Compartir</span>
+      </button>
       {% endif %}
 
       <!-- Estado del reporte -->

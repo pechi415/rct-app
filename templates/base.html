@@ -85,6 +85,45 @@
 
   <!-- [BASE] Bootstrap JS (al final para mejor carga) -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Script global para compartir PDF -->
+  <script>
+    async function sharePDF(url, filename) {
+      if (!navigator.share) {
+        alert("Tu navegador no soporta la función de compartir nativa. Intenta abrir el PDF directamente.");
+        window.open(url, '_blank');
+        return;
+      }
+      try {
+        // Obtenemos el archivo mediante fetch
+        const response = await fetch(url);
+        if (!response.ok) throw new Error("Error al descargar PDF");
+        const blob = await response.blob();
+        
+        // Creamos un objeto File compatible con Web Share
+        const file = new File([blob], filename, { type: 'application/pdf' });
+        
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          // Compartir como archivo (iOS 14+, Android Moderno)
+          await navigator.share({
+            title: filename,
+            files: [file]
+          });
+        } else {
+          // Compartir como URL si no soporta archivos
+          await navigator.share({
+            title: filename,
+            url: window.location.origin + url
+          });
+        }
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          console.error("Error al compartir", err);
+          alert("Ocurrió un problema al intentar compartir el archivo.");
+        }
+      }
+    }
+  </script>
 </body>
 
 </html>
