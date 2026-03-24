@@ -351,9 +351,11 @@ def reporte_pdf(reporte_id: int):
         if os.path.exists(out_name): os.remove(out_name)
         gc.collect()
 
+    r_data = ctx["r"]
+    filename = f'RCT_{r_data["mina"]}_{r_data["fecha"]}_{r_data["turno"]}.pdf'
     resp = make_response(pdf_bytes)
     resp.headers["Content-Type"] = "application/pdf"
-    resp.headers["Content-Disposition"] = f'inline; filename="RCT_{reporte_id}.pdf"'
+    resp.headers["Content-Disposition"] = f'inline; filename="{filename}"'
     return resp
 
 # =========================================================

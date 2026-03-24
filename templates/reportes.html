@@ -177,7 +177,7 @@ request.args.get('desde') or request.args.get('hasta') %}
                   📄 PDF
                 </a>
                 <button class="btn btn-sm btn-outline-success" type="button"
-                  onclick="sharePDF('{{ url_for('reportes.reporte_pdf', reporte_id=r.id, v='B') }}', 'RCT_{{ r.id }}.pdf')" title="Compartir PDF">
+                  onclick="sharePDF('{{ url_for('reportes.reporte_pdf', reporte_id=r.id, v='B') }}', 'RCT_{{ r.mina }}_{{ r.fecha }}_{{ r.turno }}.pdf')" title="Compartir PDF">
                   📤 Compartir
                 </button>
                 {% endif %}
