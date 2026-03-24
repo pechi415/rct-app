@@ -12,16 +12,16 @@
   <div class="acciones-header">
 
     {% if g.user and g.user.rol in ["ADMIN", "SUPERVISOR"] %}
-    <a href="{{ url_for('gerencia.index') }}" class="btn btn-info">📊 Reporte Gerencial</a>
+    <a href="{{ url_for('gerencia.index') }}" class="btn btn-info" title="Reporte Gerencial">📊 <span class="d-none d-md-inline">Reporte Gerencial</span></a>
     {% endif %}
 
     <button class="btn btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#filtrosReportes"
-      aria-expanded="false" aria-controls="filtrosReportes">
-      🔎 Buscar
+      aria-expanded="false" aria-controls="filtrosReportes" title="Buscar">
+      🔎 <span class="d-none d-md-inline">Buscar</span>
     </button>
 
     {% if g.user.rol in ["ADMIN", "SUPERVISOR"] %}
-    <a class="btn btn-primary" href="/reportes/nuevo">📝 Nuevo reporte</a>
+    <a class="btn btn-primary" href="/reportes/nuevo" title="Nuevo reporte">📝 <span class="d-none d-md-inline">Nuevo reporte</span></a>
     {% endif %}
 
   </div>
