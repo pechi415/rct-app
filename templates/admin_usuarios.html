@@ -5,10 +5,10 @@
 <div class="container py-4">
   <div class="d-flex justify-content-between align-items-center mb-3">
     <div class="d-flex align-items-center gap-3">
-      <a class="btn btn-secondary" href="{{ url_for('reportes.ver_reportes') }}">⬅ Volver a Inicio</a>
+      <a class="btn btn-secondary" href="{{ url_for('reportes.ver_reportes') }}" title="Volver a Inicio">⬅ <span class="d-none d-md-inline">Volver a Inicio</span></a>
       <h3 class="m-0">Usuarios</h3>
     </div>
-    <a class="btn btn-primary" href="{{ url_for('admin.admin_usuario_nuevo') }}">+ Nuevo usuario</a>
+    <a class="btn btn-primary" href="{{ url_for('admin.admin_usuario_nuevo') }}" title="Nuevo usuario">➕ <span class="d-none d-md-inline">Nuevo usuario</span></a>
   </div>
 
   <div class="table-responsive">
