@@ -168,7 +168,7 @@
 
 
             <div class="card subcard">
-                <div class="subhead">Ausentismo</div>
+                <div class="subhead">Ausentismo <span class="badge">{{ ausentismo|length }}</span></div>
 
                 {% if ausentismo|length == 0 %}
                 <div class="empty">Sin registros.</div>
@@ -218,7 +218,7 @@
         <div class="two-col mt-14">
 
             <div class="card subcard">
-                <div class="subhead">Operadores prestados a otras áreas</div>
+                <div class="subhead">Operadores prestados a otras áreas <span class="badge">{{ otras_areas|length }}</span></div>
 
                 {% if otras_areas|length == 0 %}
                 <div class="empty">Sin registros.</div>
@@ -257,7 +257,7 @@
 
 
             <div class="card subcard">
-                <div class="subhead">Personal en entrenamiento</div>
+                <div class="subhead">Personal en entrenamiento <span class="badge">{{ entrenamiento_items|length }}</span></div>
 
                 {% set items = entrenamiento_items %}
                 {% set half = (items|length + 1) // 2 %}
@@ -297,7 +297,7 @@
 
                 <div class="divider-hr"></div>
 
-                <div class="subhead subhead-sm">Contacto con operadores</div>
+                <div class="subhead subhead-sm">Contacto con operadores <span class="badge">{{ contactos|length }}</span></div>
 
                 {% if contactos|length == 0 %}
                 <div class="empty">Sin registros.</div>
