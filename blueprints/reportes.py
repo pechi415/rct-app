@@ -612,7 +612,7 @@ def reabrir_reporte(reporte_id):
 # ---------------------------------------------------------
 @reportes_bp.route("/reportes/<int:reporte_id>/editar-fecha", methods=["GET", "POST"])
 @reporte_mina_required
-@roles_required("ADMIN", "SUPERVISOR")
+@roles_required("ADMIN")
 def editar_fecha_reporte(reporte_id):
     with get_conn() as conn:
         r = fetch_reporte(conn, reporte_id)
