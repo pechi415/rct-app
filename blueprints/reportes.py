@@ -499,6 +499,8 @@ def nuevo_reporte():
             mina_locked=(len(minas_permitidas) == 1)
         )
 
+    copiar_anterior = request.form.get("copiar_anterior") == "1"
+
     # ✅ Insert + RETURNING id (Postgres) y lectura blindada del row
     with get_conn() as conn:
         cur = conn.execute(
@@ -520,6 +522,40 @@ def nuevo_reporte():
             except Exception:
                 # último fallback
                 reporte_id = getattr(row, "id", None)
+
+        if reporte_id and int(reporte_id) > 0 and copiar_anterior:
+            try:
+                from datetime import datetime, timedelta
+                fecha_obj = datetime.strptime(fecha, "%Y-%m-%d").date()
+                fecha_ant_str = (fecha_obj - timedelta(days=1)).isoformat()
+                
+                ant = conn.execute(
+                    "SELECT id FROM reportes WHERE fecha = ? AND turno = ? AND mina = ? ORDER BY id DESC LIMIT 1",
+                    (fecha_ant_str, turno, mina)
+                ).fetchone()
+                
+                if ant:
+                    # Extraer ID según el driver subyacente
+                    ant_id = ant["id"] if isinstance(ant, dict) else (getattr(ant, 'id', ant[0]))
+                    
+                    # 1. Ausentismo
+                    conn.execute("INSERT INTO ausentismo (reporte_id, nombre, motivo) SELECT ?, nombre, motivo FROM ausentismo WHERE reporte_id = ?", (reporte_id, ant_id))
+                    # 2. Bombas
+                    conn.execute("INSERT INTO bombas (reporte_id, numero, estado, ubicacion) SELECT ?, numero, estado, ubicacion FROM bombas WHERE reporte_id = ?", (reporte_id, ant_id))
+                    # 3. Equipo liviano
+                    conn.execute("INSERT INTO equipo_liviano (reporte_id, camioneta, estado, comentario) SELECT ?, camioneta, estado, comentario FROM equipo_liviano WHERE reporte_id = ?", (reporte_id, ant_id))
+                    # 4. Distribución de personal
+                    conn.execute("INSERT INTO distribucion_personal (reporte_id, categoria, cantidad) SELECT ?, categoria, cantidad FROM distribucion_personal WHERE reporte_id = ?", (reporte_id, ant_id))
+                    # 5. Operadores prestados a otras áreas
+                    conn.execute("INSERT INTO operadores_otras_areas (reporte_id, nombre, area) SELECT ?, nombre, area FROM operadores_otras_areas WHERE reporte_id = ?", (reporte_id, ant_id))
+                    # 6. Luminarias
+                    conn.execute("INSERT INTO luminarias (reporte_id, numero, ubicacion) SELECT ?, numero, ubicacion FROM luminarias WHERE reporte_id = ?", (reporte_id, ant_id))
+                    # 7. Supervisores de turno
+                    conn.execute("INSERT INTO supervisores_turno (reporte_id, grupo, supervisor) SELECT ?, grupo, supervisor FROM supervisores_turno WHERE reporte_id = ?", (reporte_id, ant_id))
+            except Exception as e:
+                # Si falla la copia, se registra en log pero no detiene la creación
+                from flask import current_app
+                current_app.logger.error(f"Error copiando reporte anterior: {e}")
 
     if not reporte_id or int(reporte_id) <= 0:
         return redirect(url_for("reportes.ver_reportes"))

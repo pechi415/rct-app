@@ -16,7 +16,7 @@
   <!-- Fecha -->
   <div class="mb-3">
     <label class="form-label">Fecha</label>
-    <input class="form-control" type="date" name="fecha" value="{{ hoy }}">
+    <input class="form-control" type="date" name="fecha" id="fecha" value="{{ hoy }}">
   </div>
 
   <!-- Mina -->
@@ -43,10 +43,23 @@
   <!-- Turno (por defecto DÍA) -->
   <div class="mb-3">
     <label class="form-label">Turno</label>
-    <select class="form-select" name="turno">
+    <select class="form-select" name="turno" id="turno">
       <option value="DIA" selected>DÍA</option>
       <option value="NOCHE">NOCHE</option>
     </select>
+  </div>
+
+  <!-- Opcion de Copiar Datos -->
+  <div id="container-copiar" class="mb-4 d-none">
+    <div class="form-check form-switch bg-light p-3 rounded border border-info">
+      <input class="form-check-input ms-0 me-2" type="checkbox" role="switch" id="copiar_anterior" name="copiar_anterior" value="1" checked>
+      <label class="form-check-label fw-bold text-primary" for="copiar_anterior" style="cursor: pointer;">
+        Precargar datos del reporte anterior
+      </label>
+      <div class="form-text mt-1 text-muted">
+        Se copiarán: Ausentismo, Bombas, Camionetas, Personal, Préstamos, Luminarias y Supervisores.
+      </div>
+    </div>
   </div>
 
   <div class="d-flex gap-2">
@@ -59,4 +72,46 @@
     </a>
   </div>
 </form>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const fechaInput = document.getElementById('fecha');
+    const turnoSelect = document.getElementById('turno');
+    const containerCopiar = document.getElementById('container-copiar');
+    const checkboxCopiar = document.getElementById('copiar_anterior');
+
+    function checkCopiarVisibility() {
+        if (!fechaInput || !turnoSelect) return;
+        
+        const fechaVal = fechaInput.value;
+        const turnoVal = turnoSelect.value;
+        
+        if (!fechaVal) return;
+        
+        // Interpretar la fecha seleccionada respetando el timezone local
+        const dateParts = fechaVal.split('-');
+        const dateObj = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]);
+        const dayOfWeek = dateObj.getDay(); 
+
+        // Regla: No copiar si es nuevo grupo
+        // Martes (2) de DIA o Viernes (5) de NOCHE
+        const isNuevoGrupoDia = (turnoVal === 'DIA' && dayOfWeek === 2);
+        const isNuevoGrupoNoche = (turnoVal === 'NOCHE' && dayOfWeek === 5);
+
+        if (isNuevoGrupoDia || isNuevoGrupoNoche) {
+            containerCopiar.classList.add('d-none');
+            checkboxCopiar.checked = false;
+        } else {
+            containerCopiar.classList.remove('d-none');
+            checkboxCopiar.checked = true;
+        }
+    }
+
+    fechaInput.addEventListener('change', checkCopiarVisibility);
+    turnoSelect.addEventListener('change', checkCopiarVisibility);
+
+    // Revisión inicial
+    checkCopiarVisibility();
+});
+</script>
 {% endblock %}
