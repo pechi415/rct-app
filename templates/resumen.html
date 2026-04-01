@@ -18,11 +18,16 @@
 
     {% if supervisores and supervisores|length > 0 %}
       <div class="text-muted small mt-1">
-        {{ supervisores
-           | map(attribute="supervisor")
-           | unique
-           | join(" | ")
-        }}
+        {% set vistos = [] %}
+        {% for s in supervisores %}
+          {% if s.supervisor not in vistos %}
+            <span class="{% if s.origen == 'COPIADO' %}text-warning fw-bold{% elif s.origen == 'EDITADO' %}text-info fw-bold{% endif %}" {% if s.origen == 'COPIADO' %}title="Copiado del turno anterior"{% elif s.origen == 'EDITADO' %}title="Editado en este turno"{% endif %}>
+              {% if s.origen == 'COPIADO' %}<i class="bi bi-arrow-repeat text-secondary"></i> {% elif s.origen == 'EDITADO' %}<i class="bi bi-pencil-fill text-primary" style="font-size: 0.85em;"></i> {% endif %}{{ s.supervisor }}
+            </span>
+            {% set _ = vistos.append(s.supervisor) %}
+            {% if not loop.last %} | {% endif %}
+          {% endif %}
+        {% endfor %}
       </div>
     {% endif %}
   </div>
@@ -36,6 +41,15 @@
 
 </div>
 
+
+<!-- =========================================================
+     LEYENDA DE COLORES DE TRAZABILIDAD
+========================================================== -->
+<div class="d-flex flex-wrap gap-3 mb-3 small align-items-center text-muted badge bg-light border p-2 justify-content-center">
+  <strong class="text-dark">Leyenda de datos:</strong>
+  <span><i class="bi bi-arrow-repeat text-secondary"></i> Fondo Amarillo = Dato traído del turno anterior</span>
+  <span><i class="bi bi-pencil-fill text-primary" style="font-size: 0.85em;"></i> Fondo Azul = Dato traído y modificado hoy</span>
+</div>
 
 <!-- =========================================================
      HIGHLIGHTS (Lectura rápida)
@@ -269,8 +283,8 @@
               </thead>
               <tbody>
                 {% for p in personal_items %}
-                  <tr>
-                    <td>{{ get_label(p.categoria, r.mina) }}</td>
+                  <tr {% if p.origen == 'COPIADO' %}class="table-warning" title="Copiado del turno anterior"{% elif p.origen == 'EDITADO' %}class="table-info" title="Editado en este turno"{% endif %}>
+                    <td>{% if p.origen == 'COPIADO' %}<i class="bi bi-arrow-repeat text-secondary"></i> {% elif p.origen == 'EDITADO' %}<i class="bi bi-pencil-fill text-primary" style="font-size: 0.85em;"></i> {% endif %}{{ get_label(p.categoria, r.mina) }}</td>
                     <td>{{ p.cantidad }}</td>
                   </tr>
                 {% endfor %}
@@ -304,8 +318,8 @@
               </thead>
               <tbody>
                 {% for a in ausentismo %}
-                <tr>
-                  <td>{{ a.nombre }}</td>
+                <tr {% if a.origen == 'COPIADO' %}class="table-warning" title="Copiado del turno anterior"{% elif a.origen == 'EDITADO' %}class="table-info" title="Editado en este turno"{% endif %}>
+                  <td>{% if a.origen == 'COPIADO' %}<i class="bi bi-arrow-repeat text-secondary"></i> {% elif a.origen == 'EDITADO' %}<i class="bi bi-pencil-fill text-primary" style="font-size: 0.85em;"></i> {% endif %}{{ a.nombre }}</td>
                   <td>{{ a.motivo }}</td>
                 </tr>
                 {% endfor %}
@@ -471,8 +485,8 @@
               </thead>
               <tbody>
                 {% for x in otras_areas %}
-                <tr>
-                  <td>{{ x.nombre }}</td>
+                <tr {% if x.origen == 'COPIADO' %}class="table-warning" title="Copiado del turno anterior"{% elif x.origen == 'EDITADO' %}class="table-info" title="Editado en este turno"{% endif %}>
+                  <td>{% if x.origen == 'COPIADO' %}<i class="bi bi-arrow-repeat text-secondary"></i> {% elif x.origen == 'EDITADO' %}<i class="bi bi-pencil-fill text-primary" style="font-size: 0.85em;"></i> {% endif %}{{ x.nombre }}</td>
                   <td>{{ x.area }}</td>
                 </tr>
                 {% endfor %}
@@ -550,8 +564,8 @@
                       </thead>
                       <tbody>
                         {% for b in bombas %}
-                        <tr>
-                          <td>{{ b.numero }}</td>
+                        <tr {% if b.origen == 'COPIADO' %}class="table-warning" title="Copiado del turno anterior"{% elif b.origen == 'EDITADO' %}class="table-info" title="Editado en este turno"{% endif %}>
+                          <td>{% if b.origen == 'COPIADO' %}<i class="bi bi-arrow-repeat text-secondary"></i> {% elif b.origen == 'EDITADO' %}<i class="bi bi-pencil-fill text-primary" style="font-size: 0.85em;"></i> {% endif %}{{ b.numero }}</td>
                           <td>{{ b.estado }}</td>
                           <td>{{ b.ubicacion }}</td>
                         </tr>
@@ -587,8 +601,8 @@
                       </thead>
                       <tbody>
                         {% for it in equipo_liviano %}
-                        <tr>
-                          <td>{{ it.camioneta }}</td>
+                        <tr {% if it.origen == 'COPIADO' %}class="table-warning" title="Copiado del turno anterior"{% elif it.origen == 'EDITADO' %}class="table-info" title="Editado en este turno"{% endif %}>
+                          <td>{% if it.origen == 'COPIADO' %}<i class="bi bi-arrow-repeat text-secondary"></i> {% elif it.origen == 'EDITADO' %}<i class="bi bi-pencil-fill text-primary" style="font-size: 0.85em;"></i> {% endif %}{{ it.camioneta }}</td>
                           <td>{{ it.estado }}</td>
                           <td>{{ it.comentario }}</td>
                         </tr>
@@ -623,8 +637,8 @@
                       </thead>
                       <tbody>
                         {% for x in luminarias %}
-                        <tr>
-                          <td>{{ x.numero }}</td>
+                        <tr {% if x.origen == 'COPIADO' %}class="table-warning" title="Copiado del turno anterior"{% elif x.origen == 'EDITADO' %}class="table-info" title="Editado en este turno"{% endif %}>
+                          <td>{% if x.origen == 'COPIADO' %}<i class="bi bi-arrow-repeat text-secondary"></i> {% elif x.origen == 'EDITADO' %}<i class="bi bi-pencil-fill text-primary" style="font-size: 0.85em;"></i> {% endif %}{{ x.numero }}</td>
                           <td>{{ x.ubicacion }}</td>
                         </tr>
                         {% endfor %}

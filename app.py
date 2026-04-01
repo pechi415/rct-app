@@ -641,6 +641,24 @@ def init_db():
 
             conn.commit()
 
+        # [MIGRACIÓN] Trazabilidad visual de datos copiados vs nuevos vs editados
+        tablas_trazabilidad = [
+            'ausentismo', 'bombas', 'equipo_liviano', 'distribucion_personal',
+            'operadores_otras_areas', 'luminarias', 'supervisores_turno'
+        ]
+        for tbl in tablas_trazabilidad:
+            try:
+                if is_postgres():
+                    conn.execute(f"ALTER TABLE {tbl} ADD COLUMN IF NOT EXISTS origen TEXT DEFAULT 'NUEVO';")
+                else:
+                    conn.execute(f"ALTER TABLE {tbl} ADD COLUMN origen TEXT DEFAULT 'NUEVO';")
+            except Exception:
+                pass
+        
+        # Hacemos commit nuevamente por si acaso para SQLite
+        if not is_postgres():
+            conn.commit()
+
 
 
 # ---------------------------------------------------------

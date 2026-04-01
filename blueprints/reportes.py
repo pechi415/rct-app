@@ -539,19 +539,19 @@ def nuevo_reporte():
                     ant_id = ant["id"] if isinstance(ant, dict) else (getattr(ant, 'id', ant[0]))
                     
                     # 1. Ausentismo
-                    conn.execute("INSERT INTO ausentismo (reporte_id, nombre, motivo) SELECT ?, nombre, motivo FROM ausentismo WHERE reporte_id = ?", (reporte_id, ant_id))
+                    conn.execute("INSERT INTO ausentismo (reporte_id, nombre, motivo, origen) SELECT ?, nombre, motivo, 'COPIADO' FROM ausentismo WHERE reporte_id = ?", (reporte_id, ant_id))
                     # 2. Bombas
-                    conn.execute("INSERT INTO bombas (reporte_id, numero, estado, ubicacion) SELECT ?, numero, estado, ubicacion FROM bombas WHERE reporte_id = ?", (reporte_id, ant_id))
+                    conn.execute("INSERT INTO bombas (reporte_id, numero, estado, ubicacion, origen) SELECT ?, numero, estado, ubicacion, 'COPIADO' FROM bombas WHERE reporte_id = ?", (reporte_id, ant_id))
                     # 3. Equipo liviano
-                    conn.execute("INSERT INTO equipo_liviano (reporte_id, camioneta, estado, comentario) SELECT ?, camioneta, estado, comentario FROM equipo_liviano WHERE reporte_id = ?", (reporte_id, ant_id))
+                    conn.execute("INSERT INTO equipo_liviano (reporte_id, camioneta, estado, comentario, origen) SELECT ?, camioneta, estado, comentario, 'COPIADO' FROM equipo_liviano WHERE reporte_id = ?", (reporte_id, ant_id))
                     # 4. Distribución de personal
-                    conn.execute("INSERT INTO distribucion_personal (reporte_id, categoria, cantidad) SELECT ?, categoria, cantidad FROM distribucion_personal WHERE reporte_id = ?", (reporte_id, ant_id))
+                    conn.execute("INSERT INTO distribucion_personal (reporte_id, categoria, cantidad, origen) SELECT ?, categoria, cantidad, 'COPIADO' FROM distribucion_personal WHERE reporte_id = ?", (reporte_id, ant_id))
                     # 5. Operadores prestados a otras áreas
-                    conn.execute("INSERT INTO operadores_otras_areas (reporte_id, nombre, area) SELECT ?, nombre, area FROM operadores_otras_areas WHERE reporte_id = ?", (reporte_id, ant_id))
+                    conn.execute("INSERT INTO operadores_otras_areas (reporte_id, nombre, area, origen) SELECT ?, nombre, area, 'COPIADO' FROM operadores_otras_areas WHERE reporte_id = ?", (reporte_id, ant_id))
                     # 6. Luminarias
-                    conn.execute("INSERT INTO luminarias (reporte_id, numero, ubicacion) SELECT ?, numero, ubicacion FROM luminarias WHERE reporte_id = ?", (reporte_id, ant_id))
+                    conn.execute("INSERT INTO luminarias (reporte_id, numero, ubicacion, origen) SELECT ?, numero, ubicacion, 'COPIADO' FROM luminarias WHERE reporte_id = ?", (reporte_id, ant_id))
                     # 7. Supervisores de turno
-                    conn.execute("INSERT INTO supervisores_turno (reporte_id, grupo, supervisor) SELECT ?, grupo, supervisor FROM supervisores_turno WHERE reporte_id = ?", (reporte_id, ant_id))
+                    conn.execute("INSERT INTO supervisores_turno (reporte_id, grupo, supervisor, origen) SELECT ?, grupo, supervisor, 'COPIADO' FROM supervisores_turno WHERE reporte_id = ?", (reporte_id, ant_id))
             except Exception as e:
                 # Si falla la copia, se registra en log pero no detiene la creación
                 from flask import current_app

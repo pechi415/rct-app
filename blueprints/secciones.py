@@ -488,7 +488,7 @@ def editar_item_ausentismo(reporte_id, item_id):
             else:
                 conn.execute("""
                     UPDATE ausentismo
-                    SET nombre = ?, motivo = ?
+                    SET nombre = ?, motivo = ?, origen = 'EDITADO'
                     WHERE id = ? AND reporte_id = ?
                 """, (nombre, motivo, item_id, reporte_id))
                 return redirect(url_for("secciones.ausentismo", reporte_id=reporte_id))
@@ -583,7 +583,7 @@ def editar_bomba(reporte_id, item_id):
             else:
                 conn.execute("""
                     UPDATE bombas
-                    SET numero = ?, estado = ?, ubicacion = ?
+                    SET numero = ?, estado = ?, ubicacion = ?, origen = 'EDITADO'
                     WHERE id = ? AND reporte_id = ?
                 """, (numero, estado_bomba, ubicacion, item_id, reporte_id))
                 return redirect(url_for("secciones.bombas", reporte_id=reporte_id))
@@ -899,7 +899,7 @@ def editar_equipo_liviano(reporte_id, item_id):
                 else:
                     conn.execute("""
                         UPDATE equipo_liviano
-                        SET camioneta = ?, estado = ?, comentario = ?
+                        SET camioneta = ?, estado = ?, comentario = ?, origen = 'EDITADO'
                         WHERE id = ? AND reporte_id = ?
                     """, (camioneta_num, estado, comentario, item_id, reporte_id))
                     return redirect(url_for("secciones.equipo_liviano", reporte_id=reporte_id))
@@ -1095,9 +1095,9 @@ def editar_personal(reporte_id, item_id):
                 cantidad = int(cantidad_raw)
                 conn.execute("""
                     UPDATE distribucion_personal
-                    SET cantidad = ?
+                    SET categoria = ?, cantidad = ?, origen = 'EDITADO'
                     WHERE id = ? AND reporte_id = ?
-                """, (cantidad, item_id, reporte_id))
+                """, (it["categoria"], cantidad, item_id, reporte_id))
                 return redirect(url_for("secciones.distribucion_personal", reporte_id=reporte_id))
 
     return render_template("personal_editar.html", r=r, reporte=r, it=it, get_label=get_personal_label, error=error)
@@ -1199,7 +1199,7 @@ def editar_otras_areas(reporte_id, item_id):
             else:
                 conn.execute("""
                     UPDATE operadores_otras_areas
-                    SET nombre = ?, area = ?
+                    SET nombre = ?, area = ?, origen = 'EDITADO'
                     WHERE id = ? AND reporte_id = ?
                 """, (nombre, area, item_id, reporte_id))
                 return redirect(url_for("secciones.otras_areas", reporte_id=reporte_id))
@@ -1453,7 +1453,7 @@ def editar_luminaria(reporte_id, item_id):
                 else:
                     conn.execute("""
                         UPDATE luminarias
-                        SET numero = ?, ubicacion = ?
+                        SET numero = ?, ubicacion = ?, origen = 'EDITADO'
                         WHERE id = ? AND reporte_id = ?
                     """, (numero, ubicacion, item_id, reporte_id))
                     return redirect(url_for("secciones.luminarias", reporte_id=reporte_id))
@@ -2360,7 +2360,7 @@ def editar_supervisor_turno(reporte_id, item_id):
                     else:
                         conn.execute("""
                             UPDATE supervisores_turno
-                            SET grupo = ?, supervisor = ?
+                            SET grupo = ?, supervisor = ?, origen = 'EDITADO'
                             WHERE id = ? AND reporte_id = ?
                         """, (grupo, supervisor, item_id, reporte_id))
 
