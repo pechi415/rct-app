@@ -722,12 +722,12 @@ def resumen(reporte_id):
 
 
         equipo_liviano_items = conn.execute(
-            "SELECT camioneta, estado, comentario FROM equipo_liviano WHERE reporte_id = ? ORDER BY id DESC",
+            "SELECT camioneta, estado, comentario, origen FROM equipo_liviano WHERE reporte_id = ? ORDER BY id DESC",
             (reporte_id,)
         ).fetchall()
 
         personal_items = conn.execute("""
-            SELECT categoria, cantidad
+            SELECT categoria, cantidad, origen
             FROM distribucion_personal
             WHERE reporte_id = ?
             ORDER BY
@@ -796,7 +796,7 @@ def resumen(reporte_id):
         ).fetchall()
 
         supervisores = conn.execute("""
-            SELECT grupo, supervisor
+            SELECT grupo, supervisor, origen
             FROM supervisores_turno
             WHERE reporte_id = ?
             ORDER BY
