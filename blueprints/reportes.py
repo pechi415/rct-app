@@ -804,6 +804,14 @@ def resumen(reporte_id):
                 supervisor ASC
         """, (reporte_id,)).fetchall()
 
+        # Fatiga
+        fatiga_items = conn.execute(
+            "SELECT reportes_sueno, pausas_activas FROM fatiga_pausas WHERE reporte_id = ?",
+            (reporte_id,)
+        ).fetchall()
+        fatiga_total_sueno = sum(it["reportes_sueno"] for it in fatiga_items)
+        fatiga_total_pausas = sum(it["pausas_activas"] for it in fatiga_items)
+
     return render_template(
         "resumen.html",
         r=r,
@@ -829,7 +837,9 @@ def resumen(reporte_id):
         pts=pts,
         comentarios=comentarios,
         supervisores=supervisores,
-        get_label=get_personal_label
+        get_label=get_personal_label,
+        fatiga_total_sueno=fatiga_total_sueno,
+        fatiga_total_pausas=fatiga_total_pausas
     )
 
 

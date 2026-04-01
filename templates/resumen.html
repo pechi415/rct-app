@@ -678,6 +678,25 @@
 
 
   <!-- =========================================================
+       8.5) FATIGA / CASF (MITAD)
+  ========================================================== -->
+  <div class="col-12 col-lg-6">
+    <div class="card h-100 border-info">
+      <div class="card-header bg-info text-white fw-bold">CASF (Fatiga Humana)</div>
+      <div class="card-body d-flex flex-column justify-content-center">
+        <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
+            <span class="fs-5 text-muted">Reportes de Sueño</span>
+            <span class="badge bg-warning text-dark rounded-pill fs-5">{{ fatiga_total_sueno }}</span>
+        </div>
+        <div class="d-flex justify-content-between align-items-center">
+            <span class="fs-5 text-muted">Pausas Activas</span>
+            <span class="badge bg-success rounded-pill fs-5">{{ fatiga_total_pausas }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================
        9) TEXTOS DEL TURNO (MITAD + MITAD)
        - PTS (solo si existe)
        - Comentarios (solo si hay)
