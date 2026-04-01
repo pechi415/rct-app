@@ -90,10 +90,13 @@
   <script>
     async function sharePDF(url, filename) {
       if (!navigator.share) {
-        alert("Tu navegador no soporta la función de compartir nativa. Intenta abrir el PDF directamente.");
+        alert("Tu navegador no soporta la función de compartir nativa. Abriendo archivo...");
         window.open(url, '_blank');
         return;
       }
+      
+      const absoluteUrl = new URL(url, window.location.href).href;
+      
       try {
         // Obtenemos el archivo mediante fetch
         const response = await fetch(url);
@@ -110,16 +113,27 @@
             files: [file]
           });
         } else {
-          // Compartir como URL si no soporta archivos
+          // Compartir como URL si no soporta archivos directamente
           await navigator.share({
             title: filename,
-            url: window.location.origin + url
+            url: absoluteUrl
           });
         }
       } catch (err) {
         if (err.name !== 'AbortError') {
-          console.error("Error al compartir", err);
-          alert("Ocurrió un problema al intentar compartir el archivo.");
+          console.warn("Fallo el File Share, intentando Link Share en fallback...", err);
+          try {
+             await navigator.share({
+                 title: filename,
+                 url: absoluteUrl,
+                 text: "Mira este reporte: " + filename
+             });
+          } catch(err2) {
+             if (err2.name !== 'AbortError') {
+               alert("Ocurrió un problema al compartir, abriendo archivo en la pantalla...");
+               window.open(url, '_blank');
+             }
+          }
         }
       }
     }
