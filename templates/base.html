@@ -88,53 +88,66 @@
 
   <!-- Script global para compartir PDF -->
   <script>
-    async function sharePDF(url, filename) {
+    let globalSharedPDFs = {};
+
+    async function sharePDF(url, filename, btn) {
       if (!navigator.share) {
-        alert("Tu navegador no soporta la función de compartir nativa. Abriendo archivo...");
+        alert("Tu navegador no soporta web share. Abriendo documento...");
         window.open(url, '_blank');
         return;
       }
       
       const absoluteUrl = new URL(url, window.location.href).href;
       
+      if (globalSharedPDFs[absoluteUrl]) {
+        try {
+          const file = new File([globalSharedPDFs[absoluteUrl]], filename, { type: 'application/pdf' });
+          await navigator.share({ title: filename, files: [file] });
+          if(btn) btn.innerHTML = btn.dataset.prevHtml || "Compartir";
+        } catch (e) {
+          console.warn("Share abortado por el usuario", e);
+        }
+        return;
+      }
+
+      const prevHtml = btn ? btn.innerHTML : "Compartir";
+      if(btn) btn.dataset.prevHtml = prevHtml;
+
       try {
-        // Obtenemos el archivo mediante fetch
+        if (btn) {
+           btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> Preparando...';
+           btn.style.pointerEvents = 'none';
+        }
+        
         const response = await fetch(url);
-        if (!response.ok) throw new Error("Error al descargar PDF");
+        if (!response.ok) throw new Error("Server PDF Fail");
         const blob = await response.blob();
-        
-        // Creamos un objeto File compatible con Web Share
-        const file = new File([blob], filename, { type: 'application/pdf' });
-        
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          // Compartir como archivo (iOS 14+, Android Moderno)
-          await navigator.share({
-            title: filename,
-            files: [file]
-          });
-        } else {
-          // Compartir como URL si no soporta archivos directamente
-          await navigator.share({
-            title: filename,
-            url: absoluteUrl
-          });
+        globalSharedPDFs[absoluteUrl] = blob;
+
+        if (btn) {
+           btn.innerHTML = '✅ Enviar ahora';
+           btn.style.pointerEvents = 'auto';
         }
+
+        try {
+           const file = new File([blob], filename, { type: 'application/pdf' });
+           if (navigator.canShare && navigator.canShare({files:[file]})) {
+              await navigator.share({ title: filename, files: [file] });
+              if (btn) btn.innerHTML = prevHtml;
+           } else {
+              await navigator.share({ title: filename, url: absoluteUrl });
+              if (btn) btn.innerHTML = prevHtml;
+           }
+        } catch(shareErr) {
+           console.log("Device bloqueó el primer intento por asincronismo (iOS behavior). Requiere click final.", shareErr);
+        }
+
       } catch (err) {
-        if (err.name !== 'AbortError') {
-          console.warn("Fallo el File Share, intentando Link Share en fallback...", err);
-          try {
-             await navigator.share({
-                 title: filename,
-                 url: absoluteUrl,
-                 text: "Mira este reporte: " + filename
-             });
-          } catch(err2) {
-             if (err2.name !== 'AbortError') {
-               alert("Ocurrió un problema al compartir, abriendo archivo en la pantalla...");
-               window.open(url, '_blank');
-             }
-          }
+        if (btn) {
+           btn.innerHTML = prevHtml;
+           btn.style.pointerEvents = 'auto';
         }
+        alert("Hubo un fallo generando el documento. Comprueba tu conexión o descarga del servidor remoto e intenta de nuevo.");
       }
     }
   </script>

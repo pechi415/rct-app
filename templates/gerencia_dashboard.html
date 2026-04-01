@@ -12,7 +12,7 @@
     <div class="d-flex gap-2">
         <a href="{{ url_for('gerencia.index') }}" class="btn btn-outline-secondary" title="Volver">🔙 <span class="d-none d-md-inline">Volver</span></a>
         <a href="?pdf=1" class="btn btn-success fw-bold" target="_blank" title="Exportar a PDF">📄 <span class="d-none d-md-inline">Exportar a PDF</span></a>
-        <button class="btn btn-success fw-bold" onclick="sharePDF('?pdf=1', 'Reporte_Gerencial_{{ fecha }}.pdf')" title="Compartir">📤 <span class="d-none d-md-inline">Compartir</span></button>
+        <button class="btn btn-success fw-bold" onclick="sharePDF('?pdf=1', 'Reporte_Gerencial_{{ fecha }}.pdf', this)" title="Compartir">📤 <span class="d-none d-md-inline">Compartir</span></button>
     </div>
 </div>
 
