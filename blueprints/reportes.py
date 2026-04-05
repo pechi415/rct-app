@@ -76,7 +76,7 @@ def build_reporte_context(conn, reporte_id: int) -> dict:
     # Ausentismo / Bombas
     # -------------------------
     ausentismo_items = conn.execute(
-        "SELECT * FROM ausentismo WHERE reporte_id = ? ORDER BY CASE WHEN motivo LIKE '%Inc. permanente%' THEN 1 ELSE 0 END ASC, motivo ASC, nombre ASC",
+        "SELECT * FROM ausentismo WHERE reporte_id = ? ORDER BY CASE WHEN motivo = 'Inc. permanente' THEN 1 ELSE 0 END ASC, motivo ASC, nombre ASC",
         (reporte_id,)
     ).fetchall()
 
@@ -678,7 +678,7 @@ def resumen(reporte_id):
         ).fetchall()
 
         ausentismo_items = conn.execute(
-            "SELECT * FROM ausentismo WHERE reporte_id = ? ORDER BY CASE WHEN motivo LIKE '%Inc. permanente%' THEN 1 ELSE 0 END ASC, motivo ASC, nombre ASC",
+            "SELECT * FROM ausentismo WHERE reporte_id = ? ORDER BY CASE WHEN motivo = 'Inc. permanente' THEN 1 ELSE 0 END ASC, motivo ASC, nombre ASC",
             (reporte_id,)
         ).fetchall()
 
