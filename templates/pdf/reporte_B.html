@@ -239,10 +239,10 @@
                             nom1=a1.get('nombre') if a1 is mapping else a1.nombre %} {% set area1=a1.get('area') if a1
                             is mapping else a1.area %} {% if a2 %} {% set nom2=a2.get('nombre') if a2 is mapping else
                             a2.nombre %} {% set area2=a2.get('area') if a2 is mapping else a2.area %} {% endif %} <tr>
-                            <td class="nowrap">{{ nom1 }}</td>
+                            <td class="wrap-soft">{{ nom1 }}</td>
                             <td class="wrap-soft">{{ area1 }}</td>
 
-                            <td class="split">
+                            <td class="split wrap-soft">
                                 {% if a2 %}{{ nom2 }}{% else %}&nbsp;{% endif %}
                             </td>
                             <td class="{% if not a2 %}empty-right{% endif %}">
