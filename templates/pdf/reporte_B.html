@@ -196,10 +196,10 @@
                             or "Sin motivo" %} {% if a2 %} {% set nom2=(a2["nombre"] if a2 is mapping else a2.nombre)
                             or "—" %} {% set mot2=(a2["motivo"] if a2 is mapping else a2.motivo) or "Sin motivo" %} {%
                             endif %} <tr>
-                            <td class="nowrap">{{ nom1 }}</td>
+                            <td class="wrap-soft">{{ nom1 }}</td>
                             <td class="wrap-soft">{{ mot1 }}</td>
 
-                            <td class="split">
+                            <td class="split wrap-soft">
                                 {% if a2 %}{{ nom2 }}{% else %}&nbsp;{% endif %}
                             </td>
                             <td class="{% if not a2 %}empty-right{% endif %} wrap-soft">
