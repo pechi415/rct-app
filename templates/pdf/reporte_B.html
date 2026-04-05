@@ -174,10 +174,7 @@
                 <div class="empty">Sin registros.</div>
                 {% else %}
 
-                {# 🔹 Ordenar por motivo alfabéticamente #}
-                {% set aus = ausentismo
-                | sort(attribute='motivo')
-                %}
+                {% set aus = ausentismo %}
 
                 <table class="table table-compact table-split">
                     <thead>

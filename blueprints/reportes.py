@@ -76,7 +76,7 @@ def build_reporte_context(conn, reporte_id: int) -> dict:
     # Ausentismo / Bombas
     # -------------------------
     ausentismo_items = conn.execute(
-        "SELECT * FROM ausentismo WHERE reporte_id = ? ORDER BY id DESC",
+        "SELECT * FROM ausentismo WHERE reporte_id = ? ORDER BY CASE WHEN motivo LIKE '%Inc. permanente%' THEN 1 ELSE 0 END ASC, motivo ASC, nombre ASC",
         (reporte_id,)
     ).fetchall()
 
@@ -432,8 +432,12 @@ def ver_reportes():
             sql += " AND fecha <= ?"
             params.append(hasta)
 
+        has_search = bool(mina or estado or turno or desde or hasta)
+
         # Orden final
         sql += " ORDER BY fecha DESC, id DESC"
+        if not has_search:
+            sql += " LIMIT 20"
 
         reportes = conn.execute(sql, params).fetchall()
 
@@ -674,7 +678,7 @@ def resumen(reporte_id):
         ).fetchall()
 
         ausentismo_items = conn.execute(
-            "SELECT * FROM ausentismo WHERE reporte_id = ? ORDER BY id DESC",
+            "SELECT * FROM ausentismo WHERE reporte_id = ? ORDER BY CASE WHEN motivo LIKE '%Inc. permanente%' THEN 1 ELSE 0 END ASC, motivo ASC, nombre ASC",
             (reporte_id,)
         ).fetchall()
 

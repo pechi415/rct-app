@@ -452,7 +452,7 @@ def ausentismo(reporte_id):
                     return redirect(url_for("secciones.ausentismo", reporte_id=reporte_id))
 
         items = conn.execute(
-            "SELECT * FROM ausentismo WHERE reporte_id = ? ORDER BY id DESC",
+            "SELECT * FROM ausentismo WHERE reporte_id = ? ORDER BY CASE WHEN motivo LIKE '%Inc. permanente%' THEN 1 ELSE 0 END ASC, motivo ASC, nombre ASC",
             (reporte_id,)
         ).fetchall()
 
