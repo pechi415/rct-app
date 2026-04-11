@@ -20,7 +20,10 @@ from flask import (
     url_for, abort, make_response, session, g, flash
 )
 
-from weasyprint import HTML
+try:
+    from weasyprint import HTML
+except OSError:
+    HTML = None
 from werkzeug.security import generate_password_hash, check_password_hash
 
 

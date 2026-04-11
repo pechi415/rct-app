@@ -3,7 +3,10 @@ import os
 import gc
 from datetime import date, datetime
 from flask import Blueprint, render_template, request, redirect, url_for, g, flash, abort, make_response
-from weasyprint import HTML
+try:
+    from weasyprint import HTML
+except OSError:
+    HTML = None
 from database import get_conn, get_db_connection
 from config import MINAS, CAMIONETAS_POR_MINA
 from utils import mina_label, calc_disponible_personal, get_personal_label
@@ -89,7 +92,7 @@ def build_reporte_context(conn, reporte_id: int) -> dict:
     # Distribución camiones (agrupada)
     # -------------------------
     dist_camiones = conn.execute("""
-        SELECT tipo, ROUND(SUM(cantidad)::numeric, 2) AS cantidad
+        SELECT tipo, ROUND(CAST(SUM(cantidad) AS NUMERIC), 2) AS cantidad
         FROM distribucion_camiones
         WHERE reporte_id = ?
         GROUP BY tipo
@@ -277,6 +280,7 @@ def build_reporte_context(conn, reporte_id: int) -> dict:
         disponible_p=disponible_p,
         otras_areas=otras_areas_items,
         entrenamiento=entrenamiento_items,
+        entrenamiento_items=entrenamiento_items,
         luminarias=luminarias,
         contactos=contactos,
         seguridad_obs=seguridad_obs,
@@ -346,7 +350,8 @@ def reporte_pdf(reporte_id: int):
     except subprocess.TimeoutExpired:
         abort(504, "El servidor tardó demasiado en generar el PDF (Timeout).")
     except subprocess.CalledProcessError:
-        abort(500, "Error interno al renderizar el archivo PDF.")
+        # Fallback local (previsualizar HTML si WeasyPrint no pudo funcionar por GTK3)
+        return html
     finally:
         if os.path.exists(in_name): os.remove(in_name)
         if os.path.exists(out_name): os.remove(out_name)
@@ -691,7 +696,7 @@ def resumen(reporte_id):
         dist_camiones = conn.execute("""
             SELECT
                 tipo,
-                ROUND(SUM(cantidad)::numeric, 2) AS cantidad
+                ROUND(CAST(SUM(cantidad) AS NUMERIC), 2) AS cantidad
             FROM distribucion_camiones
             WHERE reporte_id = ?
             GROUP BY tipo

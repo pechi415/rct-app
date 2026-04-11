@@ -134,6 +134,12 @@ class DBConnWrapper:
         return self
 
     def __exit__(self, exc_type, exc, tb):
+        # Emular autocommit como lo hace PostgreSQL en Render
+        if exc_type is None and not self._is_pg:
+            try:
+                self.commit()
+            except Exception:
+                pass
         # ✅ NO cerrar aquí, porque get_conn() la guarda en g y teardown la cierra.
         return False
 

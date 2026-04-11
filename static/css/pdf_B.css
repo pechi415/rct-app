@@ -372,19 +372,19 @@ h3 {
 
 /* Colores KPI */
 .mini-ok {
-  background: #fbfffb;
+  background: #D1FAE5; /* Verde pastel más marcado */
 }
 
 .mini-warn {
-  background: #fffdf7;
+  background: #FEF3C7; /* Amarillo oscuro / ámbar pastel */
 }
 
 .mini-bad {
-  background: #fff8f8;
+  background: #FEE2E2; /* Rojo pastel más vivo */
 }
 
 .mini-muted {
-  background: #fafafa;
+  background: #F3F4F6; /* Gris neutro más notable */
 }
 
 /* =======================
@@ -393,7 +393,7 @@ h3 {
 .table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 9pt;
+  font-size: 8.5pt;
   table-layout: fixed;
 }
 
@@ -404,10 +404,10 @@ h3 {
 .table th,
 .table td {
   border: 1px solid var(--line);
-  padding: 1.5mm;
-  /* Compacto y consistente */
-  vertical-align: top;
+  padding: 0.8mm 1mm;
+  vertical-align: middle;
   word-break: break-word;
+  line-height: 1.15;
 }
 
 .table th {
@@ -662,4 +662,17 @@ h3 {
 #seguridad,
 #pts-comentarios {
   padding-top: 3mm;
+}
+.masonry-2 {
+  column-count: 2;
+  column-gap: 4.5mm;
+  width: 100%;
+}
+.masonry-2 > .card,
+.masonry-2 > .subcard {
+  break-inside: avoid;
+  page-break-inside: avoid;
+  margin-bottom: 4.5mm;
+  display: inline-block;
+  width: 100%;
 }

@@ -218,8 +218,7 @@ def dashboard(fecha, turno):
             flash("Error: Tiempo de espera agotado al generar el PDF. El servidor está saturado.", "danger")
             return redirect(url_for("gerencia.index"))
         except subprocess.CalledProcessError:
-            flash("Error interno al renderizar PDF. La tarea consumió demasiada memoria del servidor.", "danger")
-            return redirect(url_for("gerencia.index"))
+            return html
         finally:
             if os.path.exists(in_name): os.remove(in_name)
             if os.path.exists(out_name): os.remove(out_name)
