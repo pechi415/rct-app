@@ -621,18 +621,7 @@ h3 {
 }
 
 
-/* Complementarios/Camiones/Liviano headers iguales a Equipos varados */
-#dist-camiones.card,
-#equipo-liviano.card,
-#complementarios-mini.card {
-  padding: 0;
-}
-
-#dist-camiones .section-title,
-#equipo-liviano .section-title,
-#complementarios-mini .section-title {
-  padding: 8px 10px;
-}
+/* Complementarios/Camiones/Liviano headers restaurados a layout nativo */
 
 #dist-camiones .table,
 #equipo-liviano .table {
