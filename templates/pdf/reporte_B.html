@@ -547,7 +547,7 @@
             {% endif %}
 
             <!-- IZQ: Distribución de camiones -->
-            <div class="card" id="dist-camiones">
+            <div class="card subcard" id="dist-camiones">
                 <div class="section-title">
                     <h2 class="h2">Distribución de camiones</h2>
                     <span class="badge">{{ total_camiones }} camiones</span>
@@ -620,7 +620,7 @@
             </div>
 
             <!-- DER: Equipo liviano -->
-            <div class="card" id="equipo-liviano">
+            <div class="card subcard" id="equipo-liviano">
                 <div class="section-title">
                     <h2 class="h2">Equipo liviano (Camionetas)</h2>
 
@@ -701,7 +701,7 @@
 
             <!-- IZQ: Equipos varados -->
             {% if equipos|length > 0 %}
-<div class="card" id="equipos-varados">
+<div class="card subcard" id="equipos-varados">
                 <div class="section-title">
                     <h2 class="h2">Equipos varados en campo</h2>
                     <span class="badge">{{ equipos|length }} equipos</span>
@@ -736,7 +736,7 @@
 
             <!-- DER: Complementarios -->
             {% if bombas|length > 0 or luminarias|length > 0 %}
-            <div class="card" id="complementarios-mini">
+            <div class="card subcard" id="complementarios-mini">
                 <div class="section-title">
                     <h2 class="h2">Complementarios</h2>
                     <span class="badge">Bombas: {{ bombas|length }} · Luminarias: {{ luminarias|length }}</span>
