@@ -663,16 +663,19 @@ h3 {
 #pts-comentarios {
   padding-top: 3mm;
 }
+/* Flex-based fallback para WeasyPrint en lugar de column-count */
 .masonry-2 {
-  column-count: 2;
-  column-gap: 4.5mm;
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: flex-start;
+  gap: 4.5mm;
   width: 100%;
 }
 .masonry-2 > .card,
 .masonry-2 > .subcard {
   break-inside: avoid;
   page-break-inside: avoid;
-  margin-bottom: 4.5mm;
-  display: inline-block;
-  width: 100%;
+  /* El width debe caber 2 veces restando el gap (4.5mm) */
+  width: calc(50% - 2.5mm) !important;
+  margin-bottom: 0 !important;
 }
