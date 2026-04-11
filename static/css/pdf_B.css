@@ -594,22 +594,7 @@ h3 {
   table-layout: fixed;
 }
 
-.table-varados th:nth-child(1),
-.table-varados td:nth-child(1) {
-  width: 80px !important;
-  max-width: 80px;
-  white-space: nowrap;
-}
 
-.table-varados th:nth-child(2),
-.table-varados td:nth-child(2) {
-  width: calc((100% - 80px) / 2) !important;
-}
-
-.table-varados th:nth-child(3),
-.table-varados td:nth-child(3) {
-  width: calc((100% - 80px) / 2) !important;
-}
 
 
 /* Complementarios/Camiones/Liviano headers restaurados a layout nativo */
