@@ -582,16 +582,7 @@ h3 {
   width: 110px;
 }
 
-/* Equipos varados */
-#equipos-varados.card {
-  padding: 0;
-}
-
-#equipos-varados .section-title {
-  padding: 8px 10px;
-  margin-bottom: 6px;
-}
-
+/* Equipos varados restaurados a layout nativo */
 #equipos-varados .ev-text {
   white-space: normal;
   line-height: 1.2;
