@@ -496,14 +496,12 @@
                     </div>
                 </div>
             <!-- DER: Llegada de buses -->
+            {% if bahias|length > 0 %}
                 <div class="card subcard">
                     <div class="subhead">
                         Llegada de buses a bahías
                     </div>
 
-                    {% if bahias|length == 0 %}
-                    <div class="empty">Sin registros de llegada de buses a bahías.</div>
-                    {% else %}
                     <table class="table table-compact table-split">
                         <thead>
                             <tr>
@@ -541,12 +539,12 @@
                                 {% endfor %}
                         </tbody>
                     </table>
-                    {% endif %}
 
                     {% if bahias_nota %}
                     <div class="note mt-10">{{ bahias_nota }}</div>
                     {% endif %}
                 </div>
+            {% endif %}
 
             <!-- IZQ: Distribución de camiones -->
             <div class="card" id="dist-camiones">
