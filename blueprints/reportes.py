@@ -511,8 +511,25 @@ def nuevo_reporte():
 
     copiar_anterior = request.form.get("copiar_anterior") == "1"
 
-    # ✅ Insert + RETURNING id (Postgres) y lectura blindada del row
     with get_conn() as conn:
+        # ✅ Validar duplicado: no permitir si ya existe fecha/turno/mina
+        existe = conn.execute(
+            "SELECT id FROM reportes WHERE fecha = ? AND turno = ? AND mina = ?",
+            (fecha, turno, mina)
+        ).fetchone()
+
+        if existe:
+            minas_ui = [(code, mina_label(code)) for code in minas_permitidas]
+            return render_template(
+                "reporte_nuevo.html",
+                hoy=date.today().isoformat(),
+                error=f"Error: Ya existe un reporte creado para la mina {mina} (Fecha: {fecha}, Turno: {turno}).",
+                minas=minas_ui,
+                mina_sel=mina if mina in minas_permitidas else minas_permitidas[0],
+                mina_locked=(len(minas_permitidas) == 1)
+            )
+
+        # ✅ Insert + RETURNING id
         cur = conn.execute(
             "INSERT INTO reportes (fecha, turno, estado, mina) "
             "VALUES (?, ?, 'ABIERTO', ?) RETURNING id",
