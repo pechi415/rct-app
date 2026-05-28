@@ -1,8 +1,12 @@
 import os
 import time
 import sqlite3
-import psycopg2
-from psycopg2.extras import DictCursor
+try:
+    import psycopg2
+    from psycopg2.extras import DictCursor
+except ImportError:
+    psycopg2 = None
+    DictCursor = None
 from flask import g, has_app_context
 from config import DB_PATH
 

@@ -31,7 +31,7 @@
   [REPORTES] BUSCAR / FILTRAR (COLLAPSE)
 ===================================================== -->
 {% set hay_filtros = request.args.get('mina') or request.args.get('estado') or request.args.get('turno') or
-request.args.get('desde') or request.args.get('hasta') %}
+request.args.get('grupo') or request.args.get('desde') or request.args.get('hasta') %}
 <div class="collapse mb-3 {% if hay_filtros %}show{% endif %}" id="filtrosReportes">
 
   <div class="card card-body">
@@ -66,6 +66,17 @@ request.args.get('desde') or request.args.get('hasta') %}
             <option value="" {% if turno_sel=="" %}selected{% endif %}>Todos</option>
             <option value="DIA" {% if turno_sel=="DIA" %}selected{% endif %}>DÍA</option>
             <option value="NOCHE" {% if turno_sel=="NOCHE" %}selected{% endif %}>NOCHE</option>
+          </select>
+        </div>
+
+        <div class="col-6 col-md-2">
+          <label class="form-label">Grupo</label>
+          {% set grupo_sel = request.args.get('grupo','') %}
+          <select class="form-select" name="grupo">
+            <option value="" {% if grupo_sel=="" %}selected{% endif %}>Todos</option>
+            <option value="G1" {% if grupo_sel=="G1" %}selected{% endif %}>G1</option>
+            <option value="G2" {% if grupo_sel=="G2" %}selected{% endif %}>G2</option>
+            <option value="G3" {% if grupo_sel=="G3" %}selected{% endif %}>G3</option>
           </select>
         </div>
 

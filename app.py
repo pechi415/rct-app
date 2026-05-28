@@ -9,8 +9,12 @@ import os
 import re
 import gc
 import sqlite3
-import psycopg2
-from psycopg2.extras import DictCursor
+try:
+    import psycopg2
+    from psycopg2.extras import DictCursor
+except ImportError:
+    psycopg2 = None
+    DictCursor = None
 from datetime import date, datetime
 import time
 from functools import wraps

@@ -390,6 +390,7 @@ def ver_reportes():
     mina = (request.args.get("mina") or "").strip()
     estado = (request.args.get("estado") or "").strip()
     turno = (request.args.get("turno") or "").strip()
+    grupo = (request.args.get("grupo") or "").strip()
     desde = (request.args.get("desde") or "").strip()
     hasta = (request.args.get("hasta") or "").strip()
 
@@ -426,6 +427,10 @@ def ver_reportes():
             sql += " AND turno = ?"
             params.append(turno)
 
+        if grupo in ("G1", "G2", "G3"):
+            sql += " AND EXISTS (SELECT 1 FROM supervisores_turno s WHERE s.reporte_id = reportes.id AND s.grupo = ?)"
+            params.append(grupo)
+
         # -------------------------
         # Rango de fechas
         # -------------------------
@@ -437,7 +442,7 @@ def ver_reportes():
             sql += " AND fecha <= ?"
             params.append(hasta)
 
-        has_search = bool(mina or estado or turno or desde or hasta)
+        has_search = bool(mina or estado or turno or grupo or desde or hasta)
 
         # Orden final
         sql += " ORDER BY fecha DESC, id DESC"
