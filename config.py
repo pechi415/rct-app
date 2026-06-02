@@ -7,9 +7,9 @@ DB_PATH = os.path.join(INSTANCE_DIR, "rct.db")
 
 BAHIAS_POR_MINA = {
     "ED": [
-        "bahía Banana 2", "bahía Platanal", "bahía Conveyor", "bahía 1.5",
-        "bahía Banana 3", "bahía 5", "bahía 7A", "bahía Retro",
-        "bahía 14", "bahía 15", "bahia 3 postes",
+        "Bahía Banana 2", "Bahía Platanal", "Bahía 1.5",
+        "Bahía Banana 3", "Bahía Retro",
+        "Bahía 14", "Bahía 15",
     ],
     "PB": [
         "Bahía Michoacán", "Bahía R39", "Bahía W3", "Bahía R24",
