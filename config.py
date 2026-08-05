@@ -12,7 +12,7 @@ BAHIAS_POR_MINA = {
         "Bahía 14", "Bahía 15",
     ],
     "PB": [
-        "Bahía Michoacán", "Bahía R39", "Bahía W3", "Bahía R24","Bahía Rampa 24A",
+        "Bahía Michoacán", "Bahía R39", "Bahía W3", "Bahía R24","Bahía Aguila",
         "Bahía Cerrejones", "Bahía San Antonio", "Bahía Los Tupes",
     ],
 }
