@@ -29,6 +29,10 @@ try:
 except OSError:
     HTML = None
 from werkzeug.security import generate_password_hash, check_password_hash
+from dotenv import load_dotenv
+
+load_dotenv()
+
 
 
 
